@@ -1,0 +1,64 @@
+﻿substance_full_string,substance_id
+Ag Lime (CaCO3),ag_lime
+Air,air
+Algal Meal,algal_meal
+Ammonia,ammonia
+Arable Land,arable_land
+Atmospheric CO2,atmospheric_co2
+CO2 Gas,co2_gas
+CO2 Released from Algae Ponds,co2_algae_ponds
+Capital Cost,capital_cost
+Commercial CO2,commercial_co2
+Commercial PV Solar Power,commercial_PV
+Corn Seed,corn_seed
+DDGS,ddgs
+Diesel,diesel
+Electricity,electricity
+Enzymes,enzymes
+EtOH Catalysts,etoh_catalysts
+FT Catalysts,ft_catalysts
+Fertilizer N2O,fertilizer_N2O
+Forestry Residue,forestry_residue
+Forestry Seed,forestry_seed
+Gasoline,gasoline
+Glucose,glucose
+Grass Seed,grass_seed
+Heat,heat
+Herbicide,herbicide
+Hexane Loss,hexane_loss
+Hydrogen,hydrogen
+Insecticide,insecticide
+JP-5,jp5
+JP-8,jp8
+Jet A-1,jet_a1
+Jet-A,jet_a
+LPG,lpg
+LUC Emissions,luc_emissions
+Labor,labor
+Land Area,land_area
+Land Capital Cost,land_capital_cost
+MSW,msw
+MSW Co-Products,msw_co_prods
+Marginal Land,marginal_land
+Naptha,naptha
+Nitrogen Gas,nitrogen_gas
+Nitrogen in Fertilizer,nitrogen_in_fertilizer
+Other N2O,other_N2O
+Phosphorus in Fertilizer,phosphorus_in_fertilizer
+Plastic,plastic
+Potassium in Fertilizer,potassium_in_fertilizer
+Propane,propane
+Rain Water (Blue Water),rain_water
+Saline Water,saline_water
+Slag,slag
+Sodium Hydroxide,sodium_hydroxide
+Soybean Meal,soybean_meal
+Soybean Seed,soybean_seed
+Steam,steam
+Sulfuric Acid,sulfuric_acid
+Syncrude,syncrude
+WOG,wog
+Wastewater,wastewater
+Water,water
+Woody Biomass,woody_biomass
+Yeast,yeast
