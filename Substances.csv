@@ -3,14 +3,22 @@ Ag Lime (CaCO3),ag_lime
 Air,air
 Algal Meal,algal_meal
 Ammonia,ammonia
+Ammonium Sulfate,ammonium_sulfate
 Arable Land,arable_land
 Atmospheric CO2,atmospheric_co2
+Calcium Chloride,calcium_chloride
 CO2 Gas,co2_gas
 CO2 Released from Algae Ponds,co2_algae_ponds
 Capital Cost,capital_cost
 Commercial CO2,commercial_co2
 Commercial PV Solar Power,commercial_PV
+Corn Beer,corn_beer
+Corn Grain,corn_grain
+Corn Oil,corn_oil
 Corn Seed,corn_seed
+Corn Steep Liquor,corn_steep_liquor
+Corn Stover,corn_stover
+Diammonium Phosphate,dap
 DDGS,ddgs
 Diesel,diesel
 Electricity,electricity
@@ -37,8 +45,10 @@ LUC Emissions,luc_emissions
 Labor,labor
 Land Area,land_area
 Land Capital Cost,land_capital_cost
+Lime,lime
 MSW,msw
 MSW Co-Products,msw_co_prods
+Magnesium Sulfate,magnesium_sulfate
 Marginal Land,marginal_land
 Naptha,naptha
 Nitrogen Gas,nitrogen_gas
@@ -47,6 +57,7 @@ Other N2O,other_N2O
 Phosphorus in Fertilizer,phosphorus_in_fertilizer
 Plastic,plastic
 Potassium in Fertilizer,potassium_in_fertilizer
+Potassium Phosphate,potassium_phosphate
 Propane,propane
 Rain Water (Blue Water),rain_water
 Saline Water,saline_water
@@ -56,6 +67,7 @@ Soybean Meal,soybean_meal
 Soybean Seed,soybean_seed
 Steam,steam
 Sulfuric Acid,sulfuric_acid
+Sulfur Dioxide,sulfur_dioxide_SO2
 Syncrude,syncrude
 WOG,wog
 Wastewater,wastewater
