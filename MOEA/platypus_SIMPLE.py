@@ -8,6 +8,7 @@ from platypus import NSGAII, Problem, Real
 import pandas as pd
 import numpy as np
 import time
+import pass_through
 
 start = time.time()
 
@@ -21,6 +22,7 @@ df_data = pd.read_csv('simple_paths.csv',header=0)
 per_unit_costs = df_data['Cost ($/gge)'] 
 per_unit_GHG = df_data['Post-Combustion GHG (g CO2e/MJ)']
 per_unit_land = df_data['Arable Land (m2/GJ/yr)']
+per_unit_N = df_data['Nitrogen (g/GJ)']
 energy_content = df_data['Energy Content (GJ/gal)']
 
 #####################################################################
@@ -33,13 +35,15 @@ def simulate(
         vars, # energy produced gallons each fuel
         pu_costs = per_unit_costs, # costs
         pu_GHG = per_unit_GHG, # emissions
-        pu_land = per_unit_land
+        pu_land = per_unit_land,
+        pu_N = per_unit_N # N fertilizer
         ):
     
     # Empty variables 
     total_costs = 0 # $
     total_GHG = 0 # g
     total_land = 0# m2
+    total_N = 0 #g
     
     Constraints = [] # constraints
     
@@ -48,6 +52,7 @@ def simulate(
         total_costs += vars[i]*pu_costs[i] 
         total_GHG += vars[i]*pu_GHG[i]*energy_content[i]*1000
         total_land += vars[i]*pu_land[i]*energy_content[i]
+        total_N +=vars[i]*pu_N[i]*energy_content[i]
         Constraints.append(-vars[0])
         
     Constraints.append(12000000000 - sum(vars))
@@ -57,6 +62,7 @@ def simulate(
     price = total_costs/sum(vars) # $/gal
     ghg = (total_GHG/sum(vars))*(1/energy_content[0])*(1/1000)#g CO2/MJ
     land = (total_land/sum(vars))*(1/energy_content[0]) #m2/yr/GJ
+    N = (total_N/sum(vars))*(1/energy_content[0]) #g N/GJ
     
     # Returns list of objectives, Constraints
     return [price, ghg, land], Constraints
@@ -120,19 +126,41 @@ df_O = pd.DataFrame(O)
 df_O.columns = ['Price','GHG','Land']
 df_O.to_csv('Objective_Functions.csv')
 
+variables = ["Soybean HEPA","Corn AF","Forestry Biomass FT","Grasses FT","Marine Microalgae HTL"]
+df_D.columns = variables
+for i in range(0,len(variables)):
+    df_O[variables[i]] = df_D[variables[i]]
+    
+N = []
+
+for i in range(0,len(df_O)):
+    total_N = 0
+    gals = 0
+    
+    for j in variables:
+        
+        var_idx = variables.index(j)
+        total_N += df_O.loc[i,j]*per_unit_N[var_idx]*energy_content[var_idx]
+        gals += df_O.loc[i,j]
+
+    N.append(total_N*(1/gals)*(1/energy_content[0]))
+
+df_O['N'] = N
+    
 
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-# marker sizes
-# S = (df_O['GHG']/max(df_O['GHG']))*60
-
 # 3D plot
+
+_min = min(df_O['Price'])
+_max = max(df_O['Price'])
+
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-p = ax.scatter(df_O['Price'], df_O['GHG'], df_O['Land'], c=df_O['Price'], cmap=cm.PiYG, edgecolor = 'black', linewidth = 0.2,s=df_O['GHG'],alpha=1)
+p = ax.scatter(df_O['Price'], df_O['GHG'], df_O['Land'], c=df_O['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=df_O['GHG'],alpha=1)
 ax.view_init(35, 130)
 ax.set_xlabel('Price ($/gge)')
 ax.set_ylabel('GHG (g CO2/MJ)')
@@ -205,128 +233,210 @@ legend2 = ax.legend(handles, labels,title='GHG (g CO2/MJ)',loc='upper right',fon
 plt.savefig('fig4.tiff',dpi=300)
 plt.show()
 
+# plot decision variables
+labels = ["Soybean\nHEPA","Corn\nAF","Forestry\nBiomass FT","Grasses\nFT","Marine\nMicroalgae HTL"]
 
- 
+# min price
+price_list = list(df_O['Price'])
+idx = price_list.index(min(price_list))
+plt.figure()
+plt.bar(labels,df_D.iloc[idx,:])
+plt.xticks(fontsize=8,wrap=True)
+plt.ylabel('Gallons')
+plt.xlabel('Source')
+plt.savefig('fig5.tiff',dpi=300)
+plt.show()
 
-# obj1 = []
-# obj2 = []
+# min GHG
+GHG_list = list(df_O['GHG'])
+idx = GHG_list.index(min(GHG_list))
+plt.figure()
+plt.bar(labels,df_D.iloc[idx,:])
+plt.xticks(fontsize=8,wrap=True)
+plt.ylabel('Gallons')
+plt.xlabel('Source')
+plt.savefig('fig6.tiff',dpi=300)
+plt.show()
 
-# for s in feasible_solutions:
-#     obj1.append(s.objectives[0])
-#     obj2.append(s.objectives[1])
+# min land
+land_list = list(df_O['Land'])
+idx = land_list.index(min(land_list))
+plt.figure()
+plt.bar(labels,df_D.iloc[idx,:])
+plt.xticks(fontsize=8,wrap=True)
+plt.ylabel('Gallons')
+plt.xlabel('Source')
+plt.savefig('fig7.tiff',dpi=300)
+plt.show()
+
+
+# scenario - Cost <$8/gge and post-combustion GHG <70 g/MJ
+A = df_O[df_O['Price']<8]
+B = A[A['GHG']<70]
+C = pd.concat([df_O,B]).drop_duplicates(keep=False)
+
+# 3D plot
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+p = ax.scatter(C['Price'], C['GHG'], C['Land'], c=C['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=C['GHG'],alpha=0.2)
+b = ax.scatter(B['Price'], B['GHG'], B['Land'], c=B['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=B['GHG'],alpha=1)
+ax.view_init(35, 130)
+ax.set_xlabel('Price ($/gge)')
+ax.set_ylabel('GHG (g CO2/MJ)')
+ax.set_zlabel('Land (m2/GJ)')
+
+cbar = plt.colorbar(b, fraction=0.05, pad=0.1, shrink=0.5)
+cbar.set_label('Price ($/gge)',rotation=270,labelpad=12)
+cbar.ax.tick_params(labelsize=8) 
+
+# produce a legend with a cross section of sizes from the scatter
+handles, labels = p.legend_elements(prop="sizes", alpha=1)
+legend2 = ax.legend(handles, labels, title='GHG (g CO2/MJ)',loc='upper left',fontsize=8,framealpha=1)
+
+plt.savefig('fig8.tiff',dpi=300)
+plt.show()
+
+
+# parallel axis plot of decision variable values
     
-# min_obj1_idx = obj1.index(min(obj1))
-# min_obj2_idx = obj2.index(min(obj2))
+columns = list(B.columns)
+min_price = min(B['Price'])
+max_price = max(B['Price'])
 
-# # find solutions' standardized distance to ideal (origin)
-# distance_to_origin_pct = []
-
-# for s in feasible_solutions:
-#     d = ((s.objectives[0]/max(obj1))**2 + (s.objectives[1]/max(obj2))**2)**0.5
-#     distance_to_origin_pct.append(d)
-
+for j in columns:
+    B[j] = B[j]/max(df_O[j])
+B['E'] = B['Price']
+B = B.sort_values(by='Price')
     
-# # select range of standardized solutions to map
-# sorted_distance = np.sort(distance_to_origin_pct)
-# idx = []
-# idx_obj1 = []
-# for i in range(0,99,9):
-#     idx.append(distance_to_origin_pct.index(sorted_distance[i]))
-#     idx_obj1.append(obj1[i])
-    
-# # display the tradeoff frontier    
-# import matplotlib.pyplot as plt
+from pandas.plotting import parallel_coordinates
 
-# plt.scatter([s.objectives[0]/1000 for s in feasible_solutions],
-#             [s.objectives[1] for s in feasible_solutions],c='red',alpha=0.5)
+fig = plt.figure()
 
-# plt.scatter(obj1[min_obj1_idx]/1000,obj2[min_obj1_idx],s=60,c='cyan',edgecolors='gray')
-# plt.scatter(obj1[min_obj2_idx]/1000,obj2[min_obj2_idx],s=60,c='cyan',edgecolors='gray')
+labels = ["Price","GHG","Land","N","Soybean HEPA","Corn AF","Forestry Biomass FT","Grasses FT","Marine Microalgae HTL"]
+ax = parallel_coordinates(B,'E',cols=labels,colormap = 'coolwarm')
+ax.legend().remove()
 
-# for i in idx:
-    
-#     plt.scatter(obj1[i]/1000,obj2[i],s=60,c='cyan',edgecolors='gray')
-    
-# plt.xlabel("Costs ($1000s)")
-# plt.ylabel("Distance (km)")
-# plt.show()
+plt.savefig('fig9.tiff',dpi=300)
+plt.show()
 
+import matplotlib as mpl
 
-# # visualize (map) solutions
-# from urllib.request import urlopen
-# import json
-# with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
-#     counties = json.load(response)
-# import plotly.express as px
-# import plotly.io as pio
-# pio.renderers.default='jpg'
+fig, ax = plt.subplots(figsize=(6, 1))
 
-# # plot in descending order from Obj1
-# df_combined = pd.DataFrame()
-# df_combined['idx'] = idx
-# df_combined['obj1'] = idx_obj1
-# df_sorted = df_combined.sort_values(by='obj1',ascending=False).reset_index(drop=True)
+cmap = mpl.cm.coolwarm
+norm = mpl.colors.Normalize(vmin=min_price, vmax=max_price)
 
-
-# # map minimum obj1 solution
-# s = np.array(feasible_solutions[min_obj1_idx].variables)
-# df_results = pd.DataFrame()
-# df_results['fips'] = fips
-# df_results['CS_ha'] = s
-# df_results['fips'] = df_results['fips'].apply(str)
-# fig = px.choropleth(df_results, geojson=counties, locations='fips', color='CS_ha',
-#                            color_continuous_scale="Viridis",
-#                            range_color=(0, 50),
-#                            scope="usa",
-#                            labels={'CS_ha':'Corn Stover Hectares'}
-#                           )
-# fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-# fig.update_geos(fitbounds="locations", visible=False)
+cb1 = mpl.colorbar.ColorbarBase(ax, cmap=cmap,
+                                norm=norm,
+                                orientation='horizontal')
+cb1.set_label('Price ($/gge)')
 # fig.show()
-
-# # map rest of selected solutions
-# for i in range(0,len(df_sorted)):
-#     j = df_sorted.loc[i,'idx']
-#     s = np.array(feasible_solutions[j].variables)
-#     df_results = pd.DataFrame()
-#     df_results['fips'] = fips
-#     df_results['CS_ha'] = s
-#     df_results['fips'] = df_results['fips'].apply(str)
-#     fig = px.choropleth(df_results, geojson=counties, locations='fips', color='CS_ha',
-#                                color_continuous_scale="Viridis",
-#                                range_color=(0, 50),
-#                                scope="usa",
-#                                labels={'CS_ha':'Corn Stover Hectares'}
-#                               )
-#     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-#     fig.update_geos(fitbounds="locations", visible=False)
-#     fig.show()
-
-# # map minimum obj2 solution
-# s = np.array(feasible_solutions[min_obj2_idx].variables)
-# df_results = pd.DataFrame()
-# df_results['fips'] = fips
-# df_results['CS_ha'] = s
-# df_results['fips'] = df_results['fips'].apply(str)
-# fig = px.choropleth(df_results, geojson=counties, locations='fips', color='CS_ha',
-#                            color_continuous_scale="Viridis",
-#                            range_color=(0, 50),
-#                            scope="usa",
-#                            labels={'CS_ha':'Corn Stover Hectares'}
-#                           )
-# fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-# fig.update_geos(fitbounds="locations", visible=False)
-# fig.show()
+# plt.savefig('colorbar.tiff',dpi=300)
 
 
+# scenario #2 - Cost <$8/gge and post-combustion GHG <70 g/MJ and Land < 90m2/GJ
+A = df_O[df_O['Price']<8]
+B = A[A['GHG']<70]
+C = B[B['Land']<90]
+D = pd.concat([df_O,C]).drop_duplicates(keep=False)
+
+# 3D plot
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+p = ax.scatter(D['Price'], D['GHG'], D['Land'], c=D['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=D['GHG'],alpha=0.2)
+b = ax.scatter(C['Price'], C['GHG'], C['Land'], c=C['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=C['GHG'],alpha=1)
+ax.view_init(35, 130)
+ax.set_xlabel('Price ($/gge)')
+ax.set_ylabel('GHG (g CO2/MJ)')
+ax.set_zlabel('Land (m2/GJ)')
+
+cbar = plt.colorbar(b, fraction=0.05, pad=0.1, shrink=0.5)
+cbar.set_label('Price ($/gge)',rotation=270,labelpad=12)
+cbar.ax.tick_params(labelsize=8) 
+
+# produce a legend with a cross section of sizes from the scatter
+handles, labels = p.legend_elements(prop="sizes", alpha=1)
+legend2 = ax.legend(handles, labels, title='GHG (g CO2/MJ)',loc='upper left',fontsize=8,framealpha=1)
+
+plt.savefig('fig10.tiff',dpi=300)
+plt.show()
+
+
+# parallel axis plot of decision variable values
+
+columns = list(C.columns)
+min_price = min(C['Price'])
+max_price = max(C['Price'])
+
+for j in columns:
+    C[j] = C[j]/max(df_O[j])
+C['E'] = C['Price']
+C = C.sort_values(by='Price')
     
-# # # plot status quo
-# ax.scatter(x/1000,y,-z,c='blue',s=36)
-# ax.set_xlabel("Developer Profits ($1000s)")
-# ax.set_ylabel("Ratio")
-# ax.set_zlabel("Monthly Variability")
+from pandas.plotting import parallel_coordinates
 
-# plt.show()
+fig = plt.figure()
 
+labels = ["Price","GHG","Land","N","Soybean HEPA","Corn AF","Forestry Biomass FT","Grasses FT","Marine Microalgae HTL"]
+ax = parallel_coordinates(C,'E',cols=labels,colormap = 'coolwarm')
+ax.legend().remove()
+
+plt.savefig('fig11.tiff',dpi=300)
+plt.show()
+
+# scenario #3 - Cost <$8/gge and post-combustion GHG <70 g/MJ and Land < 90m2/GJ and N < 700 g/MJ
+
+A = df_O[df_O['Price']<8]
+B = A[A['GHG']<70]
+C = B[B['Land']<90]
+D = C[C['N']<700]
+E = pd.concat([df_O,D]).drop_duplicates(keep=False)
+
+# 3D plot
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+p = ax.scatter(E['Price'], E['GHG'], E['Land'], c=E['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=E['GHG'],alpha=0.2)
+b = ax.scatter(D['Price'], D['GHG'], D['Land'], c=D['Price'], cmap=cm.PiYG, vmin = _min, vmax = _max, edgecolor = 'black', linewidth = 0.2,s=D['GHG'],alpha=1)
+ax.view_init(35, 130)
+ax.set_xlabel('Price ($/gge)')
+ax.set_ylabel('GHG (g CO2/MJ)')
+ax.set_zlabel('Land (m2/GJ)')
+
+cbar = plt.colorbar(b, fraction=0.05, pad=0.1, shrink=0.5)
+cbar.set_label('Price ($/gge)',rotation=270,labelpad=12)
+cbar.ax.tick_params(labelsize=8) 
+
+# produce a legend with a cross section of sizes from the scatter
+handles, labels = p.legend_elements(prop="sizes", alpha=1)
+legend2 = ax.legend(handles, labels, title='GHG (g CO2/MJ)',loc='upper left',fontsize=8,framealpha=1)
+
+plt.savefig('fig12.tiff',dpi=300)
+plt.show()
+
+
+# parallel axis plot of decision variable values
+
+columns = list(D.columns)
+min_price = min(D['Price'])
+max_price = max(D['Price'])
+
+for j in columns:
+    D[j] = D[j]/max(df_O[j])
+D['E'] = D['Price']
+D = D.sort_values(by='Price')
+    
+from pandas.plotting import parallel_coordinates
+
+fig = plt.figure()
+
+labels = ["Price","GHG","Land","N","Soybean HEPA","Corn AF","Forestry Biomass FT","Grasses FT","Marine Microalgae HTL"]
+ax = parallel_coordinates(D,'E',cols=labels,colormap = 'coolwarm')
+ax.legend().remove()
+
+plt.savefig('fig13.tiff',dpi=300)
+plt.show()
 
 
