@@ -11,168 +11,150 @@ Created on Mon Nov 16 12:11:55 2020
 #################  SETUP #####################
 ##############################################
 
-import pandas as pd
-import numpy as np
-import pint 
+import TEA_LCA_Data as D
+import UnivFunc as UF
 
-#   Conversions (Consider making this a separate module or script or whatever the proper term is)
+#   Writing each of the substances to a dictionary as above is only really justified if you can leverage a 
+#   For-loop in the calculation part of the model. As the relationships get more complex, this gets infeasible.
 
-km_per_mi       = 1.60934
-acre_per_ha     = 2.47105
-kg_per_BuC      = 25.4      # Note that BuC here denotes a Bushel of Corn
-kg_per_lbs      = 0.453515
-ton_per_kg      = 0.001102
-BuC_per_kg      = 0.03937
-L_per_Gal       = 3.78541
-acrft_per_Gal   = 0.00000306889
-m3_per_Gal      = 0.003785 
-
-#   Instantiate Pandas dataframe type to handle material flows 
-
-Material_Flows = pd.Series([17.69,161.37,15.65,76.09,125.52,9.06,91.35,25.78,452,1.213,34,50],
-                           ["Seeds","NitrogenFert","PhosphFert","PotassiumFert","NitrogenInt","PhosphInt","PotassiumInt","SulfurInt","Aglime","Herbicide","Precip (in)","StoverCollected (%)"])
-
-#   When we move to integrate pint, we will no longer be stuck performing a string-matching
-#   operation whenever we want to reference a particular index of the array (currently two frames)
+#   What is the non-dictionary procedure for altering the units?
 
 ##############################################
 ################# GROWTH #####################
 ##############################################
 
 
-#   Definition of relevant variables:
+#   Definition of relevant variables (faux inputs):
     
+land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
+
+yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')    
+
+stover_collected = 0.5 
+
+#   Not a substance, so updating the .csv does not seem like the proper path forward.
+#   Is this an acceptable way to define this?
+
+# stover_scaling_dict = {}    # For units - I am currently scaling everything based off of rainfall 
+#                                 # the percentage of stover collected...
     
-def grow_Stover():
-    seeds = Material_Flows[0]
-    NFert = Material_Flows[1]
-    PFert = Material_Flows[2]
-    KFert = Material_Flows[3]
-    NInt = Material_Flows[4]
-    PInt = Material_Flows[5]
-    KInt = Material_Flows[6]
-    SInt = Material_Flows[7]
-    Aglime = Material_Flows[8]
-    Herb = Material_Flows[9]
-    Precip = Material_Flows[10]
-    StoverCollected = Material_Flows[11]
+# stover_scaling_dict['Rain Water (Blue Water'] = D.TEA_LCA_Qty(
+#      D.substance_dict['Rain Water (Blue Water)'], 253236, 'kg/yr/in')
+       
+def grow_stover(size,yearly_precip):
     
-#   Calculation and Modeling:    
+#    scales = stover_scaling_dict
+ 
+    return_array = UF.createEmptyFrame()    
+    # A local instantiation of the return array datafram is preferable, here
+
+    # These following lines perform the same write operation that the for-loop
+    # does, but individually.  The for-loop should only be applied when the 
+    # relationship for each substance is exactly the same (which will not be 
+    # the case as the Xcel process model relationships are brought in to the
+    # program)   
     
-    # Block 110 - Land Dedication and Seeding
+    ############    INPUTS    ###############    
     
-        # What do with the mass of seeds? Do I update Material_Flows?
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'], 17.69, 'kg/ha/yr')
+       
+    return_array.loc[0] = UF.getWriteRow('Corn Seed', D.biomass_production, 
+                                      D.tl_input, scale1.qty*size.qty)
     
-    # Block 120 - Water Throughput
+    # The operation above, then, writes in to the return array the amount of 
+    # corn seed needed, scaled up by 17.69 kg/ha/yr
     
-        # Probably do not need to list the amount of water we expect Not to collect
+    scale2 = D.TEA_LCA_Qty(D.substance_dict['Nitrogen in Fertilizer'], 161.37, 'kg/ha/yr')
     
-    # Block 130 - Fertilizers (N, P, K)
-        
-    NTot = NFert + NInt
-    PTot = PFert + PInt
-    KTot = KFert + KInt
+    return_array.loc[1] = UF.getWriteRow('Nitrogen in Fertilizer', D.biomass_production,
+                                      D.tl_input, scale2.qty*size.qty)
     
-    # Block 140 - Soil pH Management
+    scale3 = D.TEA_LCA_Qty(D.substance_dict['Phosphorus in Fertilizer'], 15.65, 'kg/ha/yr')
     
-        # Expended on the Field
+    return_array.loc[2] = UF.getWriteRow('Phosphorus in Fertilizer', D.biomass_production,
+                                      D.tl_input, scale3.qty*size.qty)
     
-    # Block 160 - Herbicide Application
-        
-        # Atrazine for Corn Stover Production, could consider adding drop-down list
-        
-    # Block 170 - Crop Operations 
+    scale4 = D.TEA_LCA_Qty(D.substance_dict['Potassium in Fertilizer'], 76.09, 'kg/ha/yr')
     
-    Labor_170 = 2.965
-    Diesel_170 = 56.124     # Liters of Diesel
+    return_array.loc[3] = UF.getWriteRow('Potassium in Fertilizer', D.biomass_production,
+                                      D.tl_input, scale4.qty*size.qty)
     
-    # Block 180 - Growth and Harvest Yield
+    scale5 = D.TEA_LCA_Qty(D.substance_dict['Ag Lime (CaCO3)'], 452, 'kg/ha/yr')
     
-    Precip_kg = Precip/12 * acre_per_ha / acrft_per_Gal * m3_per_Gal *997
+    return_array.loc[4] = UF.getWriteRow('Ag Lime (CaCO3)', D.biomass_production,
+                                      D.tl_input, scale5.qty*size.qty)
     
-    Water_Cons = 0.541693991        # Water which actually goes through some corn plant throughout the year
-                                    # everything else does not interact with the corn, not really worth 
-                                    # quantifying, but the 'growth' model is set up to take this route.
-                                    # Would be good to clean this up before discussion even starts about 
-                                    # integrating a specific growth model or collecting growth data.
-                                    
-    Water_Thru = 0.997700642        # And the other value which I am not happy about. I am concerned that
-                                    # Python is going to interpret this as a particular variable type and
-                                    # that we will run into a truncation error at some point. Again, worth 
-                                    # changing this to something more intuitive/simple (i.e. soy growth)
-                                    
-    Water_avail = Precip_kg * Water_Cons
-    Water_Cycled_thru = Water_avail * Water_Thru
+    scale6 = D.TEA_LCA_Qty(D.substance_dict['Herbicide'], 1.21, 'kg/ha/yr')
     
-    Water_Struct = Water_avail - Water_Cycled_thru  # The amount of water which remains with the plant for 
-                                                    # the construction of the cell walls, etc. The matter
+    return_array.loc[5] = UF.getWriteRow('Herbicide', D.biomass_production,
+                                      D.tl_input, scale6.qty*size.qty)
     
-    Growth_SF = Water_Struct/10724.24131            # Scaling factor for the growth logic/behavior
+    # Stover_Collected_FV = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'kg/in')
     
-    # a = (Growth_SF - 1)**(1.75)
-    # b = - abs(a)
-    # c = Water_Struct**b
-    # d = Water_Struct - 10724.24131
+    # Running into an issue with the units; if I am scaling off of the inches of rainfall
+    # for the substance production of other flows. I need a faux variable to get them to read properly;
     
-    H20_Ratio_BM = 1*Water_Struct     # 
-    # H20_Ratio_BM = Water_Struct + (Water_Struct - 10724.24131)*(Water_Struct**(-abs((Growth_SF - 1)**1.75)))
+    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253236, 'kg/in/ha/yr')
     
-                                    # And this is the gross calculation. The hardcoded 10724 value is the avg
-                                    # amount of water which stays in the corn plants.  The Growth Scaling Factor
-                                    # is responsible for the attenuation of the impact that more or less rain has
-                                    # 1.75 was selected by personal preference/expectation of plany behavior based
-                                    # on the rain present each year; changing this will change how sensitive the 
-                                    # corn plant is to the changing rainfall. 
+    return_array.loc[6] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
+                                      D.tl_input, scale7.qty*yearly_precip.qty*size.qty)
+   
+    # I also need to go in and add things like the economic value associated with the process,
+    # as well as other inputs which haven't been updated in Substances.csv (especially the 
+    # km*tons that the trucks are required to move; within pathway optimization parameters.)
     
-    Biomass_Produced = H20_Ratio_BM / 0.46 * 15.997/18.01528   # Assumes plant is 46% carbon by mass
+    ############    OUTPUTS   ###############
     
-    Corn_Grain = 0.53 * Biomass_Produced            # This ratio needs a citation
-    Corn_Stover_Tot = 0.47 * Biomass_Produced
+    # QUESTION - What is proper to name the Corn Stover left on the field vs
+    # the stover collected? i.e. must they always have a corresponding entry 
+    # in the 'substances' .csv?
     
-    Corn_Stover = Corn_Stover_Tot * StoverCollected / 100
-    Corn_Stover_Unused = Corn_Stover_Tot - Corn_Stover
+    scale8 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Collected'], 327.24, 'kg/in/ha/yr')
     
-    CO2_Sequestered = H20_Ratio_BM / 0.436 * (12.017/44.01)  
+    return_array.loc[7] = UF.getWriteRow('Corn Stover Collected', D.biomass_production, 
+                                      D.tl_output, scale8.qty*yearly_precip.qty*stover_collected*size.qty)
     
-    # Block 190 - Transportation to Biorefinery
+    # Again, hard-coded value relates the inches of precipation to total kg
+    # stover produced. The more complex relationship may be brought in from 
+    # Excel, but my assumption is that a lookup operation will take its place
+    # in the near future anyway.
     
-    Tonne_Cap_Truck = 20    # Citation Needed
+    scale9 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Left'], 327.24, 'kg/in/ha/yr')
     
-    Avg_Dist = 35.36 * km_per_mi    # I believe that I had a reference which claimed the average corn-stover
-                                    # plant traveled fifty miles to bioprocessing, but I cannot locate that source.
-                                    # Another possibility is that the assumptions for the TEA portion of the CS model
-                                    # assume material is collected within a radius of 50 miles... 
-                                    # 35.36 represents 50/sqrt(2), as I believe (though my geometry is very rusty) that
-                                    # this represents the average distance to the centroid that any point in the circle
-                                    # might have. 
-                                    
-    Trucks_reqd = Corn_Stover / (Tonne_Cap_Truck * 1000)
+    return_array.loc[8] = UF.getWriteRow('Corn Stover Left', D.biomass_production, 
+                                      D.tl_output, scale9.qty*yearly_precip.qty*size.qty*(1-stover_collected))
     
-        # I think it might be worth converting from trucks required to tonne*km, 
-        # I believe that Dr. Kern did so for the MOEA and that this is the standard
-        # practice for this calculation
+    scale10 = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], 369.02, 'kg/in/ha/yr')
     
-    # Post-processing and Aggregation:
+    return_array.loc[9] = UF.getWriteRow('Corn Grain', D.biomass_production, 
+                                      D.tl_output, scale10.qty*yearly_precip.qty*size.qty)
     
-    Matl_Reqd_CS_Cult = pd.Series([Corn_Stover, Corn_Stover_Unused, Corn_Grain, Labor_170, Diesel_170, Trucks_reqd],['Corn Stover', 'Unused Corn Stover','Corn Grain', 'Labor 170','Diesel 170', 'Trucks Required (#)']) 
-    # Materials_Reqd_CS_Cult = pd.Series.replace(0, Corn_Stover)
-    # Materials_Reqd_CS_Cult = pd.Series.replace(1, Corn_Stover_Unused)
-    # Materials_Reqd_CS_Cult = pd.Series.replace(2, Corn_Grain)
-    # Materials_Reqd_CS_Cult = pd.Series.replace(3, Labor_170)
-    # Materials_Reqd_CS_Cult = pd.Series.replace(4, Diesel_170)
-    # Materials_Reqd_CS_Cult = pd.Series.replace(5, Trucks_reqd)
-    #Materials_Reqd_CS_Cult = pd.Series(1,2,3,4,5,6)
-    # print(Materials_Reqd_CS_Cult)
-    # print(Corn_Grain)
-    # return Corn_Stover
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha/yr')
     
-    return Corn_Stover
-    # print("\n")
-    # print("Required Materials for CS Cultivation (kg / ha)")
-    # print("\n")
-    # print(Material_Flows)
-    # print("\n")
-    # print("\n")
-    # print("Material Outputs from CS Cultivation (kg / ha)")
-    # print("\n")
-    # print(Matl_Reqd_CS_Cult)
+    return_array.loc[10] = UF.getWriteRow('Capital Cost', D.biomass_production,
+                                      D.tl_input, scale11.qty*size.qty)
+    
+    scale12 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha/yr')
+    
+    return_array.loc[11] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
+                                      D.tl_input, scale12.qty*size.qty)
+    
+    scale13 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 33.33333, 'dollars/ha/yr')
+    
+    return_array.loc[12] = UF.getWriteRow('Labor', D.biomass_production,
+                                      D.tl_input, scale13.qty*size.qty)
+    
+    scale14 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 252875, 'kg/in/ha/yr') # Total water eventually returned
+    
+    return_array.loc[13] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
+                                      D.tl_output, scale14.qty*yearly_precip.qty*size.qty)
+    
+    return return_array
+
+def main():
+    land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
+    yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')
+    return grow_stover(land_area_val, yearly_precip)
+
+if __name__ == "__main__":
+    output = main()

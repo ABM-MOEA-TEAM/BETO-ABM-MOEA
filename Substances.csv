@@ -6,6 +6,7 @@ Ammonia,ammonia
 Ammonium Sulfate,ammonium_sulfate
 Arable Land,arable_land
 Atmospheric CO2,atmospheric_co2
+Biodiesel,biodiesel
 Calcium Chloride,calcium_chloride
 CO2 Gas,co2_gas
 CO2 Released from Algae Ponds,co2_algae_ponds
@@ -18,18 +19,23 @@ Corn Oil,corn_oil
 Corn Seed,corn_seed
 Corn Steep Liquor,corn_steep_liquor
 Corn Stover,corn_stover
+Corn Stover Collected,corn_stover_collected
+Corn Stover Left,corn_stover_left
 Diammonium Phosphate,dap
 DDGS,ddgs
 Diesel,diesel
 Electricity,electricity
 Enzymes,enzymes
+Ethanol,etoh
 EtOH Catalysts,etoh_catalysts
+FAMEs and Glycerol,fames_glycerol
 FT Catalysts,ft_catalysts
 Fertilizer N2O,fertilizer_N2O
 Forestry Residue,forestry_residue
 Forestry Seed,forestry_seed
 Gasoline,gasoline
 Glucose,glucose
+Glycerol,glycerol
 Grass Seed,grass_seed
 Heat,heat
 Herbicide,herbicide
@@ -50,10 +56,12 @@ MSW,msw
 MSW Co-Products,msw_co_prods
 Magnesium Sulfate,magnesium_sulfate
 Marginal Land,marginal_land
+Methanol,methanol
 Naptha,naptha
 Nitrogen Gas,nitrogen_gas
 Nitrogen in Fertilizer,nitrogen_in_fertilizer
 Other N2O,other_N2O
+Phosphoric Acid (H3PO4),phosph_acid
 Phosphorus in Fertilizer,phosphorus_in_fertilizer
 Plastic,plastic
 Potassium in Fertilizer,potassium_in_fertilizer
@@ -63,6 +71,7 @@ Rain Water (Blue Water),rain_water
 Saline Water,saline_water
 Slag,slag
 Sodium Hydroxide,sodium_hydroxide
+Soybeans,soybeans
 Soybean Meal,soybean_meal
 Soybean Seed,soybean_seed
 Steam,steam

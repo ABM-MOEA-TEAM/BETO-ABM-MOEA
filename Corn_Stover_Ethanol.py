@@ -1,124 +1,76 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 23 13:53:49 2020
+Created on Mon Dec  7 16:58:22 2020
 
-@author: Jacks074
+@author: jacks074
 """
-import pandas as pd
-import Corn_Stover_Cultivation as CS_Cult
 
-Material_Flows = pd.Series([18876,151,52,18366,140,5.244,0.903,80.676,0.744,1.042,
-                            1.488,0.223,0.276,8.700,6,71,137,10],
-                           ["Water_DAH","H2SO4_DAH","NH3_DAH","Water_EH","Glucose_EP",
-                            "NH3_EP","SO2_EP","CSL_EP","Corn_Oil_EP","AmSulf_EP",
-                            "PotSulf_EP","MgSulf_EP","CaCl2_EP","DAP_EP","CSL_F",
-                            "Flue_Gas_WT","NaOH_WT","Gas"])
+# Corn Stover Conversion - Ethanol
+import TEA_LCA_Data as D
+import UnivFunc as UF
+import Corn_Stover_Cultivation as CSC
 
-def Ethanol_Stover():
+def ethanol_stover(biomass_IO_array):
     
-    Biomass = CS_Cult.grow_Stover()
-    Biomass = round(Biomass)
+    return_array = UF.createEmptyFrame()    
     
-    #   Block 200 - Size Reduction and Comminution Process
+    match_list = [[UF.input_or_output, D.tl_output],
+                 [UF.substance_name, 'Corn Stover Collected']]      # Grab the total amount of stover sent to BPP
     
-        #   Hammer mill is used to reduce the size of the corn stover particulates (believe it is 5mm)
+    corn_stover_qty = UF.returnPintQty(biomass_IO_array, match_list)
+      
+    return_array.loc[0] = UF.getWriteRow('Water', D.conv, 
+                                      D.tl_input, 7.655*corn_stover_qty)
     
-    Matl_Pass_Thru = 0.97
-    Biomass = Biomass*Matl_Pass_Thru    # Expecting to lose some mass on input (grate)
+    return_array.loc[1] = UF.getWriteRow('Sulfuric Acid', D.conv, 
+                                      D.tl_input, 0.0532*corn_stover_qty)
+
+    return_array.loc[2] = UF.getWriteRow('Ammonia', D.conv, 
+                                      D.tl_input, 0.0117*corn_stover_qty)
     
-    kWh_Per_Tonne_200 = 39
-    MJ_Per_kg_Stover = kWh_Per_Tonne_200 / 1000 * 3.6
+    return_array.loc[3] = UF.getWriteRow('Glucose', D.conv, 
+                                      D.tl_input, 0.0252*corn_stover_qty)
     
-    Comminution_Elec = MJ_Per_kg_Stover * Biomass
-    Matl_Handling_E_200 = 66.61
+    return_array.loc[4] = UF.getWriteRow('Corn Steep Liquor', D.conv, 
+                                      D.tl_input, 0.0145*corn_stover_qty)
     
-    #   Block 300 - Dilute Acid Hydrolysis
+    return_array.loc[5] = UF.getWriteRow('Lime', D.conv, 
+                                      D.tl_input, 0.0128*corn_stover_qty)
     
-        #   Sulfuric Acid is used to break down the biomass feedstock (Ammonia is used to neutralize)
+    return_array.loc[6] = UF.getWriteRow('Sodium Hydroxide', D.conv, 
+                                      D.tl_input, 0.0246*corn_stover_qty)
     
-    Ratio_Water_Stover_300 = 4
-    Perc_Acid_By_Weight = 0.08
-    Molar_Mass_H2SO4 = 98.079       #   Gram/Mole
-    Molar_Mass_NH3 = 17.031
-    Base_To_Neutralize = ((Molar_Mass_NH3 * 2/Molar_Mass_H2SO4))       #   Molar Mass NH3 * 2 / Molar Mass H2SO4
-                                    #   Verify that two is the proper stoich. Coeff
-    C_P_Water   = 4.84              #   kJ/kg*C
-    C_P_Stover  = 1.03              
-    C_P_H2SO4   = 1.34
-    Final_T_300 = 175               #   C
-    Init_T_300  = 20                #   C
-    Total_Mass_Conv_Perc_300 = 0.9730
+    return_array.loc[7] = UF.getWriteRow('Gasoline', D.conv, 
+                                      D.tl_input, 0.018*corn_stover_qty)
     
-    Dilution_Water_300 = Ratio_Water_Stover_300 * Biomass
-    Acid_Weight = Perc_Acid_By_Weight * Dilution_Water_300 / 10
+    return_array.loc[8] = UF.getWriteRow('Corn Beer', D.conv, 
+                                      D.tl_output, 4.727*corn_stover_qty)
     
+    return_array.loc[9] = UF.getWriteRow('Ethanol', D.conv,
+                                      D.tl_output, 0.25365*corn_stover_qty)
     
-    Q_Reqd      = (Dilution_Water_300 * C_P_Water *(Final_T_300 - Init_T_300)) + (Biomass*C_P_Stover*(Final_T_300 - Init_T_300)) + (Acid_Weight* C_P_H2SO4*(Final_T_300 - Init_T_300))
+    return_array.loc[10] = UF.getWriteRow('Corn Stover Collected', D.conv,
+                                      D.tl_input, corn_stover_qty)
     
-    Pre_Hydrolysate = Biomass + Dilution_Water_300 + Acid_Weight + Base_To_Neutralize
-    Biomass = Biomass * Total_Mass_Conv_Perc_300
-    Waste_Water_300 = Pre_Hydrolysate - Biomass
-    Matl_Handling_E_300 = 224.30
+    return return_array
     
-    #   Block 400 - Enzymatic Hydrolysis
+def main():
+    land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
+    yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')
+    biomass_IO_array = CSC.grow_stover(land_area_val,yearly_precip)
+    # addendum_IO_array = UF.createEmptyFrame()
     
-        #   Enzyme Added in final breakdown step
-        
-    Ratio_Water_Hydrolysate_400  = 4
-    Ratio_Cellulase_Cellulose    = 0.02
-    Final_T_400                  = 175
-    Init_T_400                   = 48
+    # addendum_IO_array.loc[0] = UF.getWriteRow('Jet-A', D.conv, 
+    #                                   D.tl_output, 0*land_area_val.qty)
     
-    Dilution_Water_400 = Biomass * Ratio_Water_Hydrolysate_400
-    Cellulase = Ratio_Cellulase_Cellulose * Biomass * 0.4105        #   Ratio Cellulase
+    # addendum_IO_array.loc[1] = UF.getWriteRow('Diesel', D.conv, 
+    #                                   D.tl_output, 0*land_area_val.qty)
     
-    Q_Cooling_400 = (Biomass * C_P_Stover*(Final_T_400 - Init_T_300))/1000
-    Matl_Handling_E_400 = 50.21
+    # addendum_IO_array.loc[2] = UF.getWriteRow('Electricity', D.conv, 
+    #                                   D.tl_output, 0*land_area_val.qty)
     
-    Hydrolysate = Biomass + Dilution_Water_400 + Cellulase
-    Biomass = Biomass
-    
-    #   Block 500 - Enzyme Production 
-    
-        #   Nutrients required to grow the cellulase enzyme
-        
-    Matl_Handling_E_500            = 1343.51
-    # Glucose_500         = Material_Flows([4])
-    # Ammonia_500         = Material_Flows([5])
-    # SO2_500             = Material_Flows([6])
-    # CSL_500             = Material_Flows([7])
-    # Corn_Oil_500        = Material_Flows([8])         Don't know if these are needed beyond
-    # Ammon_Sulf_500      = Material_Flows([9])         The input matrix
-    # Potass_Phosph_500   = Material_Flows([10])
-    # Mag_Sulf_500        = Material_Flows([11])
-    # Calc_Chlor_500      = Material_Flows([12])
-    # DAP_500             = Material_Flows([13])
-    
-    #   Block 600 - Fermentation 
-    
-    Corn_Beer           = Hydrolysate
-    Matl_Handling_E_600 = 50.21
-    
-    Glucose_Proportion  = 0.406815352
-    Xylose_Proportion   = 0.210313
-    Gay_Lussac_Yield    = 0.511         #   Maximum stoichiometric yield
-    Overall_Yield_Eff   = 0.931
-    Gluc_to_Eth         = 0.95
-    Xylose_to_Eth       = 0.83
-    
-    Biomass_To_Eth = (Glucose_Proportion * Gluc_to_Eth)+(Xylose_Proportion * Xylose_to_Eth)
-    
-    Ethanol = Biomass_To_Eth * Biomass * Gay_Lussac_Yield * Overall_Yield_Eff
-    
-    #   Block 700 - Distillation and Dehydration 
-    
-    Matl_Handling_E_700 = 3089.34
-    Heating_Power_700   = 11960.03
-    
-    Ethanol = round(Ethanol)
-    
-    Matl_Handl_Series = pd.Series([Matl_Handling_E_200, Matl_Handling_E_300, Matl_Handling_E_400,
-                                  Matl_Handling_E_500, Matl_Handling_E_600, Matl_Handling_E_700],
-                                  ["MHE_200","MHE_300","MHE_400","MHE_500","MHE_600","MHE_700"])
-    
-    return Ethanol
+    # biomass_IO_array = biomass_IO_array.append(addendum_IO_array,ignore_index=True)
+    return ethanol_stover(biomass_IO_array)
+
+if __name__ == "__main__":
+    output = main()

@@ -31,18 +31,43 @@ def calcEROI(tl_array):
 
 # Calculate GHG Impact
 def calcGHGImpact(tl_array):
-    jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
+    
+    if 'Jet-A' in tl_array:
+        jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
-    diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
+    else:
+        jet_a_out = 0
+    
+    if 'Diesel' in tl_array:
+        diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
-    gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
+    else:
+        diesel_out = 0
+    
+    if 'Gasoline' in tl_array:
+        gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude   # Need to edit this so that it includes all possible final fuel types
+    else:
+        gasoline_out = 0
+    
+    if 'Ethanol' in tl_array:
+        ethanol_out = UF.returnPintQty(tl_array, [[UF.substabce_name, 'Ethanol'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
-    transport_fuel_energy = 46.0*(jet_a_out+diesel_out+gasoline_out)
+    else:
+        ethanol_out = 0
+        
+    if 'Biodiesel' in tl_array:
+        biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+    else:
+        biodiesel_out = 0
+        
+    transport_fuel_energy = 46*(jet_a_out + diesel_out + gasoline_out + ethanol_out + biodiesel_out)
     
     # note that excel formula has a few others. zero for grass so omitting.
     total_MJ = transport_fuel_energy + UF.returnPintQty(tl_array, [[UF.substance_name, 'Electricity'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
-    
+        
     GHG_impact = 0
     
     for i in range(len(tl_array)):

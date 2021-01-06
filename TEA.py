@@ -11,13 +11,39 @@ yrs = 30 #userinputs.yrs
 # function used for goal finding
 def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
              loanpay, tl_array):
-    jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    transport_fuel_energy = 46.0*(jet_a_out+diesel_out+gasoline_out)
+    if 'Jet-A' in tl_array:
+        jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
+                                       [UF.input_or_output, D.tl_output]]).magnitude
+    else:
+        jet_a_out = 0
+    
+    if 'Diesel' in tl_array:
+        diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
+                                       [UF.input_or_output, D.tl_output]]).magnitude
+    else:
+        diesel_out = 0
+    
+    if 'Gasoline' in tl_array:
+        gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
+                                       [UF.input_or_output, D.tl_output]]).magnitude
+    else:
+        gasoline_out = 0
+        
+    if 'Ethanol' in tl_array:
+        ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
+                                       [UF.input_or_output, D.tl_output]]).magnitude
+    else:
+        ethanol_out = 0
+    
+    if 'Biodiesel' in tl_array:
+        biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
+                                       [UF.input_or_output, D.tl_output]]).magnitude
+    else: 
+        biodiesel_out = 0
+        
+    transport_fuel_energy = 46.0*(jet_a_out+diesel_out+gasoline_out+ethanol_out+biodiesel_out)
+    
+    
     nonfuel_value = calcNonFuelValue(tl_array)
     annrevenue =  nonfuel_value + price_per_MJ * transport_fuel_energy
     
