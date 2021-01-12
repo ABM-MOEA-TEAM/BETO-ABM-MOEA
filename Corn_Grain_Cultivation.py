@@ -57,7 +57,7 @@ def grow_corn(size,yearly_precip):
     return_array.loc[7] = UF.getWriteRow('Corn Stover Left', D.biomass_production, 
                                       D.tl_output, scale8.qty*yearly_precip.qty*size.qty)
     
-    scale9 = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], 369.02, 'kg/in/ha/yr')
+    scale9 = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], 322.759, 'kg/in/ha/yr')
     
     return_array.loc[8] = UF.getWriteRow('Corn Grain', D.biomass_production, 
                                       D.tl_output, scale9.qty*yearly_precip.qty*size.qty)

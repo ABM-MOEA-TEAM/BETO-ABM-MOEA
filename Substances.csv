@@ -2,6 +2,7 @@
 Ag Lime (CaCO3),ag_lime
 Air,air
 Algal Meal,algal_meal
+Alpha_Amylase,alpha_amylase
 Ammonia,ammonia
 Ammonium Sulfate,ammonium_sulfate
 Arable Land,arable_land
@@ -35,6 +36,7 @@ Forestry Residue,forestry_residue
 Forestry Seed,forestry_seed
 Gasoline,gasoline
 Glucose,glucose
+Glucoamylase,glucoamylase
 Glycerol,glycerol
 Grass Seed,grass_seed
 Heat,heat
@@ -78,6 +80,7 @@ Steam,steam
 Sulfuric Acid,sulfuric_acid
 Sulfur Dioxide,sulfur_dioxide_SO2
 Syncrude,syncrude
+Urea,urea
 WOG,wog
 Wastewater,wastewater
 Water,water
