@@ -83,4 +83,4 @@ def calcGHGImpact(tl_array):
                                       D.LCA_GHG_impact)
             GHG_impact += (LCA_val * mag)
 
-    return 75 + GHG_impact/total_MJ            
+    return 75 + GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting
