@@ -43,7 +43,8 @@ path_list = [Path(cwd + '/LCA_Inventory.csv'),
 # LCA Inventory Variables
 LCA_key_str = 'Key_String'
 LCA_IO = 'In_or_out'
-LCA_energy_impact = 'Energy_Impact'
+LCA_units = 'Default_Unit'
+LCA_energy_impact = 'Energy_Impact (MJ/X)'
 LCA_cost = 'Cost'
 LCA_GHG_impact = 'GHG_Impact'
 LCA_inventory_df = pd.read_csv(path_list[0])
