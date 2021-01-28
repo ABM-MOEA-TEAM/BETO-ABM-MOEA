@@ -11,12 +11,21 @@ def calcEROI(tl_array):
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
         mag = row_vals[UF.magnitude]
+        val_units = row_vals[UF.units]
         if in_or_out != D.zeroed:
             match_list = [[D.LCA_key_str, subst_name],
                           [D.LCA_IO, in_or_out]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_energy_impact)
+            LCA_units = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_units)
+            if LCA_units != val_units:
+                print(subst_name)
+                print(LCA_units)
+                print(val_units)
+            
             if in_or_out == D.tl_input:
                 energy_investment += (LCA_val * mag)
             else:
