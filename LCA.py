@@ -25,6 +25,9 @@ def calcEROI(tl_array):
                 print(subst_name)
                 print(LCA_units)
                 print(val_units)
+                pqty = D.returnPintQtyObj(mag, val_units)
+                mag = UF.returnConvertedMagnitude(pqty, LCA_units)
+                
             
             if in_or_out == D.tl_input:
                 energy_investment += (LCA_val * mag)
