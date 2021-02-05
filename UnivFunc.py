@@ -35,6 +35,10 @@ def createEmptySummaryFrame():
                          eroi_col : []})
 
 # Helper functions
+def returnConvertedMagnitude(qty, output_units):
+    converted_qty = qty.to(output_units)
+    return converted_qty.magnitude
+
 def returnPintQty(tl_array, match_list):
     return_obj = 'Found zero or multiple rows'
     num_pairs = len(match_list)
