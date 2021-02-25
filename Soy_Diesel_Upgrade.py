@@ -15,24 +15,33 @@ def upgrade_soy_diesel(biomass_IO_array):
     results_array = UF.createEmptyFrame()
     
     match_list = [[UF.input_or_output, D.tl_output],
-                 [UF.substance_name, 'FAMEs and Glycerol']]      # Grab the total amount of soybeans sent to plant
+                  [UF.substance_name, 'FAMEs and Glycerol']]      # Grab the total amount of soybeans sent to plant
     
     FAME_qty = UF.returnPintQty(biomass_IO_array, match_list)
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.56852,'MJ/kg')
     
-    results_array.loc[0] = UF.getWriteRow('Electricity', D.conv, 
-                                      D.tl_input, scale1.qty*FAME_qty)
-    results_array.loc[1] = UF.getWriteRow('FAMEs and Glycerol', D.conv, 
+    results_array.loc[0] = UF.getWriteRow('FAMEs and Glycerol', D.conv, 
                                       D.tl_input, FAME_qty)
-    results_array.loc[2] = UF.getWriteRow('Glycerol', D.conv, 
+    results_array.loc[1] = UF.getWriteRow('Glycerol', D.conv, 
                                       D.tl_output, 0.01779*FAME_qty)
-    results_array.loc[3] = UF.getWriteRow('Methanol', D.conv, 
+    results_array.loc[2] = UF.getWriteRow('Methanol', D.conv, 
                                       D.tl_output, 0.05139*FAME_qty)
-    results_array.loc[4] = UF.getWriteRow('Biodiesel', D.conv, 
+    results_array.loc[3] = UF.getWriteRow('Biodiesel', D.conv, 
                                       D.tl_output, 0.87163*FAME_qty)
-    results_array.loc[5] = UF.getWriteRow('Electricity', D.conv,
-                                      D.tl_output, 0.000001*FAME_qty)
+    
+    scale2 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], 0.0000001, 'MJ/kg')
+    results_array.loc[4] = UF.getWriteRow('Electricity', D.conv,
+                                      D.tl_output, scale2.qty*FAME_qty)
+    
+    
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.56852,'MJ/kg')
+    results_array.loc[5] = UF.getWriteRow('Electricity', D.conv, 
+                                      D.tl_input, scale1.qty*FAME_qty)
+    
+    scale3 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'],0.05757,'dollars*yr/kg')
+    results_array.loc[6] = UF.getWriteRow('Capital Cost', D.conv,
+                                      D.tl_input, scale3.qty*FAME_qty)
+    
     
     return results_array
 

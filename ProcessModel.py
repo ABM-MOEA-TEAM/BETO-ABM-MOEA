@@ -8,8 +8,10 @@ import LCA
 
 # Process steps
 import Grow_Grass as GG
+import Grow_Grass2 as GG2
 import GasFT as GFT
 import Hydroprocessing as H
+
 
 # Initialize empty Process Model output table
 results_array = UF.createEmptyFrame()
@@ -19,8 +21,11 @@ land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 100, 'hectare')
 
 biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 8960, 'kg/yr/ha')
 
+ScalingValue = 1000
 # Biomass Production
+
 biomass_IO = GG.growGrassForOneYear(land_area_val, biomass_output)
+#biomass_IO = GG2.growGrassPerKg(land_area_val, biomass_output, ScalingValue)
 results_array = results_array.append(biomass_IO, ignore_index=True)
 
 # Extraction/Conversion
@@ -60,5 +65,3 @@ upgr_out_chksm = 448586.7008
 eroi_chksm = 2.51
 ghg_impact_chksm = 41.87
 mfsp_chksm = 8.24
-
-

@@ -60,22 +60,22 @@ def grow_soy(land_area_val, yearly_precip):
     return_array.loc[8] = UF.getWriteRow('Soybeans', D.biomass_production,
                                          D.tl_output, scale9.qty*size.qty*precip.qty)
     
-    scale10 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha/yr')
+    scale10 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 246.52, 'dollars/ha')         # From Soy PM TEA tab - nonop costs/142 (avg ha per farm)
     
     return_array.loc[9] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale10.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha/yr')
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 8.105, 'dollars/ha')
     
     return_array.loc[10] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)
     
-    scale12 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 33.33333, 'dollars/ha/yr')
+    scale12 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 60, 'dollars/ha/yr')
     
     return_array.loc[11] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)
     
-    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253180, 'kg/in/ha/yr')
+    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253180, 'kg/yr/ha')
     
     return_array.loc[12] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
                                       D.tl_output, scale13.qty*size.qty)

@@ -45,6 +45,9 @@ def ethanol_grain(biomass_IO_array):
     return_array.loc[8] = UF.getWriteRow('Corn Beer', D.conv,
                                       D.tl_output, 3.511894562*corn_qty)
     
+    scale1 = D.TEA_LCA_Qty('Capital Cost', 0.2066, 'dollars*yr/kg')
+    return_array.loc[9] = UF.getWriteRow('Capital Cost', D.conv,
+                                      D.tl_input, scale1.qty*corn_qty)
     return return_array
 
 

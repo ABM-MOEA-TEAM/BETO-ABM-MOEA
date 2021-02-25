@@ -39,12 +39,12 @@ results_array = results_array.append(upgrading_IO, ignore_index=True)
 IO_array = UF.consolidateIO(results_array)
 
 # Calculate EROI
-eroi = LCA.calcEROI(IO_array)
+# eroi = LCA.calcEROI(IO_array)
 
-# Calculate GHG Impact
+# # Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array)
 
-# Calculate MFSP
+# # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
 
 # CheckSum for spreadsheet/Python agreement
@@ -54,11 +54,3 @@ upgr_in = UF.sumProcessIO(results_array, D.upgrading, D.tl_input)
 bp_out = UF.sumProcessIO(results_array, D.biomass_production, D.tl_output)
 conv_out = UF.sumProcessIO(results_array, D.conv, D.tl_output)
 upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
-
-
-# eroi_chksm = 2.51
-# ghg_impact_chksm = 41.87
-# mfsp_chksm = 8.24
-
-
-

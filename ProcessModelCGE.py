@@ -47,10 +47,10 @@ IO_array = UF.consolidateIO(results_array)
 #eroi = LCA.calcEROI(IO_array)
 
 # Calculate GHG Impact
-#ghg_impact = LCA.calcGHGImpact(IO_array)
+ghg_impact = LCA.calcGHGImpact(IO_array)
 
 # Calculate MFSP
-#mfsp = TEA.calc_MFSP(IO_array)
+mfsp = TEA.calc_MFSP(IO_array)
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)

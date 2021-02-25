@@ -34,14 +34,14 @@ forestry_upgr_out['Diesel'] = D.TEA_LCA_Qty_Cited(
 forestry_upgr_out['Gasoline'] = D.TEA_LCA_Qty_Cited(
     D.substance_dict['Gasoline'], 464.39757, 'kg/yr/ha',
     'Swanson, 2010')
-forestry_upgr_out['Ethanol'] = D.TEA_LCA_Qty(
-    D.substance_dict['Ethanol'],0.00001,'kg/yr/ha')
+#forestry_upgr_out['Ethanol'] = D.TEA_LCA_Qty(
+#    D.substance_dict['Ethanol'],0,'kg/yr/ha')
 
 # Grass Upgrading IO
 upgr_in_list = ['Syncrude', 'Hydrogen', 'Electricity', 
                 'Labor', 'Capital Cost']
 upgr_out_list = ['Jet-A', 'Water', 'Propane', 
-                 'Diesel', 'Gasoline','Ethanol']
+                 'Diesel', 'Gasoline']#,'Ethanol']
 
 # Grass Upgrading     
 def upgradeGrassProducts(size, conv_IO_array):

@@ -46,36 +46,51 @@ def calcEROI(tl_array):
 def calcGHGImpact(tl_array):
     
     # Note that the fact that this is transportation fuel could be a substance attribute
-    if 'Jet-A' in tl_array:
-        jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    else:
-        jet_a_out = 0
     
-    if 'Diesel' in tl_array:
-        diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    else:
-        diesel_out = 0
+    # It's this; the "if in" statement is not doing what I thought it was. Each process model steps
+    # through and fails to pass each if, even when fuel is generated. 
     
-    if 'Gasoline' in tl_array:
-        gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude   # Need to edit this so that it includes all possible final fuel types
-    else:
-        gasoline_out = 0
+    jet_a_out = 0
+    diesel_out = 0
+    gasoline_out = 0
+    ethanol_out = 0
+    biodiesel_out = 0
     
-    if 'Ethanol' in tl_array:
-        ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    else:
-        ethanol_out = 0
+    # for j in range(len(tl_array)):
+    #     rows = tl_array.loc[j]
+    #     outputs = []
+    #     if rows
+            
         
-    if 'Biodiesel' in tl_array:
-        biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-    else:
-        biodiesel_out = 0
         
+    
+    for i in range(len(tl_array)):
+        row_vals = tl_array.loc[i]
+        in_or_out = row_vals[UF.input_or_output]
+        subst_name = row_vals[UF.substance_name]
+        
+        if 'Jet-A' in subst_name and in_or_out == D.tl_output:
+            jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+
+        if 'Diesel' in subst_name and in_or_out == D.tl_output:
+            diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+        
+        if 'Gasoline' in subst_name and in_or_out == D.tl_output:
+            
+            gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
+                                                      [UF.input_or_output, D.tl_output]]).magnitude
+            
+        if 'Ethanol' in subst_name and in_or_out == D.tl_output:
+            ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+                
+        if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
+            biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+        
+
     transport_fuel_energy = 46*(jet_a_out + diesel_out + gasoline_out + ethanol_out + biodiesel_out)
     # shouldn't use 46 for all of them. do separately with correct energy content (MJ/kg)
     
@@ -97,5 +112,11 @@ def calcGHGImpact(tl_array):
                                       match_list, 
                                       D.LCA_GHG_impact)
             GHG_impact += (LCA_val * mag)
-
+    
+    # print('Jet A      -', jet_a_out)        # Helpful output for debugging
+    # print('Diesel     -', diesel_out)
+    # print('Gasoline   -', gasoline_out)
+    # print('Ethanol    -', ethanol_out)
+    # print('Biodiesel  -', biodiesel_out)
+    
     return 75 + GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting

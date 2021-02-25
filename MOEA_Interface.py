@@ -55,7 +55,7 @@ def Collect_DayCent():
         SOC_list.append(row[DayCent_SOC_ha])
     
     print('Done')
-    return Yield_list, GHG_list, N2O_list, CH4_list, SOC_list
+    return Yield_list#, GHG_list, N2O_list, CH4_list, SOC_list
 
 # Outputting all as an aggregated Tuple to see what duration of run looks like. Can units be left off?
 

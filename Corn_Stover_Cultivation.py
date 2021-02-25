@@ -129,17 +129,17 @@ def grow_stover(size,yearly_precip):
     return_array.loc[9] = UF.getWriteRow('Corn Grain', D.biomass_production, 
                                       D.tl_output, scale10.qty*yearly_precip.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha/yr')
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha')
     
     return_array.loc[10] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)
     
-    scale12 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha/yr')
+    scale12 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha')
     
     return_array.loc[11] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)
     
-    scale13 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 33.33333, 'dollars/ha/yr')
+    scale13 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 33.33333, 'dollars/ha')
     
     return_array.loc[12] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale13.qty*size.qty)

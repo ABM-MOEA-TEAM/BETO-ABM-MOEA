@@ -42,6 +42,8 @@ def growGrassForOneYear(size, biomass_output):
     crop_outputs = grass_outputs_dict   
     
     # Calculate Atmospheric CO2 based on biomass output
+   
+   
     return_array.loc[0] = UF.getWriteRow('Atmospheric CO2', D.biomass_production, 
                                       D.tl_input, 
                 biomass_output.qty*size.qty*D.CO2_fixing_proportion_grass.qty)
@@ -66,7 +68,39 @@ def growGrassForOneYear(size, biomass_output):
         row_count += 1
         
     return return_array
-
+        
+    # else: 
+    #     BMProduced = D.TEA_LCA_Qty(D.substance_dict, biomass_output, 'kg/ha')
+        
+        
+    #     return_array.loc[0] = UF.getWriteRow('Atmospheric CO2', D.biomass_production, 
+    #                                       D.tl_input, 
+    #                 BMProduced.qty*size.qty*D.CO2_fixing_proportion_grass.qty)
+        
+    #     # special write of woody biomass
+    #     return_array.loc[1] = UF.getWriteRow('Woody Biomass', D.biomass_production, 
+    #                                       D.tl_output, BMProduced.qty*size.qty)
+        
+    #     row_count = 2
+    #     # Scale crop inputs
+    #     for key in crop_inputs:
+    #         pint_qty = size.qty*crop_inputs[key].qty
+    #         return_array.loc[row_count] = UF.getWriteRow(key, D.biomass_production, 
+    #                                                   D.tl_input, pint_qty)
+    #         row_count += 1
+            
+    #     # Scale crop outputs
+    #     for key in crop_outputs:
+    #         pint_qty = size.qty*crop_outputs[key].qty
+    #         return_array.loc[row_count] = UF.getWriteRow(key, D.biomass_production, 
+    #                                                   D.tl_output, pint_qty)
+    #         row_count += 1
+    #     print('Engaged')
+    #     print('Yield for specific county - ', BMProduced.qty)
+    #     return return_array
+        
+    
+    
 def main():
     land_area_val = D.TEA_LCA_Qty('Land Area', 100, 'hectare')
     biomass_output = D.TEA_LCA_Qty('Woody Biomass', 8960, 'kg/yr/ha')
