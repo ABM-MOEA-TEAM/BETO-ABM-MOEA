@@ -8,6 +8,7 @@ import TEA_LCA_Data as D
 import UnivFunc as UF
 
 import TEA
+import TEA2
 import LCA
 
 # Process steps
@@ -44,8 +45,9 @@ IO_array = UF.consolidateIO(results_array)
 # # Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array)
 
-# # Calculate MFSP
+# Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
+
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)
@@ -54,3 +56,7 @@ upgr_in = UF.sumProcessIO(results_array, D.upgrading, D.tl_input)
 bp_out = UF.sumProcessIO(results_array, D.biomass_production, D.tl_output)
 conv_out = UF.sumProcessIO(results_array, D.conv, D.tl_output)
 upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
+
+mfsp_chksm = 2.87
+
+print('Executed Soybean Transesterification to Biodiesel PM')

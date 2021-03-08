@@ -5,7 +5,7 @@ Created on Fri Feb 19 10:02:15 2021
 @author: Jack Smith
 """
 
-import csv
+import csv         # Should be able to add to .csv's with pandas library alone
 
 import pandas as pd
 import pint
@@ -23,7 +23,7 @@ import LCA
 
 # Process steps
 import Grow_Grass as GG
-import Grow_Grass2 as GG2
+#import Grow_Grass2 as GG2
 import GasFT as GFT
 import Hydroprocessing as H
 import ProcessModel as PM
@@ -38,11 +38,12 @@ DayCent_County = 'County'
 DayCent_Yield = 'Yield_Mg_hay'
 DayCent_Yield_Data = pd.read_csv(path_list[0])
 
-switchgrass_yields_dict = {}
 
-def Collect_DayCent():
+def Collect_DayCent():          # Move to D., handle all preprocessing there
     
-    DayCent_Scales = []    
+    DayCent_Scales = []         # For a list, "for yield in DayCent_yields" produces an iterable data type
+                                # No index needed 
+
     
     for i in range(len(DayCent_Yield_Data)):
         row = DayCent_Yield_Data.loc[i]
@@ -52,9 +53,6 @@ def Collect_DayCent():
 
 DayCent_Yields = Collect_DayCent()   
 
-output = UF.createEmptyFrame()
-
-
 land_area_val = D.TEA_LCA_Qty('Land Area', 100, 'hectare')
 biomass_output = D.TEA_LCA_Qty('Woody Biomass', 1, 'kg/yr/ha')  # Fudging the units currently - need to fix
     
@@ -62,7 +60,7 @@ def Grassification_GWP(j):
       
     results_array = UF.createEmptyFrame()
     
-    Yield = D.TEA_LCA_Qty('Woody Biomass', DayCent_Yields[j]*1000, 'kg/yr/ha')
+    Yield = D.TEA_LCA_Qty('Woody Biomass', DayCent_Yields[j]*1000, 'kg/yr/ha')      # Mg specified in Lookup Table
     
     biomass_IO = GG.growGrassForOneYear(land_area_val, Yield)
     results_array = results_array.append(biomass_IO, ignore_index=True)
@@ -79,12 +77,14 @@ def Grassification_GWP(j):
     IO_array = UF.consolidateIO(results_array)
    
     # Calculate GHG Impact
-    ghg_impact = LCA.calcGHGImpact(IO_array)
-         
-    return ghg_impact
+    ghg_impact = LCA.calcGHGImpact(IO_array)        # Same IO array!
+    mfsp = TEA.calc_MFSP(IO_array)
+
+    # Write to row in data frame, once the for loop is completed, write to .csv     
+    return [ghg_impact, mfsp]
 
 
-def Grassification_MFSP(j):
+def Grassification_MFSP(j):             #pull this and rename GWP
     
     results_array = UF.createEmptyFrame()
     
@@ -119,7 +119,7 @@ with f:
     writer = csv.writer(f)
     writer.writerow(['County','MFSP','GWP'])
     i = 0
-    while i < len(DayCent_Yields):
+    while i < len(DayCent_Yields):              # instantiate pandas dataframe before while loop, populate .csv after while
 
         # MFSP = 1
         # GWP = 2
@@ -127,13 +127,21 @@ with f:
         # MFSP = DayCent_Yields[i]
         # GWP = DayCent_Yields[i]
         
-        MFSP = Grassification_MFSP(i)
-        GWP = Grassification_GWP(i)
+        # MFSP = Grassification_MFSP(i)
+        # GWP = Grassification_GWP(i)
+        
+        answer = Grassification_GWP(i)
+        MFSP = answer[0]
+        GWP = answer[1]
         
         #print(DayCent_Yields[i])
         Output_array = [i,MFSP,GWP]
         writer.writerows([Output_array])
-        if(i == 10):
+        
+        #df = pd.DataFrame(data=numpy_data
+
+        
+        if(i == 10):                        # Clearly I can clean this up with the '%' operator
             print('10%....')
         if(i == 20):
             print('20%....')

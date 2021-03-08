@@ -8,7 +8,6 @@ import LCA
 
 # Process steps
 import Grow_Grass as GG
-import Grow_Grass2 as GG2
 import GasFT as GFT
 import Hydroprocessing as H
 
@@ -65,3 +64,5 @@ upgr_out_chksm = 448586.7008
 eroi_chksm = 2.51
 ghg_impact_chksm = 41.87
 mfsp_chksm = 8.24
+
+# print('Executed Switchgrass Gasification to Jet PM')

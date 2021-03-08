@@ -68,6 +68,6 @@ upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 
 # eroi_chksm = 2.51
 # ghg_impact_chksm = 41.87
-# mfsp_chksm = 8.24
+mfsp_chksm = 2.43
 
-
+print('Executed Corn Stover Fermentation to Ethanol PM')

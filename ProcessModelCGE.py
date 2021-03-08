@@ -26,10 +26,11 @@ land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 
 yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')    
 
+biomass_yield = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'],10974,'kg/ha/yr')
 #stover_collected = 0.5
 
 # Biomass Production
-biomass_IO = CGC.grow_corn(land_area_val, yearly_precip)
+biomass_IO = CGC.grow_corn(land_area_val, biomass_yield)
 results_array = results_array.append(biomass_IO, ignore_index=True)
 
 # Extraction/Conversion
@@ -68,6 +69,6 @@ upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 
 # eroi_chksm = 2.51
 # ghg_impact_chksm = 41.87
-# mfsp_chksm = 8.24
+mfsp_chksm = 1.39
 
-
+print('Executed Corn Grain Fermentation to Ethanol PM')

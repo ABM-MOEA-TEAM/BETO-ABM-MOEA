@@ -22,21 +22,27 @@ def upgrade_grain_ethanol(biomass_IO_array):
     
     scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.01666,'MJ/kg')
     
-    results_array.loc[0] = UF.getWriteRow('Electricity', D.conv, 
+    results_array.loc[0] = UF.getWriteRow('Electricity', D.upgrading, 
                                       D.tl_input, scale1.qty*corn_beer_qty)
-    results_array.loc[1] = UF.getWriteRow('Corn Beer', D.conv, 
+    results_array.loc[1] = UF.getWriteRow('Corn Beer', D.upgrading, 
                                       D.tl_input, corn_beer_qty)
-    results_array.loc[3] = UF.getWriteRow('Water', D.conv, 
+    results_array.loc[3] = UF.getWriteRow('Water', D.upgrading, 
                                       D.tl_output, 0.798688*corn_beer_qty)
-    results_array.loc[4] = UF.getWriteRow('Gasoline', D.conv,
+    results_array.loc[4] = UF.getWriteRow('Gasoline', D.upgrading,
                                       D.tl_input, 0.0050526*corn_beer_qty)
-    results_array.loc[4] = UF.getWriteRow('Ethanol', D.conv, 
+    results_array.loc[4] = UF.getWriteRow('Ethanol', D.upgrading, 
                                       D.tl_output, (0.0959998*corn_beer_qty)+(0.0050526*corn_beer_qty))
     
     scale2 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], 0.005, 'MJ/kg')
     
-    results_array.loc[5] = UF.getWriteRow('Electricity', D.conv,
-                                      D.tl_output, scale2.qty*corn_beer_qty)         # !! Placeholder - need to back out actual electricty
+    results_array.loc[5] = UF.getWriteRow('Electricity', D.upgrading,
+                                      D.tl_output, scale2.qty*corn_beer_qty)         
+    
+    capex = D.TEA_LCA_Qty('Capital Cost', 2267.15,'dollars')                    # TCI/ha's_reqd
+    
+    results_array.loc[6] = UF.getWriteRow('Capital Cost', D.upgrading, 
+                                      D.tl_input, capex.qty)
+                                                                                # !! Placeholder - need to back out actual electricty
                                                                                 # produced per kg of corn beer from burner.
     # results_array.loc[5] = UF.getWriteRow('Atmospheric CO2', D.conv,          # Must remember to be consistent with In/Out
     #                                   D.tl_output, 0.049379*corn_beer_qty)    # CO2 flows (count up front and end? not at all?)

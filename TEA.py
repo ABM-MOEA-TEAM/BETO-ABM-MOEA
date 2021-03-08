@@ -43,41 +43,10 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
         if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
             biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
-    
-    
-    
-    
-    # if 'Jet-A' in tl_array:
-    #     jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
-    #                                    [UF.input_or_output, D.tl_output]]).magnitude
-    # else:
-    #     jet_a_out = 0
-    
-    # if 'Diesel' in tl_array:
-    #     diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
-    #                                    [UF.input_or_output, D.tl_output]]).magnitude
-    # else:
-    #     diesel_out = 0
-    
-    # if 'Gasoline' in tl_array:
-    #     gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
-    #                                    [UF.input_or_output, D.tl_output]]).magnitude
-    # else:
-    #     gasoline_out = 0
-        
-    # if 'Ethanol' in tl_array:
-    #     ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
-    #                                    [UF.input_or_output, D.tl_output]]).magnitude
-    # else:
-    #     ethanol_out = 0
-    
-    # if 'Biodiesel' in tl_array:
-    #     biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
-    #                                    [UF.input_or_output, D.tl_output]]).magnitude
-    # else: 
-    #     biodiesel_out = 0
-        
+  
     transport_fuel_energy = 46.0*(jet_a_out+diesel_out+gasoline_out+ethanol_out+biodiesel_out)
+    # Same comment as in LCA file - 46 seems like it is MJ/kg for jet-diesel-gasoline avg, update/breakout
+    # Expand the paranthetical mult. (values of energy density ought to be coming from pint i.e.)
     
     
     nonfuel_value = calcNonFuelValue(tl_array)
@@ -239,7 +208,7 @@ def calc_MFSP(tl_array):
                                                                  loanpay,
                                                                  tl_array))
 
-    return result.x * 152.79288
+    return result.x * 152.79288     # $/MJ (above optimization) * MJ/gge
 
 # Calculate cost of inputs (opex)
 def calcOPEX(tl_array):

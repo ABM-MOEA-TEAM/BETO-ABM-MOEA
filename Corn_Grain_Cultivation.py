@@ -9,8 +9,9 @@ import UnivFunc as UF
 
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')    
+biomass_yield = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'],10974,'kg/ha/yr')
 
-def grow_corn(size,yearly_precip):
+def grow_corn(size,biomass_yield):
  
     return_array = UF.createEmptyFrame()    
     
@@ -47,47 +48,44 @@ def grow_corn(size,yearly_precip):
     return_array.loc[5] = UF.getWriteRow('Herbicide', D.biomass_production,
                                       D.tl_input, scale6.qty*size.qty)
     
-    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253236, 'kg/in/ha/yr')
+    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253236, 'kg/ha/yr')
     
-    return_array.loc[6] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
-                                      D.tl_input, scale7.qty*yearly_precip.qty*size.qty)
-          
-    scale8 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Left'], 327.24, 'kg/in/ha/yr')
+    return_array.loc[6] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,       # needed?
+                                      D.tl_input, scale7.qty*34*size.qty)                       # 34 is avg precip
     
-    return_array.loc[7] = UF.getWriteRow('Corn Stover Left', D.biomass_production, 
-                                      D.tl_output, scale8.qty*yearly_precip.qty*size.qty)
+    return_array.loc[7] = UF.getWriteRow('Corn Stover Left', D.biomass_production,              #
+                                      D.tl_output, 0.886776927*biomass_yield.qty*size.qty)
     
-    scale9 = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], 322.759, 'kg/in/ha/yr')
+    return_array.loc[8] = UF.getWriteRow('Corn Grain', D.biomass_production,                    #
+                                      D.tl_output, biomass_yield.qty*size.qty)
     
-    return_array.loc[8] = UF.getWriteRow('Corn Grain', D.biomass_production, 
-                                      D.tl_output, scale9.qty*yearly_precip.qty*size.qty)
-    
-    scale10 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 157.8366, 'dollars/ha')
+    scale10 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha')
     
     return_array.loc[9] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale10.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 8.105, 'dollars/ha')
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha')
     
     return_array.loc[10] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)
     
-    scale12 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 60, 'dollars/ha/yr')
+    scale12 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 33.3333333, 'dollars/ha/yr')
     
     return_array.loc[11] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)
     
-    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 252875, 'kg/in/ha/yr') # Total water eventually returned
+    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 252875, 'kg/ha/yr') # Total water eventually returned
     
-    return_array.loc[12] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
-                                      D.tl_output, scale13.qty*yearly_precip.qty*size.qty)
+    return_array.loc[12] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,      #
+                                      D.tl_output, scale13.qty*34*size.qty)
     
     return return_array
     
 def main():
     land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
     yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')
-    return grow_corn(land_area_val, yearly_precip)
+    biomass_yield = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'],10974,'kg/ha/yr')
+    return grow_corn(land_area_val, biomass_yield)
 
 if __name__ == "__main__":
     output = main()
