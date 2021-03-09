@@ -35,7 +35,7 @@ class Substance:
     def __init__(self, name_str, id_str):
         self.name_str = name_str
         self.id_str = id_str
-
+        
 # Paths and hard-coded strings
 path_list = [Path(cwd + '/LCA_Inventory.csv'), 
              Path(cwd + '/Substances.csv')]

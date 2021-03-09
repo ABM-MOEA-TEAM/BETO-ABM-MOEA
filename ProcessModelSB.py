@@ -24,6 +24,9 @@ land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 
 yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')    
 
+Ag_only = bool(False)
+AllocationID = 3
+
 # Biomass Production
 biomass_IO = SC.grow_soy(land_area_val, yearly_precip)
 results_array = results_array.append(biomass_IO, ignore_index=True)
@@ -43,10 +46,10 @@ IO_array = UF.consolidateIO(results_array)
 # eroi = LCA.calcEROI(IO_array)
 
 # # Calculate GHG Impact
-ghg_impact = LCA.calcGHGImpact(IO_array)
+ghg_impact = LCA.calcGHGImpact(IO_array, AllocationID)
 
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
+mfsp = TEA.calc_MFSP(IO_array, Ag_only)
 
 
 # CheckSum for spreadsheet/Python agreement

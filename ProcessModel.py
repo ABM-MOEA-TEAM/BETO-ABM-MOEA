@@ -17,8 +17,12 @@ results_array = UF.createEmptyFrame()
 
 # Scaling Value
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 100, 'hectare')
-
 biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 8960, 'kg/yr/ha')
+# biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 17933, 'kg/yr/ha')
+# Second variable exists so that I could verify that the lookup table output is the same as 
+# the PM execution (note the difference in magnitude of yield)
+Ag_only = bool(False)
+AllocationID = 4
 
 ScalingValue = 1000
 # Biomass Production
@@ -42,10 +46,10 @@ IO_array = UF.consolidateIO(results_array)
 eroi = LCA.calcEROI(IO_array)
 
 # Calculate GHG Impact
-ghg_impact = LCA.calcGHGImpact(IO_array)
+ghg_impact = LCA.calcGHGImpact(IO_array, AllocationID)
 
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
+mfsp = TEA.calc_MFSP(IO_array, Ag_only)
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)
@@ -62,7 +66,7 @@ upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 upgr_out_chksm = 448586.7008
 
 eroi_chksm = 2.51
-ghg_impact_chksm = 41.87
-mfsp_chksm = 8.24
+ghg_impact_chksm = 41.87    # with updated inventory - closer to 42.32 (3/8/21)
+mfsp_chksm = 8.24           # with updated inventory - closer to  8.78 (3/8/21)
 
 # print('Executed Switchgrass Gasification to Jet PM')

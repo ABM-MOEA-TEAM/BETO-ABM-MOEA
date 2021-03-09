@@ -6,56 +6,96 @@ import UnivFunc as UF
 # using the pathway module. This module calls the pathway module and has the user choose the pathway
 # on which to conduct the economic analysis
 
-yrs = 30 #userinputs.yrs
+yrs = 30 # userinputs.yrs
 
 # function used for goal finding
+
+
 def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
              loanpay, tl_array):
     
+    # Primary Fuel Products
     jet_a_out = 0
     diesel_out = 0
     gasoline_out = 0
     ethanol_out = 0
     biodiesel_out = 0
     
+    #Coproducts List (Only Crops for Ag-Only Executions)
+    switchgrass_out = 0
+    corn_grain_out = 0
+    soybean_out = 0
+    
     for i in range(len(tl_array)):
         row_vals = tl_array.loc[i]
         in_or_out = row_vals[UF.input_or_output]
         subst_name = row_vals[UF.substance_name]
         
-        if 'Jet-A' in subst_name and in_or_out == D.tl_output:
+        if 'Jet-A' in subst_name and in_or_out == D.tl_output:                              # 43.2 MJ/kg from https://ecn.sandia.gov/diesel-spray-combustion/sandia-cv/fuels/
             jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
 
         if 'Diesel' in subst_name and in_or_out == D.tl_output:
-            diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],
+            diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],         # 42.975 MJ/kg from ""
                                             [UF.input_or_output, D.tl_output]]).magnitude
         
         if 'Gasoline' in subst_name and in_or_out == D.tl_output:
             
             gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
-                                                      [UF.input_or_output, D.tl_output]]).magnitude
+                                                      [UF.input_or_output, D.tl_output]]).magnitude     # 43.44 MJ/kg from https://h2tools.org/hyarc/calculator-tools/lower-and-higher-heating-values-fuels
             
         if 'Ethanol' in subst_name and in_or_out == D.tl_output:
             ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
+                                            [UF.input_or_output, D.tl_output]]).magnitude   # 26.95 MJ/kg from ""
                 
         if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
-            biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
+            biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],   # 37.75 MJ/kg from Tesfa - "LHV Predication Models and LHV Effect on the 
+                                            [UF.input_or_output, D.tl_output]]).magnitude   # Performance of CI Engine Running with Biodiesel Blends" (Implies Compression Ignition Engine)
   
-    transport_fuel_energy = 46.0*(jet_a_out+diesel_out+gasoline_out+ethanol_out+biodiesel_out)
-    # Same comment as in LCA file - 46 seems like it is MJ/kg for jet-diesel-gasoline avg, update/breakout
-    # Expand the paranthetical mult. (values of energy density ought to be coming from pint i.e.)
+    # _________________________________CO-PRODUCTS_________________________________
     
+        if 'Woody Biomass' in subst_name and in_or_out == D.tl_output:
+            switchgrass_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Woody Biomass'],     # Should probably build this out elsewhere as well
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+        
+        if 'Corn Grain' in subst_name and in_or_out == D.tl_output:
+            corn_grain_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Corn Grain'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+            
+        if 'Soybeans' in subst_name and in_or_out == D.tl_output:
+            soybean_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Soybeans'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+        
+        # Leaving out stover currently as I have no idea how we are going to approach; are we considering stover just to be an additional free resource?
+        # Are we going to assume that the farmers expect some value back from the stover? 
+            
+            
+    transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) + (43.44*gasoline_out)
+                             + (26.95*ethanol_out) + (37.75*biodiesel_out))
     
+    # Broke this out with the actual Lower Heating Values of each fuel; hardcoding of the values isn't great. 
+    # Was considering adding a new class in TEA_LCA_Data of maybe "Output_Fuel_LHV" which references a new column in 
+    # LCA_Inventory? Or in the Substances .csv?  (Just not sure where to put it; I am confident that I can get the logic
+    # changed for the transport_fuel_energy variable once we decide where to put this info)
+    
+    # This will slightly alter the observed eroi values of the Switchgrass model as I found ~43 rather than ~46 to be the
+    # heating values of each of these fuels. Should we be using HHV here for some reason? (All vapor phase on turbojet exhaust)
+    
+    ann_coproduct_revenue = (switchgrass_out + corn_grain_out + soybean_out) * price_per_MJ        
+    
+    # Will probably have to make a dictionary or list so that we can reference the value of the coproduct 
+    # by its name string (and avoid making a 6,000 character summation in this line)
+      
     nonfuel_value = calcNonFuelValue(tl_array)
-    annrevenue =  nonfuel_value + price_per_MJ * transport_fuel_energy
+    ann_fuel_revenue =  nonfuel_value + price_per_MJ * transport_fuel_energy
+    
+    annrevenue = ann_fuel_revenue + ann_coproduct_revenue
     
     #calculating total annual revenue from annual fuel revenue and co product revenue
     # for key in prodcost:
     #     if key in prodcost and key in outputs:
     #         annrevenue += prodcost [key] * outputs[key]
+    
     
     #calculating net income
     netincome = []
@@ -121,7 +161,8 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     # print(abs(npv[-1]))
     return abs(npv[-1])
 
-def calc_MFSP(tl_array):
+def calc_MFSP(tl_array,Ag_only_bool):
+    
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Capital Cost']])
     capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
@@ -208,7 +249,14 @@ def calc_MFSP(tl_array):
                                                                  loanpay,
                                                                  tl_array))
 
+    if Ag_only_bool == True:
+            print('You are performing an Agriculture-only Analysis.')
+            print('The MCSP appears under MFSP - has units $/tonne:')
+            return result.x
+        
     return result.x * 152.79288     # $/MJ (above optimization) * MJ/gge
+
+    # Will need to switch this 
 
 # Calculate cost of inputs (opex)
 def calcOPEX(tl_array):

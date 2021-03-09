@@ -24,9 +24,11 @@ results_array = UF.createEmptyFrame()
 # Scaling Value
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 
-yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')    
+biomass_yield = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], 10974, 'kg/ha/yr')
 
-biomass_yield = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'],10974,'kg/ha/yr')
+Ag_only = bool(False)
+AllocationID = 1
+
 #stover_collected = 0.5
 
 # Biomass Production
@@ -48,10 +50,10 @@ IO_array = UF.consolidateIO(results_array)
 #eroi = LCA.calcEROI(IO_array)
 
 # Calculate GHG Impact
-ghg_impact = LCA.calcGHGImpact(IO_array)
+ghg_impact = LCA.calcGHGImpact(IO_array, AllocationID)
 
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
+mfsp = TEA.calc_MFSP(IO_array,Ag_only)
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)

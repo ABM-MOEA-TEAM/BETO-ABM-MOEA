@@ -43,7 +43,7 @@ def calcEROI(tl_array):
 
 # Calculate GHG Impact by energy allocation (reminder--need to add calculations 
 # for allocation by mass, economic allocation, as well as system expansion displacement credits)
-def calcGHGImpact(tl_array):
+def calcGHGImpact(tl_array, Ag_allocation):
     
     # Note that the fact that this is transportation fuel could be a substance attribute
     
@@ -60,9 +60,7 @@ def calcGHGImpact(tl_array):
     #     rows = tl_array.loc[j]
     #     outputs = []
     #     if rows
-            
-        
-        
+
     
     for i in range(len(tl_array)):
         row_vals = tl_array.loc[i]
@@ -91,8 +89,8 @@ def calcGHGImpact(tl_array):
                                             [UF.input_or_output, D.tl_output]]).magnitude
         
 
-    transport_fuel_energy = 46*(jet_a_out + diesel_out + gasoline_out + ethanol_out + biodiesel_out)
-    # shouldn't use 46 for all of them. do separately with correct energy content (MJ/kg)
+    transport_fuel_energy = (43.2*jet_a_out) + (42.975*diesel_out) + (43.44*gasoline_out) + (26.95*ethanol_out) + (37.75*biodiesel_out)
+    # See the TEA file for comments on this update and for the sources of the LHV's     
     
     # note that excel formula has a few others. zero for grass so omitting.
     total_MJ = transport_fuel_energy + UF.returnPintQty(tl_array, [[UF.substance_name, 'Electricity'],
@@ -119,4 +117,7 @@ def calcGHGImpact(tl_array):
     # print('Ethanol    -', ethanol_out)
     # print('Biodiesel  -', biodiesel_out)
     
-    return 75 + GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting
+    if Ag_allocation == 4:
+        return 75 + GHG_impact/total_MJ
+    
+    return GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting

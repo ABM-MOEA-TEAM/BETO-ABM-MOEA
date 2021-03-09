@@ -38,7 +38,6 @@ DayCent_County = 'County'
 DayCent_Yield = 'Yield_Mg_hay'
 DayCent_Yield_Data = pd.read_csv(path_list[0])
 
-
 def Collect_DayCent():          # Move to D., handle all preprocessing there
     
     DayCent_Scales = []         # For a list, "for yield in DayCent_yields" produces an iterable data type
@@ -56,7 +55,7 @@ DayCent_Yields = Collect_DayCent()
 land_area_val = D.TEA_LCA_Qty('Land Area', 100, 'hectare')
 biomass_output = D.TEA_LCA_Qty('Woody Biomass', 1, 'kg/yr/ha')  # Fudging the units currently - need to fix
     
-def Grassification_GWP(j):
+def Grassification_ProcessModelResults(j):
       
     results_array = UF.createEmptyFrame()
     
@@ -84,53 +83,16 @@ def Grassification_GWP(j):
     return [ghg_impact, mfsp]
 
 
-def Grassification_MFSP(j):             #pull this and rename GWP
-    
-    results_array = UF.createEmptyFrame()
-    
-    Yield = D.TEA_LCA_Qty('Woody Biomass', DayCent_Yields[j]*1000, 'kg/yr/ha')
-    
-    biomass_IO = GG.growGrassForOneYear(land_area_val, Yield)
-    results_array = results_array.append(biomass_IO, ignore_index=True)
-    
-    # Extraction/Conversion
-    conversion_IO = GFT.convertGrassBiomass(land_area_val, results_array)
-    results_array = results_array.append(conversion_IO, ignore_index=True)
-    
-    # Upgrading
-    upgrading_IO = H.upgradeGrassProducts(land_area_val,results_array)
-    results_array = results_array.append(upgrading_IO, ignore_index=True)
-    
-    # Process Control Vol IO
-    IO_array = UF.consolidateIO(results_array)
-       
-    # Calculate GHG Impact
-    mfsp = TEA.calc_MFSP(IO_array)
-    
-    return mfsp
-
-
-
-
 f = open('Ex_Lookup.csv','w')
 
 with f:
     
     writer = csv.writer(f)
-    writer.writerow(['County','MFSP','GWP'])
+    writer.writerow(['County','GWP_gCO2eq/MJ','MFSP_$/gge'])
     i = 0
     while i < len(DayCent_Yields):              # instantiate pandas dataframe before while loop, populate .csv after while
 
-        # MFSP = 1
-        # GWP = 2
-        
-        # MFSP = DayCent_Yields[i]
-        # GWP = DayCent_Yields[i]
-        
-        # MFSP = Grassification_MFSP(i)
-        # GWP = Grassification_GWP(i)
-        
-        answer = Grassification_GWP(i)
+        answer = Grassification_ProcessModelResults(i)
         MFSP = answer[0]
         GWP = answer[1]
         
@@ -141,7 +103,7 @@ with f:
         #df = pd.DataFrame(data=numpy_data
 
         
-        if(i == 10):                        # Clearly I can clean this up with the '%' operator
+        if(i == 10):                        # Clearly, I can clean this up with the '%' operator
             print('10%....')
         if(i == 20):
             print('20%....')
