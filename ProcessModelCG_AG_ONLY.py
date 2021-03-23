@@ -31,7 +31,7 @@ results_array = results_array.append(biomass_IO, ignore_index=True)
 # Which executes just fine - Now we need to modify the existing TLAs to accept only biomass as the product
 Ag_only = bool(True)
 
-MCSP = TEA.calc_MFSP(results_array,Ag_only)*1000
+MCSP = TEA.calc_MFSP(results_array,Ag_only)*1000 # Need a new loop for Ag only Process Set
 
 MCSP = round(MCSP)
 

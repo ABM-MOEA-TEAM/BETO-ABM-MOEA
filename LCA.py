@@ -43,24 +43,15 @@ def calcEROI(tl_array):
 
 # Calculate GHG Impact by energy allocation (reminder--need to add calculations 
 # for allocation by mass, economic allocation, as well as system expansion displacement credits)
-def calcGHGImpact(tl_array, Ag_allocation):
+def calcGHGImpact(tl_array):
     
     # Note that the fact that this is transportation fuel could be a substance attribute
-    
-    # It's this; the "if in" statement is not doing what I thought it was. Each process model steps
-    # through and fails to pass each if, even when fuel is generated. 
     
     jet_a_out = 0
     diesel_out = 0
     gasoline_out = 0
     ethanol_out = 0
     biodiesel_out = 0
-    
-    # for j in range(len(tl_array)):
-    #     rows = tl_array.loc[j]
-    #     outputs = []
-    #     if rows
-
     
     for i in range(len(tl_array)):
         row_vals = tl_array.loc[i]
@@ -117,7 +108,7 @@ def calcGHGImpact(tl_array, Ag_allocation):
     # print('Ethanol    -', ethanol_out)
     # print('Biodiesel  -', biodiesel_out)
     
-    if Ag_allocation == 4:
-        return 75 + GHG_impact/total_MJ
-    
     return GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting
+
+    # I removed the 75 - going to neglect the input credit of carbon pulled from atmosphere and then not track 
+    # the carbon released upon combustion, as this is consistent with the methodology for the other PM's

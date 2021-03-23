@@ -161,7 +161,7 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     # print(abs(npv[-1]))
     return abs(npv[-1])
 
-def calc_MFSP(tl_array,Ag_only_bool):
+def calc_MFSP(tl_array):
     
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Capital Cost']])
@@ -249,10 +249,6 @@ def calc_MFSP(tl_array,Ag_only_bool):
                                                                  loanpay,
                                                                  tl_array))
 
-    if Ag_only_bool == True:
-            print('You are performing an Agriculture-only Analysis.')
-            print('The MCSP appears under MFSP - has units $/tonne:')
-            return result.x
         
     return result.x * 152.79288     # $/MJ (above optimization) * MJ/gge
 
@@ -295,7 +291,9 @@ def calcNonFuelValue(tl_array):
                                       D.LCA_cost)
             if in_or_out == D.tl_output and (subst_name != 'Jet-A' and
                                              subst_name != 'Diesel' and
-                                             subst_name != 'Gasoline'):
-                outputs_value += (LCA_val * mag)
+                                             subst_name != 'Gasoline' and 
+                                             subst_name != 'Ethanol' and 
+                                             subst_name != 'Biodiesel'):
+                outputs_value += (LCA_val * mag)  # In dollars 
     #print(outputs_value)
     return outputs_value

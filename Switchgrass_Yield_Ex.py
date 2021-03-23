@@ -23,7 +23,6 @@ import LCA
 
 # Process steps
 import Grow_Grass as GG
-#import Grow_Grass2 as GG2
 import GasFT as GFT
 import Hydroprocessing as H
 import ProcessModel as PM
