@@ -4,7 +4,9 @@ import UnivFunc as UF
 
 # Bolt on TEA and LCA
 import TEA
+import Ag_TEA
 import LCA
+import Ag_LCA
 
 # Process steps
 import Grow_Grass as GG
@@ -21,6 +23,7 @@ biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 8960, 'kg/yr/h
 # biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 17933, 'kg/yr/ha')
 # Second variable exists so that I could verify that the lookup table output is the same as 
 # the PM execution (note the difference in magnitude of yield)
+
 Ag_only = bool(False)
 AllocationID = 4
 
@@ -28,7 +31,7 @@ ScalingValue = 1000
 # Biomass Production
 
 biomass_IO = GG.growGrassForOneYear(land_area_val, biomass_output)
-#biomass_IO = GG2.growGrassPerKg(land_area_val, biomass_output, ScalingValue)
+
 results_array = results_array.append(biomass_IO, ignore_index=True)
 
 # Extraction/Conversion
@@ -48,8 +51,14 @@ eroi = LCA.calcEROI(IO_array)
 # Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array)
 
+# Calculate GHG Impact at Farm Gate
+ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO)
+
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
+
+# Calculate MCSP at Farm Gate
+mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)

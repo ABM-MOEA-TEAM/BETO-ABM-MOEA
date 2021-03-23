@@ -8,8 +8,9 @@ import TEA_LCA_Data as D
 import UnivFunc as UF
 
 import TEA
-import TEA2
+import Ag_TEA
 import LCA
+import Ag_LCA
 
 # Process steps
 import Soy_Cultivation as SC
@@ -45,13 +46,17 @@ IO_array = UF.consolidateIO(results_array)
 # Calculate EROI
 # eroi = LCA.calcEROI(IO_array)
 
-# # Calculate GHG Impact
+# Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array)
+
+# Calculate GHG Impact at Farm Gate
+ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO)
 
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
 
-
+# Calculate Minimum Crop Selling Price at Farm Gate
+mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
 
 # CheckSum for spreadsheet/Python agreement

@@ -11,7 +11,9 @@ import UnivFunc as UF
 
 # Bolt on TEA and LCA
 import TEA
+import Ag_TEA
 import LCA
+import Ag_LCA
 
 # Process steps
 import Corn_Stover_Cultivation as CSC
@@ -52,8 +54,14 @@ IO_array = UF.consolidateIO(results_array)
 # Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array)
 
+# Calculate GHG Impact at Farm Gate
+ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO)
+
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
+
+# Calculate Minimum Crop Selling Price at farm gate
+mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)

@@ -43,10 +43,18 @@ def growGrassForOneYear(size, biomass_output):
     
     # Calculate Atmospheric CO2 based on biomass output
    
+    # Commenting out this set and replacing with a zero credit placeholder -
+    # methodologically we are going to not count the upfront credit and will 
+    # # instead just neglect the CO2 produced by the combustion
+    # return_array.loc[0] = UF.getWriteRow('Atmospheric CO2', D.biomass_production, 
+    #                                   D.tl_input, 
+    #             biomass_output.qty*size.qty*D.CO2_fixing_proportion_grass.qty)
    
+    # This is the zero credit phrase below
+    scale_zero = 0
     return_array.loc[0] = UF.getWriteRow('Atmospheric CO2', D.biomass_production, 
-                                      D.tl_input, 
-                biomass_output.qty*size.qty*D.CO2_fixing_proportion_grass.qty)
+                                      D.tl_input, biomass_output.qty*size.qty*D.CO2_fixing_proportion_grass.qty*scale_zero)
+   
     
     # special write of woody biomass
     return_array.loc[1] = UF.getWriteRow('Woody Biomass', D.biomass_production, 
@@ -68,38 +76,7 @@ def growGrassForOneYear(size, biomass_output):
         row_count += 1
         
     return return_array
-        
-    # else: 
-    #     BMProduced = D.TEA_LCA_Qty(D.substance_dict, biomass_output, 'kg/ha')
-        
-        
-    #     return_array.loc[0] = UF.getWriteRow('Atmospheric CO2', D.biomass_production, 
-    #                                       D.tl_input, 
-    #                 BMProduced.qty*size.qty*D.CO2_fixing_proportion_grass.qty)
-        
-    #     # special write of woody biomass
-    #     return_array.loc[1] = UF.getWriteRow('Woody Biomass', D.biomass_production, 
-    #                                       D.tl_output, BMProduced.qty*size.qty)
-        
-    #     row_count = 2
-    #     # Scale crop inputs
-    #     for key in crop_inputs:
-    #         pint_qty = size.qty*crop_inputs[key].qty
-    #         return_array.loc[row_count] = UF.getWriteRow(key, D.biomass_production, 
-    #                                                   D.tl_input, pint_qty)
-    #         row_count += 1
-            
-    #     # Scale crop outputs
-    #     for key in crop_outputs:
-    #         pint_qty = size.qty*crop_outputs[key].qty
-    #         return_array.loc[row_count] = UF.getWriteRow(key, D.biomass_production, 
-    #                                                   D.tl_output, pint_qty)
-    #         row_count += 1
-    #     print('Engaged')
-    #     print('Yield for specific county - ', BMProduced.qty)
-    #     return return_array
-        
-    
+
     
 def main():
     land_area_val = D.TEA_LCA_Qty('Land Area', 100, 'hectare')
