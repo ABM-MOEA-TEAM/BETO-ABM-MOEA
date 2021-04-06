@@ -59,12 +59,12 @@ def grow_corn(size,biomass_yield):
     return_array.loc[8] = UF.getWriteRow('Corn Grain', D.biomass_production,                    #
                                       D.tl_output, biomass_yield.qty*size.qty)
     
-    scale10 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha')
+    scale10 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 2300, 'dollars/ha') #2300
     
     return_array.loc[9] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale10.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha')
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.001, 'dollars/ha') #16549
     
     return_array.loc[10] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)

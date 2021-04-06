@@ -170,6 +170,8 @@ def calc_MCSP(tl_array):
     ecovar = {'disc rate': 0.1, 't': 0.2, 'equity': 0.4, 'interest': 0.08, 'loan term': 10, 
               'maint rate': 0.03, 'ins rate': 0.01, 'land lease': 0, 'dep capex': 0.85}
     macrs = [0.143, 0.245, 0.175, 0.125, 0.089, 0.089, 0.089, 0.045]
+    # Matches the B&D AltJet Spreadsheet
+    
     ###yrs = input('What is the project lifespan? ')
     landcapex =  land_cost_qty.magnitude 
     

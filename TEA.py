@@ -143,7 +143,8 @@ def calc_MFSP(tl_array):
     #calculating total costs for inputs to the pathway (opex)
     
     opex = calcOPEX(tl_array)
-
+    #print(capex)
+    #print(opex)
     #Economic analysis variables
     ecovar = {'disc rate': 0.1, 't': 0.2, 'equity': 0.4, 'interest': 0.08, 'loan term': 10, 
               'maint rate': 0.03, 'ins rate': 0.01, 'land lease': 0, 'dep capex': 0.85}
@@ -157,6 +158,7 @@ def calc_MFSP(tl_array):
     invloanshare = capex * (1-ecovar['equity'])
     #Loan annual payment
     loanannpay = capex*(1-ecovar['equity'])*ecovar['interest']*(1+ecovar['interest'])**ecovar['loan term']/((1+ecovar['interest'])**ecovar['loan term']-1)
+    #print(loanannpay)
     #Investment-equity share
     invequityshare = capex * (ecovar['equity'])
     #Salvage value end of life
@@ -243,7 +245,7 @@ def calcOPEX(tl_array):
                                       D.LCA_cost)
             if in_or_out == D.tl_input:
                 inputs_cost += (LCA_val * mag)
-   
+    
     return inputs_cost
 
 # Calculate value of non-fuel outputs

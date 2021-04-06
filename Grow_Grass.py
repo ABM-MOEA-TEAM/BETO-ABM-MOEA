@@ -20,7 +20,7 @@ grass_inputs_dict['Diesel'] = D.TEA_LCA_Qty(
 grass_inputs_dict['Labor'] = D.TEA_LCA_Qty(
     D.substance_dict['Labor'], 33.33333333, 'dollars/yr/ha')
 grass_inputs_dict['Land Capital Cost'] = D.TEA_LCA_Qty(
-    D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha')
+    D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha') # 16549 - Switch to zero if want to replicate with Altjet?
 grass_inputs_dict['Capital Cost'] = D.TEA_LCA_Qty(
     D.substance_dict['Capital Cost'], 2300, 'dollars/ha')
 grass_inputs_dict['Rain Water (Blue Water)'] = D.TEA_LCA_Qty(

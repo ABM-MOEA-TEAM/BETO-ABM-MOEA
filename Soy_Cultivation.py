@@ -53,7 +53,7 @@ def grow_soy(land_area_val, yearly_precip):
     return_array.loc[7] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
                                          D.tl_input, scale8.qty*size.qty*precip.qty)
     
-    scale9 = D.TEA_LCA_Qty(D.substance_dict['Soybeans'],108.765, 'kg/in/yr/ha')
+    scale9 = D.TEA_LCA_Qty(D.substance_dict['Soybeans'],108.8, 'kg/in/yr/ha')
     return_array.loc[8] = UF.getWriteRow('Soybeans', D.biomass_production,
                                          D.tl_output, scale9.qty*size.qty*precip.qty)
     
@@ -62,12 +62,12 @@ def grow_soy(land_area_val, yearly_precip):
     return_array.loc[9] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale10.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha')
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.001, 'dollars/ha') #16549
     
     return_array.loc[10] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)
     
-    scale12 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 60, 'dollars/ha/yr')
+    scale12 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 61.75, 'dollars/ha/yr')
     
     return_array.loc[11] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)

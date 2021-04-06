@@ -80,13 +80,22 @@ def calcGHGImpact(tl_array):
                                             [UF.input_or_output, D.tl_output]]).magnitude
         
 
-    transport_fuel_energy = (43.2*jet_a_out) + (42.975*diesel_out) + (43.44*gasoline_out) + (26.95*ethanol_out) + (37.75*biodiesel_out)
+    transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) + 
+        (43.44*gasoline_out) + (26.95*ethanol_out) + (37.75*biodiesel_out))
     # See the TEA file for comments on this update and for the sources of the LHV's     
     
     # note that excel formula has a few others. zero for grass so omitting.
-    total_MJ = transport_fuel_energy + UF.returnPintQty(tl_array, [[UF.substance_name, 'Electricity'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
-        
+    
+    # This function must take the mass of all outputs (coproducts) such that we can both track how many
+    # coproducts are present and the amount of each coproduct (so that we can scale based on energy,mass, $..)
+    
+    total_MJ = transport_fuel_energy #+ UF.returnPintQty(tl_array, [[UF.substance_name, 'Electricity'],
+    #                                         [UF.input_or_output, D.tl_input]]).magnitude
+    
+    # Removed the electricity MJ's as we will instead take a credit 
+    # Will throw off switchgrass value (3/31/21)
+    # UPDATE - The MJ's electricity is a normalization wrt the functional unit of MJ's (4/5) - need to reintroduce
+    
     GHG_impact = 0
     
     for i in range(len(tl_array)):
@@ -95,11 +104,13 @@ def calcGHGImpact(tl_array):
         in_or_out = row_vals[UF.input_or_output]
         mag = row_vals[UF.magnitude]
         if in_or_out != D.zeroed:
+            #print(subst_name)
             match_list = [[D.LCA_key_str, subst_name],
                           [D.LCA_IO, in_or_out]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_GHG_impact)
+            #print(LCA_val)
             GHG_impact += (LCA_val * mag)
     
     # print('Jet A      -', jet_a_out)        # Helpful output for debugging
@@ -111,4 +122,5 @@ def calcGHGImpact(tl_array):
     return GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting
 
     # I removed the 75 - going to neglect the input credit of carbon pulled from atmosphere and then not track 
-    # the carbon released upon combustion, as this is consistent with the methodology for the other PM's
+    # the carbon released upon combustion, as this is consistent with the methodology for the other PM's (3/31)
+    

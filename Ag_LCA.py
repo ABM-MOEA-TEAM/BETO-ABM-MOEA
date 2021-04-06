@@ -12,7 +12,11 @@ import UnivFunc as UF
 
 # Calculate GHG Impact by energy allocation (reminder--need to add calculations 
 # for allocation by mass, economic allocation, as well as system expansion displacement credits)
-def calcGHGImpactAg(tl_array):
+def calcGHGImpactAg(biomass_IO, MJ_out):
+    
+    # Second Argument is Total MJ's produced by the whole PW - 
+    # allows us to do an Apples-Apples comparison and aids in allocation for 
+    # corn stover pathway
     
     corn_grain_out = 0
     corn_stover_out = 0
@@ -20,25 +24,25 @@ def calcGHGImpactAg(tl_array):
     soybean_out = 0
     mass_allocation_ratio = 1
     
-    for i in range(len(tl_array)):
-        row_vals = tl_array.loc[i]
+    for i in range(len(biomass_IO)):
+        row_vals = biomass_IO.loc[i]
         in_or_out = row_vals[UF.input_or_output]
         subst_name = row_vals[UF.substance_name]
         
         if 'Woody Biomass' in subst_name and in_or_out == D.tl_output:
-            switchgrass_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Woody Biomass'],    
+            switchgrass_out = UF.returnPintQty(biomass_IO, [[UF.substance_name, 'Woody Biomass'],    
                                             [UF.input_or_output, D.tl_output]]).magnitude
         
         if 'Corn Grain' in subst_name and in_or_out == D.tl_output:
-            corn_grain_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Corn Grain'],
+            corn_grain_out = UF.returnPintQty(biomass_IO, [[UF.substance_name, 'Corn Grain'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
             
         if 'Soybeans' in subst_name and in_or_out == D.tl_output:
-            soybean_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Soybeans'],
+            soybean_out = UF.returnPintQty(biomass_IO, [[UF.substance_name, 'Soybeans'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
         
         if 'Corn Stover Collected' in subst_name and in_or_out == D.tl_output:
-            corn_stover_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Corn Stover Collected'],
+            corn_stover_out = UF.returnPintQty(biomass_IO, [[UF.substance_name, 'Corn Stover Collected'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
     
     total_kg = switchgrass_out + corn_grain_out + corn_stover_out + soybean_out 
@@ -47,11 +51,11 @@ def calcGHGImpactAg(tl_array):
         total_kg = corn_stover_out
         print('Allocation Performed')
         mass_allocation_ratio = (corn_stover_out / (corn_stover_out + corn_grain_out))    
-    
+        #print(mass_allocation_ratio)
     GHG_impact = 0
     
-    for i in range(len(tl_array)):
-        row_vals = tl_array.loc[i]
+    for i in range(len(biomass_IO)):
+        row_vals = biomass_IO.loc[i]
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
         mag = row_vals[UF.magnitude]
@@ -64,6 +68,7 @@ def calcGHGImpactAg(tl_array):
             GHG_impact += (LCA_val * mag)
    
     GHG_impact_kg = (GHG_impact * mass_allocation_ratio)/total_kg
-    
-    return GHG_impact_kg
+    GHG_impact_MJ = (GHG_impact * mass_allocation_ratio)/MJ_out
+    #print(GHG_impact)
+    return GHG_impact_MJ
    

@@ -4,7 +4,7 @@ import pandas as pd
 # Column Headings for Results Dataframe
 substance_name = 'Substance_Name'
 process_name = 'Process_Name'
-input_or_output = 'In_or_Out'
+input_or_output = 'In_or_out'
 magnitude = 'Magnitude'
 units = 'Units'
 
