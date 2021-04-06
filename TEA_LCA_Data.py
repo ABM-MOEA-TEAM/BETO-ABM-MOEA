@@ -5,6 +5,7 @@ from pathlib import Path
 cwd = os.getcwd()
 ureg = pint.UnitRegistry()
 ureg.define('dollars = [money]')
+ureg.define('cuttings = [seed]')
 
 def returnPintQtyObj(magnitude, units):
     return magnitude * ureg.parse_expression(units)

@@ -1,7 +1,7 @@
 import TEA_LCA_Data as D
 import UnivFunc as UF
 
-# Calculate EROI
+# Calculate EROI. Note that MJ/X is hard-coded units for LCI
 def calcEROI(tl_array):
     energy_investment = 0
     energy_return = 0
@@ -12,6 +12,7 @@ def calcEROI(tl_array):
         in_or_out = row_vals[UF.input_or_output]
         mag = row_vals[UF.magnitude]
         val_units = row_vals[UF.units]
+        val_qty = D.returnPintQtyObj(mag, val_units)
         if in_or_out != D.zeroed:
             match_list = [[D.LCA_key_str, subst_name],
                           [D.LCA_IO, in_or_out]]
@@ -21,6 +22,8 @@ def calcEROI(tl_array):
             LCA_units = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_units)
+            LCA_qty = D.returnPintQtyObj(LCA_val, str('MJ / (' + LCA_units + ')'))
+
             if LCA_units != val_units:
                 print(subst_name)
                 print(LCA_units)
@@ -30,9 +33,9 @@ def calcEROI(tl_array):
                 
             
             if in_or_out == D.tl_input:
-                energy_investment += (LCA_val * mag)
+                energy_investment += (LCA_qty * val_qty).to('MJ')
             else:
-                energy_return += (LCA_val * mag)
+                energy_return += (LCA_qty * val_qty).to('MJ')
     
     eroi = 0
     try:
