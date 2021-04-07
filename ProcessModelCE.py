@@ -116,7 +116,7 @@ LCA_val_elec = UF.returnLCANumber(D.LCA_inventory_df,
 
 elec_credit = (LCA_val_elec*elec_out)/transport_fuel_energy
 #Calculate EROI
-#eroi = LCA.calcEROI(IO_array)
+eroi = LCA.calcEROI(IO_array)
 
 # Calculate GHG Impact at Farm Gate
 ghg_farm = Ag_LCA.calcGHGImpactAg(biomass_IO,transport_fuel_energy)

@@ -49,7 +49,7 @@ def grow_soy(land_area_val, yearly_precip):
     return_array.loc[6] = UF.getWriteRow('Ag Lime (CaCO3)', D.biomass_production,
                                          D.tl_input, scale7.qty*size.qty)
     
-    scale8 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],253236, 'kg/in/yr/ha')
+    scale8 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],4678, 'm**3/ha/yr')
     return_array.loc[7] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
                                          D.tl_input, scale8.qty*size.qty*precip.qty)
     
@@ -72,7 +72,7 @@ def grow_soy(land_area_val, yearly_precip):
     return_array.loc[11] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)
     
-    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253180, 'kg/yr/ha')
+    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 4665, 'm**3/yr/ha')
     
     return_array.loc[12] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
                                       D.tl_output, scale13.qty*size.qty)

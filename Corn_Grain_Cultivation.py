@@ -48,10 +48,10 @@ def grow_corn(size,biomass_yield):
     return_array.loc[5] = UF.getWriteRow('Herbicide', D.biomass_production,
                                       D.tl_input, scale6.qty*size.qty)
     
-    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 253236, 'kg/ha/yr')
+    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 4678, 'm**3/ha/yr')
     
     return_array.loc[6] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,       # needed?
-                                      D.tl_input, scale7.qty*34*size.qty)                       # 34 is avg precip
+                                      D.tl_input, scale7.qty*size.qty)                       # 34 is avg precip
     
     return_array.loc[7] = UF.getWriteRow('Corn Stover Left', D.biomass_production,              #
                                       D.tl_output, 0.886776927*biomass_yield.qty*size.qty)
@@ -74,10 +74,10 @@ def grow_corn(size,biomass_yield):
     return_array.loc[11] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)
     
-    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 252875, 'kg/ha/yr') # Total water eventually returned
+    scale13 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 4665, 'm**3/ha/yr') # Total water eventually returned
     
     return_array.loc[12] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,      #
-                                      D.tl_output, scale13.qty*34*size.qty)
+                                      D.tl_output, scale13.qty*size.qty)
     
     return return_array
     

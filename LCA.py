@@ -22,7 +22,7 @@ def calcEROI(tl_array):
             LCA_units = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_units)
-            LCA_qty = D.returnPintQtyObj(LCA_val, str('MJ / (' + LCA_units + ')'))
+            
 
             if LCA_units != val_units:
                 print(subst_name)
@@ -31,6 +31,7 @@ def calcEROI(tl_array):
                 pqty = D.returnPintQtyObj(mag, val_units)
                 mag = UF.returnConvertedMagnitude(pqty, LCA_units)
                 
+            LCA_qty = D.returnPintQtyObj(LCA_val, str('MJ / (' + LCA_units + ')'))
             
             if in_or_out == D.tl_input:
                 energy_investment += (LCA_qty * val_qty).to('MJ')

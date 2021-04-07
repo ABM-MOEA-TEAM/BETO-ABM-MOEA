@@ -44,7 +44,7 @@ results_array = results_array.append(upgrading_IO, ignore_index=True)
 IO_array = UF.consolidateIO(results_array)
 
 # Calculate EROI
-# eroi = LCA.calcEROI(IO_array)
+eroi = LCA.calcEROI(IO_array)
 
 jet_a_out = 0
 diesel_out = 0

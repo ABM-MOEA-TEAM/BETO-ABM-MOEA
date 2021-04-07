@@ -51,10 +51,10 @@ def grow_stover(size,yield_value):
     return_array.loc[5] = UF.getWriteRow('Herbicide', D.biomass_production,
                                       D.tl_input, scale6.qty*size.qty)
 
-    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 838.39, 'kg/ha/yr') 
+    scale7 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 4678, 'm**3/ha/yr') 
     
     return_array.loc[6] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
-                                      D.tl_input, scale7.qty*yield_value*size.qty)
+                                      D.tl_input, scale7.qty*size.qty)
    # 4/6 - the rain values are still scaling wrt to the yield, don't know what to set this to
 
     scale8 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Collected'], 1, 'kg/ha/yr')
@@ -88,10 +88,10 @@ def grow_stover(size,yield_value):
     return_array.loc[12] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale13.qty*size.qty)
     
-    scale14 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 836.18, 'kg/ha/yr') # Total water eventually returned
+    scale14 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 4665, 'm**3/ha/yr') # Total water eventually returned
     
     return_array.loc[13] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
-                                      D.tl_output, scale14.qty*yield_value*size.qty)
+                                      D.tl_output, scale14.qty*size.qty)
     
     return return_array
 
