@@ -54,6 +54,7 @@ downstream_IO = downstream_IO.append(upgrading_IO, ignore_index=True)
 # Process Control Vol IO
 IO_array = UF.consolidateIO(results_array)
 IO_ds_array = UF.consolidateIO(downstream_IO)
+
 # If we end up doing a mass allocation in the TEA steps, it might make sense
 # to replace the "IO_array" as I don't know if we're using it any longer
 
@@ -109,12 +110,7 @@ transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) +
         (43.44*gasoline_out) + (26.95*ethanol_out) + (37.75*biodiesel_out))
 # This is just the logic from the TEA block
 
-LCA_val_elec = UF.returnLCANumber(D.LCA_inventory_df,
-                                  [[D.LCA_key_str, 'Electricity'],
-                                   [D.LCA_IO, D.tl_output]],
-                                  D.LCA_GHG_impact)
 
-elec_credit = (LCA_val_elec*elec_out)/transport_fuel_energy
 #Calculate EROI
 eroi = LCA.calcEROI(IO_array)
 
@@ -129,7 +125,7 @@ ghg_downstream = LCA.calcGHGImpact(IO_ds_array)
 # Compiles the Greenhouse Gas Impact of the conv/upgr blocks
 
 #ghg_impact = ghg_farm + ghg_downstream
-ghg_impact = ghg_farm + ghg_downstream - elec_credit
+ghg_impact = ghg_farm + ghg_downstream
 
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)

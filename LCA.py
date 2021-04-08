@@ -47,20 +47,39 @@ def calcEROI(tl_array):
 
 # Calculate GHG Impact by energy allocation (reminder--need to add calculations 
 # for allocation by mass, economic allocation, as well as system expansion displacement credits)
-def calcGHGImpact(tl_array):
+def calcGHGImpact(tl_array): # Needs additional argument (calcGHGImpact(tl_array,products_list,co-products_list))
     
     # Note that the fact that this is transportation fuel could be a substance attribute
+    
+    output_frame = [] # Intent as of (4/7) is to simply return all LCA results 
+    # for all methods (ie from energy, mass, $ allocation and later displac.)
+    
+    # Need to add names for entries in output frame
     
     jet_a_out = 0
     diesel_out = 0
     gasoline_out = 0
     ethanol_out = 0
     biodiesel_out = 0
+    electricity_out_MJ = 0
+    soymeal_out = 0
+    ddgs_out = 0
     
     for i in range(len(tl_array)):
         row_vals = tl_array.loc[i]
         in_or_out = row_vals[UF.input_or_output]
         subst_name = row_vals[UF.substance_name]
+        
+        # Replace these statements with products list and coproducts list
+        # Substance name is critical - MJ's 
+        # Collapse down to single if;
+        # If subst_name in products_list and in_or_out == output:
+            # create a dictionary (declare) {} - 
+            # dictionary_subst_name = pintQty (should populate with amounts of indicated prod quantities)
+        # same loop and structure for coproducts 
+        # that gives us length of coproducts list 
+        
+        # Create a dictionary in TEA_LCA_Data with the substance name and energy content
         
         if 'Jet-A' in subst_name and in_or_out == D.tl_output:
             jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
@@ -82,24 +101,39 @@ def calcGHGImpact(tl_array):
         if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
             biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],
                                             [UF.input_or_output, D.tl_output]]).magnitude
+    # transport fuel energy is the primary product, the list below identifies following coproducts    
+
+        if 'Electricity' in subst_name and in_or_out == D.tl_output:
+            electricity_out_MJ = UF.returnPintQty(tl_array, [[UF.substance_name, 'Electricity'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+
+    # Feed Coproducts list
+        if 'Soymeal' in subst_name and in_or_out == D.tl_output:
+            soymeal_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Soymeal'],
+                                            [UF.input_or_output, D.tl_output]]).magnitude
+    
         
+    transport_fuel_kg = jet_a_out + diesel_out + gasoline_out + ethanol_out + biodiesel_out # all kg
 
     transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) + 
-        (43.44*gasoline_out) + (26.95*ethanol_out) + (37.75*biodiesel_out))
-    # See the TEA file for comments on this update and for the sources of the LHV's     
+        (43.44*gasoline_out) + (26.95*ethanol_out) + (37.75*biodiesel_out)) # loop to get products energy (above)
+    # make the heating values pint quantities (kg/day?) TEA_LCA_Data function in declaration (MJ/kg)
     
-    # note that excel formula has a few others. zero for grass so omitting.
+    # Going to move these values from being hardcoded to being a substance attribute
+    # Also decided to switch from LHV to HHV (4/7)
+    
+    # Transport fuel = primary product, Electricity out = 1st coproduct, Feed out = 2nd coproduct
     
     # This function must take the mass of all outputs (coproducts) such that we can both track how many
     # coproducts are present and the amount of each coproduct (so that we can scale based on energy,mass, $..)
     
-    total_MJ = transport_fuel_energy #+ UF.returnPintQty(tl_array, [[UF.substance_name, 'Electricity'],
-    #                                         [UF.input_or_output, D.tl_input]]).magnitude
+    total_MJ = transport_fuel_energy + electricity_out_MJ
     
-    # Removed the electricity MJ's as we will instead take a credit 
-    # Will throw off switchgrass value (3/31/21)
-    # UPDATE - The MJ's electricity is a normalization wrt the functional unit of MJ's (4/5) - need to reintroduce
+    feed_out_kg = soymeal_out #+ all the other things I need to add still (DDGS..) (4/7)
     
+    feed_out_MJ = soymeal_out # * energy of soymeal + DDGS * energy of DDGS, etc.
+    
+    # Evaluate the Total GHG burden of the pathway
     GHG_impact = 0
     
     for i in range(len(tl_array)):
@@ -107,8 +141,8 @@ def calcGHGImpact(tl_array):
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
         mag = row_vals[UF.magnitude]
-        if in_or_out != D.zeroed:
-            #print(subst_name)
+        if in_or_out == D.tl_input:             #(4/7) changed to "tl_Input" as we are not handling the 
+            #print(subst_name)                  # output substance impacts until we try to tackle displ
             match_list = [[D.LCA_key_str, subst_name],
                           [D.LCA_IO, in_or_out]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
@@ -117,14 +151,62 @@ def calcGHGImpact(tl_array):
             #print(LCA_val)
             GHG_impact += (LCA_val * mag)
     
-    # print('Jet A      -', jet_a_out)        # Helpful output for debugging
-    # print('Diesel     -', diesel_out)
-    # print('Gasoline   -', gasoline_out)
-    # print('Ethanol    -', ethanol_out)
-    # print('Biodiesel  -', biodiesel_out)
-    
-    return GHG_impact/total_MJ # the 75 number has to do with pre/post combustion accounting
+    # GHG_impact is the total burden that the pathway possesses 
 
-    # I removed the 75 - going to neglect the input credit of carbon pulled from atmosphere and then not track 
-    # the carbon released upon combustion, as this is consistent with the methodology for the other PM's (3/31)
+    #################### Energy Allocation Logic ####################
     
+    primary_prod_MJ = transport_fuel_energy # Should always be nonzero as a fuel is always produced
+    
+    coprod1_MJ = 0
+    coprod2_MJ = 0
+    
+    if electricity_out_MJ == 0 and feed_out_MJ == 0:
+    # Should not occur for any of the pathways as all produce elec or feed
+    
+        print("No coproduct! Check pathway?")
+        return output_frame
+    
+    if electricity_out_MJ != 0 and feed_out_kg != 0:
+        coprod1_MJ = electricity_out_MJ
+        coprod2_MJ = feed_out_MJ
+    
+    # This assumes that at most only fuel, elec, and one feed are produced
+    # probably ok for the first attempt but not going to be sufficient for 
+    # pathways with numerous coproducts (i.e. algae) 
+    
+    if electricity_out_MJ == 0 and feed_out_kg != 0:
+        coprod1_MJ = feed_out_MJ
+    
+    # If no electricity is made and feed is present, feed is only (1st) coproduct
+    
+    if electricity_out_MJ != 0 and feed_out_kg == 0:
+        coprod1_MJ = electricity_out_MJ
+    
+    # Nothing should get through these if's but it would probably be best to clean 
+    # them up somehow. Maybe set coprod1_MJ to elec and coprod2_MJ to feed and then
+    # check for the special case of is elec == 0? Ways to improve code...(4/7)
+    
+    total_MJ = primary_prod_MJ + coprod1_MJ + coprod2_MJ
+    
+    primary_ratio = primary_prod_MJ/total_MJ
+    coprod1_ratio = coprod1_MJ/total_MJ
+    coprod2_ratio = coprod2_MJ/total_MJ    
+    
+    normalized_burden = GHG_impact/total_MJ
+    primary_burden = (GHG_impact*primary_ratio)/primary_prod_MJ
+    coprod1_burden = (GHG_impact*coprod1_ratio)/primary_prod_MJ
+    coprod2_burden = (GHG_impact*coprod2_ratio)/primary_prod_MJ
+    
+    # I am normalizing with respect to the transport fuel energy rather than each
+    # coproduct as the we feel it describes more clearly the relative burdens of 
+    # the different products. If /"coprod1", all should be the same:
+    # GHG_impact/total_MJ's gives the value that all work out to. 
+    
+    output_frame.append(normalized_burden)
+    output_frame.append(primary_burden)
+    output_frame.append(coprod1_burden)
+    output_frame.append(coprod2_burden)
+    print(coprod2_burden)
+    #################### Mass Allocation Logic ####################
+    
+    return output_frame
