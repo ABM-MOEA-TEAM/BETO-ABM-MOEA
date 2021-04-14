@@ -39,6 +39,7 @@ Glucose,glucose
 Glucoamylase,glucoamylase
 Glycerol,glycerol
 Grass Seed,grass_seed
+Greenhouse Gas Impact,ghg_i
 Heat,heat
 Herbicide,herbicide
 Hexane Loss,hexane_loss
@@ -48,6 +49,7 @@ JP-5,jp5
 JP-8,jp8
 Jet A-1,jet_a1
 Jet-A,jet_a
+LNG,lng
 LPG,lpg
 LUC Emissions,luc_emissions
 Labor,labor

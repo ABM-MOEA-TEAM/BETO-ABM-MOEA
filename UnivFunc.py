@@ -1,6 +1,8 @@
 import TEA_LCA_Data as D
 import pandas as pd
 
+import csv
+
 # Column Headings for Results Dataframe
 substance_name = 'Substance_Name'
 process_name = 'Process_Name'
@@ -48,7 +50,7 @@ def returnPintQty(tl_array, match_list):
             query_str += match_list[i][0] + ' == "' + match_list[i][1] + '"'
         else:
             query_str += match_list[i][0] + ' == "' + match_list[i][1] + '" and '
-    
+        #print(query_str)
     rows = tl_array.query(query_str)
     if len(rows) == 1:
         row_vals = list(rows.loc[list(rows.index)[0]])
@@ -74,6 +76,36 @@ def returnLCANumber(df, match_list, desired_col_name):
         pass
             
     return return_obj
+
+def returnProdlist(pathname):
+    prodlist = []
+    return_list = []        
+    
+    prods = 'Product'
+    products_listed = pd.read_csv(pathname)
+    
+    for i in range(len(products_listed)):
+        row = products_listed.loc[i]
+        prodlist.append(row[prods])
+ 
+    for i in range(len(products_listed)):
+        row = prodlist[i]
+        isnull_query = pd.isnull(row)
+        if isnull_query == False:
+            return_list.append(row)
+    return return_list
+
+def returnCoProdlist(pathname):
+    coprodlist = []
+    
+    coprods = 'Co-products'
+    coprods_list = pd.read_csv(pathname)
+    
+    for i in range(len(coprods_list)):
+        row = coprods_list.loc[i]
+        coprodlist.append(row[coprods])
+        
+    return coprodlist
 
 def returnListOfPintQtys(tl_array):
     return_list = []

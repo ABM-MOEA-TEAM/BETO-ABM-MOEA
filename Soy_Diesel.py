@@ -18,6 +18,9 @@ def diesel_soy(biomass_IO_array):
     
     soybean_qty = UF.returnPintQty(biomass_IO_array, match_list)
     
+    # Depending on the feedstock type, if statements filter the scaling values
+    # (Chance to stop a nonsensical extraction ask - i.e. corn "extraction")
+    
     results_array.loc[0] = UF.getWriteRow('Soybeans', D.conv, 
                                       D.tl_input, soybean_qty)
     results_array.loc[1] = UF.getWriteRow('Hexane Loss', D.conv, 
@@ -32,13 +35,19 @@ def diesel_soy(biomass_IO_array):
                                       D.tl_input, 0.41301*soybean_qty)
     results_array.loc[6] = UF.getWriteRow('FAMEs and Glycerol', D.conv, 
                                       D.tl_output, 0.19424*soybean_qty)
+    results_array.loc[7] = UF.getWriteRow('Soybean Meal', D.conv,
+                                      D.tl_output, 0.73261*soybean_qty)
+    
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['LNG'],0.73639,'MJ/kg')
+    results_array.loc[8] = UF.getWriteRow('LNG', D.conv,
+                                      D.tl_input, soybean_qty*scale1.qty)
     
     return results_array
 
 def main():
     land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
-    yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')
-    biomass_IO_array = SC.grow_soy(land_area_val, yearly_precip)
+    yield_value = 3698
+    biomass_IO_array = SC.grow_soy(land_area_val, yield_value)
     
     return diesel_soy(biomass_IO_array)
 

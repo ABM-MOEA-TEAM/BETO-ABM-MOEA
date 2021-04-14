@@ -54,8 +54,8 @@ def ethanol_grain(biomass_IO_array):
 def main():
     
     land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
-    yearly_precip = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'],34,'inches')
-    biomass_IO_array = CGC.grow_corn(land_area_val,yearly_precip)
+    biomass_yield = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'],10974,'kg/ha/yr')
+    biomass_IO_array = CGC.grow_corn(land_area_val,biomass_yield)
     
     return ethanol_grain(biomass_IO_array)
 

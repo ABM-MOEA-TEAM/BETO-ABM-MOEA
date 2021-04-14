@@ -49,7 +49,7 @@ def calcGHGImpactAg(biomass_IO, MJ_out):
 
     if corn_stover_out != 0 and corn_grain_out != 0: # I think this conditional has to follow "total_kg" assignment
         total_kg = corn_stover_out
-        print('Allocation Performed')
+        #print('Allocation Performed')
         mass_allocation_ratio = (corn_stover_out / (corn_stover_out + corn_grain_out))    
         #print(mass_allocation_ratio)
     GHG_impact = 0
