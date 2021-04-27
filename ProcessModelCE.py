@@ -81,7 +81,7 @@ eroi = LCA.calcEROI(IO_array)
 
 # Calc GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array,prod,coprods)
-
+                            
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
 

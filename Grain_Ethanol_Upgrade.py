@@ -39,10 +39,12 @@ def upgrade_grain_ethanol(biomass_IO_array):
     
     results_array.loc[7] = UF.getWriteRow('Capital Cost', D.upgrading, 
                                       D.tl_input, capex.qty)
-                                                                                # !! Placeholder - need to back out actual electricty
-                                                                                # produced per kg of corn beer from burner.
-    # results_array.loc[5] = UF.getWriteRow('Atmospheric CO2', D.conv,          # Must remember to be consistent with In/Out
-    #                                   D.tl_output, 0.049379*corn_beer_qty)    # CO2 flows (count up front and end? not at all?)
+    
+    scale2 = D.TEA_LCA_Qty(D.substance_dict['LNG'],0.95077,'MJ/kg')
+    
+    results_array.loc[8] = UF.getWriteRow('LNG', D.conv,
+                                      D.tl_input, corn_beer_qty*scale2.qty)
+    
     return results_array
 
 def main():
