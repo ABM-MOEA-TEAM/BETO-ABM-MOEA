@@ -245,7 +245,7 @@ def calcOPEX(tl_array):
                                       D.LCA_cost)
             if in_or_out == D.tl_input:
                 inputs_cost += (LCA_val * mag)
-    
+    print(inputs_cost)
     return inputs_cost
 
 # Calculate value of non-fuel outputs

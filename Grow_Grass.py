@@ -79,7 +79,7 @@ def growGrassForOneYear(size, biomass_output):
 
     
 def main():
-    land_area_val = D.TEA_LCA_Qty('Land Area', 100, 'hectare')
+    land_area_val = D.TEA_LCA_Qty('Land Area', 1, 'hectare')
     biomass_output = D.TEA_LCA_Qty('Woody Biomass', 8960, 'kg/yr/ha')
     return growGrassForOneYear(land_area_val, biomass_output)
 

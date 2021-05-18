@@ -27,6 +27,9 @@ forestry_cited_values_dict['Labor'] = D.TEA_LCA_Qty_Cited(
 forestry_cited_values_dict['Capital Cost'] = D.TEA_LCA_Qty_Cited(
     D.substance_dict['Capital Cost'], 7547.02, 'dollars/ha',
     'Swanson, 2010')
+forestry_cited_values_dict['Land Capital Cost'] = D.TEA_LCA_Qty_Cited(
+    D.substance_dict['Land Capital Cost'], 0.000001, 'dollars/ha',
+    'Swanson, 2010')        # Need an empty but present value for non-vert. int.
 
 forestry_out_vals = {}
 forestry_out_vals['Syncrude'] = D.TEA_LCA_Qty_Cited(
@@ -53,7 +56,7 @@ forestry_out_vals['Electricity'] = D.TEA_LCA_Qty_Cited(
 
 # Grass Conversion IO
 conv_in_list = ['Water', 'Steam', 'FT Catalysts', 'Air',
-                'Propane', 'Electricity', 'Labor', 'Capital Cost']
+                'Propane', 'Electricity', 'Labor', 'Capital Cost','Land Capital Cost']
 conv_out_list = ['Syncrude', 'Slag', 'CO2 Gas', 'Nitrogen Gas', 'Hydrogen',
                  'Wastewater', 'Electricity']
 
@@ -89,6 +92,7 @@ def convertGrassBiomass(size, biomass_IO_array):
                                                   D.tl_output, pint_qty)
         row_count += 1
         
+    
     return return_array
 
 def main():

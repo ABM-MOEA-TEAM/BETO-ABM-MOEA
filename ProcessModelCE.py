@@ -27,6 +27,7 @@ cwd = os.getcwd()
 
 # Initialize empty Process Model output table
 results_array = UF.createEmptyFrame()
+ds_results_array = UF.createEmptyFrame()
 
 # Scaling Value
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
@@ -42,23 +43,16 @@ results_array = results_array.append(biomass_IO, ignore_index=True)
 # Extraction/Conversion
 conversion_IO = CSE.ethanol_stover(biomass_IO)
 results_array = results_array.append(conversion_IO, ignore_index=True)
+ds_results_array = ds_results_array.append(conversion_IO, ignore_index=True)
 
 # Upgrading
 upgrading_IO = SEU.upgrade_stover_ethanol(conversion_IO)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
-
-downstream_IO = UF.createEmptyFrame()   # Downstream here corresponds to 
-                                        # the conversion and upgrading blocks
-                                        # (perhaps another name is better?)
-
-downstream_IO = downstream_IO.append(conversion_IO, ignore_index=True)
-downstream_IO = downstream_IO.append(upgrading_IO, ignore_index=True)
-
-# And we now have a compliment to the Biomass IO array
+ds_results_array = ds_results_array.append(upgrading_IO, ignore_index=True)
 
 # Process Control Vol IO
 IO_array = UF.consolidateIO(results_array)
-IO_ds_array = UF.consolidateIO(downstream_IO)
+ds_IO_array = UF.consolidateIO(ds_results_array)
 
 # If we end up doing a mass allocation in the TEA steps, it might make sense
 # to replace the "IO_array" as I don't know if we're using it any longer
@@ -80,10 +74,11 @@ coprods = UF.returnCoProdlist(pathname)
 eroi = LCA.calcEROI(IO_array)
 
 # Calc GHG Impact
-ghg_impact = LCA.calcGHGImpact(IO_array,prod,coprods)
+ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
                             
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
+new_mfsp = TEA.calc_MFSP(ds_IO_array)
 
 # Calculate Minimum Crop Selling Price at farm gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)

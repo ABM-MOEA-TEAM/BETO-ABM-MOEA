@@ -25,18 +25,20 @@ def upgrade_soy_diesel(biomass_IO_array):
     results_array.loc[1] = UF.getWriteRow('Glycerol', D.conv, 
                                       D.tl_output, 0.01779*FAME_qty)
     results_array.loc[2] = UF.getWriteRow('Methanol', D.conv, 
-                                      D.tl_output, 0.05139*FAME_qty)
+                                      D.tl_output, 0.0070434*FAME_qty)
     results_array.loc[3] = UF.getWriteRow('Biodiesel', D.conv, 
-                                      D.tl_output, 0.87163*FAME_qty)
+                                      D.tl_output, 0.979966*FAME_qty)
         
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.56852,'MJ/kg')
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],3.3365,'MJ/kg')
     results_array.loc[4] = UF.getWriteRow('Electricity', D.conv, 
                                       D.tl_input, scale1.qty*FAME_qty)
     
-    scale3 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'],0.05757,'dollars*yr/kg')  
+    # scale3 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'],2.348,'dollars*yr/kg') #2.348*FAME_qty for Excel PM, 681.72 for AltJet 
+    # results_array.loc[5] = UF.getWriteRow('Capital Cost', D.conv,
+    #                                   D.tl_input, scale3.qty*FAME_qty)
+    scale3 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'],504.59,'dollars') #2.348*FAME_qty for Excel PM, 681.72 for AltJet 
     results_array.loc[5] = UF.getWriteRow('Capital Cost', D.conv,
-                                      D.tl_input, scale3.qty*FAME_qty)
-    
+                                      D.tl_input, scale3.qty)
     
     return results_array
 

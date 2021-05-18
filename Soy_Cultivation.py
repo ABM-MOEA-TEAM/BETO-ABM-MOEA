@@ -58,7 +58,7 @@ def grow_soy(land_area_val, yield_value):
     return_array.loc[8] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale10.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.001, 'dollars/ha') #16549
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.000001, 'dollars/ha') #16549
     
     return_array.loc[9] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)

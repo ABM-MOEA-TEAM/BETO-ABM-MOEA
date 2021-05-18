@@ -57,40 +57,34 @@ def grow_stover(size,yield_value):
                                       D.tl_input, scale7.qty*size.qty)
    # 4/6 - the rain values are still scaling wrt to the yield, don't know what to set this to
 
-    scale8 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Collected'], 1, 'kg/ha/yr')
+    scale9 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover'], 2, 'kg/ha/yr')
     
-    return_array.loc[7] = UF.getWriteRow('Corn Stover Collected', D.biomass_production, 
-                                      D.tl_output, scale8.qty*yield_value*size.qty)
-   # 4/6 - Removed the scalar for "stover collected" - hope to put back in before push
-
-    scale9 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Left'], 1, 'kg/ha/yr')
-    
-    return_array.loc[8] = UF.getWriteRow('Corn Stover Left', D.biomass_production, 
+    return_array.loc[7] = UF.getWriteRow('Corn Stover', D.biomass_production, 
                                       D.tl_output, scale9.qty*yield_value*size.qty)
     
     scale10 = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], 2.255, 'kg/ha/yr')
     
-    return_array.loc[9] = UF.getWriteRow('Corn Grain', D.biomass_production, 
+    return_array.loc[8] = UF.getWriteRow('Corn Grain', D.biomass_production, 
                                       D.tl_output, scale10.qty*yield_value*size.qty)
     
     scale11 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 597.7, 'dollars/ha') #597.7
     
-    return_array.loc[10] = UF.getWriteRow('Capital Cost', D.biomass_production,
+    return_array.loc[9] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)
     
     scale12 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha') #16549
     
-    return_array.loc[11] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
+    return_array.loc[10] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale12.qty*size.qty)
     
     scale13 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 33.33, 'dollars/ha/yr')
     
-    return_array.loc[12] = UF.getWriteRow('Labor', D.biomass_production,
+    return_array.loc[11] = UF.getWriteRow('Labor', D.biomass_production,
                                       D.tl_input, scale13.qty*size.qty)
     
     scale14 = D.TEA_LCA_Qty(D.substance_dict['Rain Water (Blue Water)'], 4665, 'm**3/ha/yr') # Total water eventually returned
     
-    return_array.loc[13] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
+    return_array.loc[12] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,
                                       D.tl_output, scale14.qty*size.qty)
     
     return return_array

@@ -15,9 +15,9 @@ def ethanol_stover(biomass_IO_array):
     return_array = UF.createEmptyFrame()    
     
     match_list = [[UF.input_or_output, D.tl_output],
-                 [UF.substance_name, 'Corn Stover Collected']]      # Grab the total amount of stover sent to BPP
+                 [UF.substance_name, 'Corn Stover']]      # Grab the total amount of stover sent to BPP
     
-    corn_stover_qty = UF.returnPintQty(biomass_IO_array, match_list)
+    corn_stover_qty = 0.5*UF.returnPintQty(biomass_IO_array, match_list)
       
     return_array.loc[0] = UF.getWriteRow('Water', D.conv, 
                                       D.tl_input, 7.655*corn_stover_qty)
@@ -43,13 +43,21 @@ def ethanol_stover(biomass_IO_array):
     return_array.loc[7] = UF.getWriteRow('Corn Beer', D.conv, 
                                       D.tl_output, 4.727*corn_stover_qty)
     
-    return_array.loc[8] = UF.getWriteRow('Corn Stover Collected', D.conv,
+    return_array.loc[8] = UF.getWriteRow('Corn Stover', D.conv,
                                       D.tl_input, corn_stover_qty)
     
     scale9 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], 0.519228,'MJ/kg')
     return_array.loc[9] = UF.getWriteRow('Electricity', D.conv,
                                       D.tl_input, scale9.qty*corn_stover_qty)
     # 2888.51 MJ/ha from summing electricity inputs in Excel Model Blocks
+    
+    scale10 = D.TEA_LCA_Qty('Land Capital Cost', 0.000001, 'dollars')
+    return_array.loc[10] = UF.getWriteRow('Land Capital Cost', D.conv, 
+                                      D.tl_input, scale10.qty)
+    
+    scale3 = D.TEA_LCA_Qty('Labor', 0.000001, 'dollars/yr')
+    return_array.loc[11] = UF.getWriteRow('Labor', D.conv, 
+                                      D.tl_input, scale3.qty)
     
     return return_array
     

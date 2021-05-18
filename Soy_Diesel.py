@@ -22,7 +22,7 @@ def diesel_soy(biomass_IO_array):
     # (Chance to stop a nonsensical extraction ask - i.e. corn "extraction")
     
     results_array.loc[0] = UF.getWriteRow('Soybeans', D.conv, 
-                                      D.tl_input, soybean_qty)
+                                      D.tl_input, 1*soybean_qty)
     results_array.loc[1] = UF.getWriteRow('Hexane Loss', D.conv, 
                                       D.tl_input, 0.00676*soybean_qty)
     results_array.loc[2] = UF.getWriteRow('Sodium Hydroxide', D.conv, 
@@ -42,6 +42,13 @@ def diesel_soy(biomass_IO_array):
     results_array.loc[8] = UF.getWriteRow('LNG', D.conv,
                                       D.tl_input, soybean_qty*scale1.qty)
     
+    scale2 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.000001, 'dollars')
+    results_array.loc[9] = UF.getWriteRow('Land Capital Cost', D.conv,
+                                      D.tl_output, scale2.qty)
+    
+    scale3 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 0.000001, 'dollars/yr')
+    results_array.loc[10] = UF.getWriteRow('Labor', D.conv,
+                                      D.tl_output, scale3.qty)
     return results_array
 
 def main():

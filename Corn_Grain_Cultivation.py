@@ -15,7 +15,7 @@ def grow_corn(size,biomass_yield):
  
     return_array = UF.createEmptyFrame()    
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Stover Collected'], 17.69, 'kg/ha/yr')
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'], 17.69, 'kg/ha/yr')
        
     return_array.loc[0] = UF.getWriteRow('Corn Seed', D.biomass_production, 
                                       D.tl_input, scale1.qty*size.qty)
@@ -53,7 +53,7 @@ def grow_corn(size,biomass_yield):
     return_array.loc[6] = UF.getWriteRow('Rain Water (Blue Water)', D.biomass_production,       # needed?
                                       D.tl_input, scale7.qty*size.qty)                       # 34 is avg precip
     
-    return_array.loc[7] = UF.getWriteRow('Corn Stover Left', D.biomass_production,              #
+    return_array.loc[7] = UF.getWriteRow('Corn Stover', D.biomass_production,              #
                                       D.tl_output, 0.886776927*biomass_yield.qty*size.qty)
     
     return_array.loc[8] = UF.getWriteRow('Corn Grain', D.biomass_production,                    #

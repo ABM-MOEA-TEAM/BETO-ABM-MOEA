@@ -94,7 +94,7 @@ def calcGHGImpact(tl_array, prod, coprods): # Needs additional argument (calcGHG
             GHG_impact_val += (LCA_val * mag)
     
     GHG_impact = D.TEA_LCA_Qty(D.substance_dict['Greenhouse Gas Impact'], GHG_impact_val, 'g/yr')
-    print(GHG_impact.qty)
+    # print(GHG_impact.qty)
   
     for i in range(len(coprods)):
         if coprods[i] == 'Electricity':

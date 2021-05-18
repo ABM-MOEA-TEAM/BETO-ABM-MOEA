@@ -26,6 +26,7 @@ cwd = os.getcwd()
 
 # Initialize empty Process Model output table
 results_array = UF.createEmptyFrame()
+ds_results_array = UF.createEmptyFrame()
 
 # Scaling Value
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
@@ -44,13 +45,16 @@ results_array = results_array.append(biomass_IO, ignore_index=True)
 # Extraction/Conversion
 conversion_IO = CGE.ethanol_grain(biomass_IO)
 results_array = results_array.append(conversion_IO, ignore_index=True)
+ds_results_array = ds_results_array.append(conversion_IO, ignore_index=True)
 
 # Upgrading
 upgrading_IO = GEU.upgrade_grain_ethanol(conversion_IO)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
+ds_results_array = ds_results_array.append(upgrading_IO, ignore_index=True)
 
 # Process Control Vol IO
 IO_array = UF.consolidateIO(results_array)
+ds_IO_array = UF.consolidateIO(ds_results_array)
 
 #Calculate EROI
 eroi = LCA.calcEROI(IO_array)
@@ -69,7 +73,7 @@ ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
 
 # Calculate MFSP
 mfsp = TEA.calc_MFSP(IO_array)
-
+new_mfsp = TEA.calc_MFSP(ds_IO_array)
 # Calculate Minimum Crop Selling Price at Farm Gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
