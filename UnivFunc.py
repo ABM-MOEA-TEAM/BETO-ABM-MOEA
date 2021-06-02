@@ -159,7 +159,7 @@ def consolidateIO(multistep_array):
               [substance_name, subst_str]]
             sum_inputs = sumQtysWhere(match_list_2, multistep_array)
             
-            if subst_str not in D.nonfunglist:
+            if subst_str not in D.DoNotConsolidateList:
                 # if fungible, sum outputs and substract sum of inputs
                 # if value is positive, write to outputs
                 # if value is negative, write abs val to inputs   

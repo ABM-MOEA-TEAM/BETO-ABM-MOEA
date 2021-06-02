@@ -70,8 +70,8 @@ MJ_out = 23635
 ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO, MJ_out)
 
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
-new_mfsp = TEA.calc_MFSP(ds_IO_array)
+mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 135.13) # MJ/Gal BD (Check)
+new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 135.13) # MJ/Gal BD
 # Calculate Minimum Crop Selling Price at Farm Gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
@@ -83,6 +83,6 @@ bp_out = UF.sumProcessIO(results_array, D.biomass_production, D.tl_output)
 conv_out = UF.sumProcessIO(results_array, D.conv, D.tl_output)
 upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 
-mfsp_chksm = 2.87
+mfsp_chksm = 2.57
 
 print('Executed Soybean Transesterification to Biodiesel PM')

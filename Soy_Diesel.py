@@ -38,17 +38,17 @@ def diesel_soy(biomass_IO_array):
     results_array.loc[7] = UF.getWriteRow('Soybean Meal', D.conv,
                                       D.tl_output, 0.73261*soybean_qty)
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['LNG'],0.73639,'MJ/kg')
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['LNG'],0.2258,'MJ/kg')
     results_array.loc[8] = UF.getWriteRow('LNG', D.conv,
                                       D.tl_input, soybean_qty*scale1.qty)
     
-    scale2 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.000001, 'dollars')
+    scale2 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.0000001, 'dollars')
     results_array.loc[9] = UF.getWriteRow('Land Capital Cost', D.conv,
-                                      D.tl_output, scale2.qty)
+                                      D.tl_input, scale2.qty)
     
     scale3 = D.TEA_LCA_Qty(D.substance_dict['Labor'], 0.000001, 'dollars/yr')
     results_array.loc[10] = UF.getWriteRow('Labor', D.conv,
-                                      D.tl_output, scale3.qty)
+                                      D.tl_input, scale3.qty)
     return results_array
 
 def main():

@@ -63,6 +63,9 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     
     annrevenue = ann_fuel_revenue + ann_coproduct_revenue
     
+    # print('Price Per MJ')
+    # print(price_per_MJ)
+    # print('--------------')
     #calculating total annual revenue from annual fuel revenue and co product revenue
     # for key in prodcost:
     #     if key in prodcost and key in outputs:
@@ -133,7 +136,20 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     # print(abs(npv[-1]))
     return abs(npv[-1])
 
-def calc_MFSP(tl_array):
+def calc_MFSP(tl_array, prod, coprods):
+    
+    for i in range(len(tl_array)):
+        row_vals = tl_array.loc[i]
+        subst_name = row_vals[UF.substance_name]          
+        
+    match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
+    # Can be done outside of for because the PW only has one "primary" product
+    fuel_out = UF.returnPintQty(tl_array, match_list)
+    fuel_out_type = prod[0]
+    
+    HHV = D.HHV_dict[fuel_out_type].qty      
+ 
+    #print(fuel_out_type)
     
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Capital Cost']])
@@ -222,9 +238,14 @@ def calc_MFSP(tl_array):
                                                                  invequityshare,
                                                                  loanpay,
                                                                  tl_array))
-
-        
-    return result.x * 152.79288     # $/MJ (above optimization) * MJ/gge
+    
+    # print('Result Value ?')
+    # print(result)
+    # print('---------')
+    # print('CAPEX')
+    # print(capex)  
+    # print('-------')
+    return result.x     # $/MJ (above optimization) * MJ/gge
 
     # Will need to switch this 
 
@@ -244,8 +265,14 @@ def calcOPEX(tl_array):
                                       match_list, 
                                       D.LCA_cost)
             if in_or_out == D.tl_input:
+                # print(subst_name)
+                # print(LCA_val)
+                # print(mag)
+                total = LCA_val*mag
+                # print(total)
+                # print('-----------')
                 inputs_cost += (LCA_val * mag)
-    print(inputs_cost)
+    # print(inputs_cost)
     return inputs_cost
 
 # Calculate value of non-fuel outputs

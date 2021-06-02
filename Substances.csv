@@ -2,7 +2,7 @@
 Ag Lime (CaCO3),ag_lime
 Air,air
 Algal Meal,algal_meal
-Alpha_Amylase,alpha_amylase
+Alpha-Amylase,alpha_amylase
 Ammonia,ammonia
 Ammonium Sulfate,ammonium_sulfate
 Arable Land,arable_land
@@ -36,6 +36,7 @@ Gasoline,gasoline
 Glucose,glucose
 Glucoamylase,glucoamylase
 Glycerol,glycerol
+Glyphosate,glyphosate
 Grass Seed,grass_seed
 Greenhouse Gas Impact,ghg_i
 Heat,heat

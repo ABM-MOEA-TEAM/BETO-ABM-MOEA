@@ -36,8 +36,8 @@ def grow_soy(land_area_val, yield_value):
     return_array.loc[4] = UF.getWriteRow('Ag Lime (CaCO3)', D.biomass_production,
                                          D.tl_input, scale5.qty*size.qty)
     
-    scale6 = D.TEA_LCA_Qty(D.substance_dict['Herbicide'],12.26,'kg/ha/yr')
-    return_array.loc[5] = UF.getWriteRow('Herbicide', D.biomass_production,
+    scale6 = D.TEA_LCA_Qty(D.substance_dict['Glyphosate'],12.26,'kg/ha/yr')
+    return_array.loc[5] = UF.getWriteRow('Glyphosate', D.biomass_production,
                                          D.tl_input, scale6.qty*size.qty)
     
     # scale7 = D.TEA_LCA_Qty(D.substance_dict['Atmospheric CO2'],5908.22,'kg/ha/yr')      # Really, this should scale
@@ -58,7 +58,7 @@ def grow_soy(land_area_val, yield_value):
     return_array.loc[8] = UF.getWriteRow('Capital Cost', D.biomass_production,
                                       D.tl_input, scale10.qty*size.qty)
     
-    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 0.000001, 'dollars/ha') #16549
+    scale11 = D.TEA_LCA_Qty(D.substance_dict['Land Capital Cost'], 16549, 'dollars/ha') #16549
     
     return_array.loc[9] = UF.getWriteRow('Land Capital Cost', D.biomass_production,
                                       D.tl_input, scale11.qty*size.qty)

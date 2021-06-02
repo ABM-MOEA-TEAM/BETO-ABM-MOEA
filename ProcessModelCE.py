@@ -71,14 +71,14 @@ prod = UF.returnProdlist(pathname)
 coprods = UF.returnCoProdlist(pathname)
 
 #Calculate EROI
-eroi = LCA.calcEROI(IO_array)
+#eroi = LCA.calcEROI(IO_array)
 
 # Calc GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
                             
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
-new_mfsp = TEA.calc_MFSP(ds_IO_array)
+mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
+new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 
 # Calculate Minimum Crop Selling Price at farm gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
@@ -97,6 +97,6 @@ conv_out = UF.sumProcessIO(results_array, D.conv, D.tl_output)
 upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 
 # eroi_chksm = 2.51
-mfsp_chksm = 2.43
+mfsp_chksm = 2.40
 
 print('Executed Corn Stover Fermentation to Ethanol PM')

@@ -51,14 +51,25 @@ LCA_GHG_impact = 'GHG_Impact'
 LCA_inventory_df = pd.read_csv(path_list[0])
 
 # Get [short] list of substances that are NOT fungible, depends on LCA Inventory
-sub_list = []
-nonfunglist = []
-for i in range(len(LCA_inventory_df)):
-    row = LCA_inventory_df.loc[i]
-    if row[LCA_key_str] in sub_list:
-        nonfunglist.append(row[LCA_key_str])
-    else:
-        sub_list.append(row[LCA_key_str])
+# sub_list = []
+# nonfunglist = []
+# for i in range(len(LCA_inventory_df)):
+#     row = LCA_inventory_df.loc[i]
+#     if row[LCA_key_str] in sub_list:
+#         nonfunglist.append(row[LCA_key_str])
+#     else:
+#         sub_list.append(row[LCA_key_str])
+
+DoNotConsolidateList = []
+DoNotConsolidateList.append('Electricity')# 
+DoNotConsolidateList.append('Diesel')
+DoNotConsolidateList.append('Gasoline')
+DoNotConsolidateList.append('Water')
+
+# Non-funglist is an explicit list of substance to not be added/aggegregated.
+# This prevents the non-vertically integrated case from functioning
+# (5/25) Change to more "Do not consolidate List" - prescribe each substance
+# which is not to be consolidated. 
 
 # Keyword Strings
 tl_input = 'Input'

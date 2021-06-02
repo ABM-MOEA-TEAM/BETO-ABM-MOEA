@@ -35,14 +35,14 @@ def upgrade_grain_ethanol(biomass_IO_array):
     results_array.loc[6] = UF.getWriteRow('DDGS', D.upgrading,
                                       D.tl_output, 0.09846*corn_beer_qty)         
     
-    capex = D.TEA_LCA_Qty('Capital Cost', 2267.15,'dollars')                    # TCI/ha's_reqd
+    capex = D.TEA_LCA_Qty('Capital Cost', 2267,'dollars')                    # 2267.15 TCI/ha's_reqd
     
     results_array.loc[7] = UF.getWriteRow('Capital Cost', D.upgrading, 
                                       D.tl_input, capex.qty)
     
-    scale2 = D.TEA_LCA_Qty(D.substance_dict['LNG'],0.95077,'MJ/kg')
+    scale2 = D.TEA_LCA_Qty(D.substance_dict['LNG'],0.264103,'MJ/kg') #0.95077
     
-    results_array.loc[8] = UF.getWriteRow('LNG', D.conv,
+    results_array.loc[8] = UF.getWriteRow('LNG', D.upgrading,
                                       D.tl_input, corn_beer_qty*scale2.qty)
     
     return results_array

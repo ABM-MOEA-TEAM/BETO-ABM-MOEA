@@ -43,9 +43,10 @@ def upgrade_stover_ethanol(biomass_IO_array):
     results_array.loc[6] = UF.getWriteRow('Gasoline', D.upgrading, 
                                       D.tl_input, 0.001073185*corn_beer_qty)
     
-    capex = D.TEA_LCA_Qty('Capital Cost', 2758*(1**0.6), 'dollars') 
-    # 3355 Corresponds to TCI/ha's_reqd, and the 1 corresponds to the economies
-    # of scale. "1" is a placeholder for the ratio of plant throughput to Humbird
+    capex = D.TEA_LCA_Qty('Capital Cost', 4496.84, 'dollars') 
+    # Total Capital Cost (Equip and Working Capital) divided by full prod rate
+    # times the Gallons per ha produced.  The '1' above corresponds to the 
+    # ratio of the plant to Humbirds' 61 MMGal/yr rate
     
     results_array.loc[7] = UF.getWriteRow('Capital Cost', D.upgrading, 
                                       D.tl_input, capex.qty)

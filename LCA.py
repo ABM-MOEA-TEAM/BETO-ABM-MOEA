@@ -72,6 +72,7 @@ def calcGHGImpact(tl_array, prod, coprods): # Needs additional argument (calcGHG
     coprods_HHV = []
     coprods_MJ = []
     
+
     for j in range(len(coprods)):
         match_list = [[UF.substance_name, coprods[j]],[UF.input_or_output, D.tl_output]]
         coprods_vals.append(UF.returnPintQty(tl_array,match_list))
@@ -92,9 +93,14 @@ def calcGHGImpact(tl_array, prod, coprods): # Needs additional argument (calcGHG
                                       match_list, 
                                       D.LCA_GHG_impact)
             GHG_impact_val += (LCA_val * mag)
-    
+        # print(subst_name)
+        # print(LCA_val)
+        # print(mag)
+        # print(GHG_impact_val)
+        # print('-----------')
+        
     GHG_impact = D.TEA_LCA_Qty(D.substance_dict['Greenhouse Gas Impact'], GHG_impact_val, 'g/yr')
-    # print(GHG_impact.qty)
+    print(GHG_impact.qty)
   
     for i in range(len(coprods)):
         if coprods[i] == 'Electricity':

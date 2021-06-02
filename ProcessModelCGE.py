@@ -72,8 +72,8 @@ coprods = UF.returnCoProdlist(pathname)
 ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
 
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
-new_mfsp = TEA.calc_MFSP(ds_IO_array)
+mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
+new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 # Calculate Minimum Crop Selling Price at Farm Gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
@@ -93,6 +93,6 @@ upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 
 # eroi_chksm = 2.51
 # ghg_impact_chksm = 41.87
-mfsp_chksm = 1.39
+mfsp_chksm = 1.29
 
 print('Executed Corn Grain Fermentation to Ethanol PM')

@@ -90,7 +90,7 @@ def grow_stover(size,yield_value):
     return return_array
 
 def main():
-    land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 100, 'hectare')
+    land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
     yield_value = 5563.08
     return grow_stover(land_area_val, yield_value)
 

@@ -22,7 +22,7 @@ results_array = UF.createEmptyFrame()
 ds_results_array = UF.createEmptyFrame()
 
 # Scaling Value
-land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 100, 'hectare')
+land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 8960, 'kg/yr/ha')
 # biomass_output = D.TEA_LCA_Qty(D.substance_dict['Woody Biomass'], 17933, 'kg/yr/ha')
 # Second variable exists so that I could verify that the lookup table output is the same as 
@@ -65,8 +65,8 @@ ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
 #ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO, transport_fuel_energy)
 
 # Calculate MFSP
-mfsp = TEA.calc_MFSP(IO_array)
-new_mfsp = TEA.calc_MFSP(ds_IO_array)
+mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 152.79) # MJ/Gal Jet-A
+new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 152.79) # MJ/Gal Jet-A
 
 # Calculate MCSP at Farm Gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
