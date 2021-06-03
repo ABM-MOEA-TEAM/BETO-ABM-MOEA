@@ -30,10 +30,18 @@ def upgrade_grain_ethanol(biomass_IO_array):
                                       D.tl_output, 0.798688*corn_beer_qty)
     results_array.loc[4] = UF.getWriteRow('Gasoline', D.upgrading,
                                       D.tl_input, 0.0050526*corn_beer_qty)
+    
+    BM_to_EtOH_ratio = 0.3371413
+    
     results_array.loc[5] = UF.getWriteRow('Ethanol', D.upgrading, 
-                                      D.tl_output, (0.0959998*corn_beer_qty)+(0.0050526*corn_beer_qty))
+                                      D.tl_output, 
+                                      ((BM_to_EtOH_ratio/3.511895)*corn_beer_qty)
+                                      +(0.0050526*corn_beer_qty))
+    BM_to_DDGS_ratio = 0.345773
+    
     results_array.loc[6] = UF.getWriteRow('DDGS', D.upgrading,
-                                      D.tl_output, 0.09846*corn_beer_qty)         
+                                      D.tl_output, (BM_to_DDGS_ratio/3.511895)
+                                      *corn_beer_qty)         
     
     capex = D.TEA_LCA_Qty('Capital Cost', 2267,'dollars')                    # 2267.15 TCI/ha's_reqd
     

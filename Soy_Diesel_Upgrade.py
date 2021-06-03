@@ -22,12 +22,16 @@ def upgrade_soy_diesel(biomass_IO_array):
     
     results_array.loc[0] = UF.getWriteRow('FAMEs and Glycerol', D.conv, 
                                       D.tl_input, FAME_qty)
+    
+    glycerol_yield = 0.003455039
     results_array.loc[1] = UF.getWriteRow('Glycerol', D.conv, 
-                                      D.tl_output, 0.01779*FAME_qty)
+                                      D.tl_output, (glycerol_yield/0.19424)*FAME_qty)
     results_array.loc[2] = UF.getWriteRow('Methanol', D.conv, 
                                       D.tl_output, 0.0070434*FAME_qty)
+    
+    biodiesel_yield = 0.169296933
     results_array.loc[3] = UF.getWriteRow('Biodiesel', D.conv, 
-                                      D.tl_output, 0.87163*FAME_qty)
+                                      D.tl_output, (biodiesel_yield/0.19424)*FAME_qty)
         
     scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],5.5166,'MJ/kg')
     results_array.loc[4] = UF.getWriteRow('Electricity', D.conv, 

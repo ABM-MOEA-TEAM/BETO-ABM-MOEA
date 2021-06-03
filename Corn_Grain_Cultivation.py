@@ -15,7 +15,9 @@ def grow_corn(size,biomass_yield):
  
     return_array = UF.createEmptyFrame()    
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'], 17.69, 'kg/ha/yr')
+    seeds_per_ha = 30000
+    
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'], 0.000589667*seeds_per_ha, 'kg/ha/yr')
        
     return_array.loc[0] = UF.getWriteRow('Corn Seed', D.biomass_production, 
                                       D.tl_input, scale1.qty*size.qty)

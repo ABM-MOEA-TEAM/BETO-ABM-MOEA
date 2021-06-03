@@ -21,7 +21,11 @@ def grow_stover(size,yield_value):
 
     ############    INPUTS    ###############    
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'], 17.69, 'kg/ha/yr')
+    seeds_per_ha = 30000
+    
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'], 0.000589667*seeds_per_ha, 'kg/ha/yr') 
+                                                # And then we can change the seeds per ha val.
+                                                # (the ratio at left is 17.69/30000)
        
     return_array.loc[0] = UF.getWriteRow('Corn Seed', D.biomass_production, 
                                       D.tl_input, scale1.qty*size.qty)

@@ -23,8 +23,13 @@ def diesel_soy(biomass_IO_array):
     
     results_array.loc[0] = UF.getWriteRow('Soybeans', D.conv, 
                                       D.tl_input, 1*soybean_qty)
+    
+    hexane_recovery = 0.9910173
+    
     results_array.loc[1] = UF.getWriteRow('Hexane Loss', D.conv, 
-                                      D.tl_input, 0.00676*soybean_qty)
+                                      D.tl_input, ((0.7418248*soybean_qty)
+                                      *(1-hexane_recovery)))
+                                      
     results_array.loc[2] = UF.getWriteRow('Sodium Hydroxide', D.conv, 
                                       D.tl_input, 0.03429*soybean_qty)
     results_array.loc[3] = UF.getWriteRow('Phosphoric Acid (H3PO4)', D.conv, 

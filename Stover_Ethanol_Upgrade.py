@@ -21,17 +21,28 @@ def upgrade_stover_ethanol(biomass_IO_array):
     # 26295.56 kg Corn Beer/ha-yr
     
     scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.01666,'MJ/kg')
+    
     results_array.loc[0] = UF.getWriteRow('Electricity', D.upgrading, 
                                       D.tl_input, scale1.qty*corn_beer_qty)
     
     results_array.loc[1] = UF.getWriteRow('Corn Beer', D.upgrading, 
                                       D.tl_input, corn_beer_qty)
+    
     results_array.loc[3] = UF.getWriteRow('Water', D.upgrading, 
                                       D.tl_output, 0.798688*corn_beer_qty)
-    results_array.loc[4] = UF.getWriteRow('Ethanol', D.upgrading, 
-                                      D.tl_output, 0.054367*corn_beer_qty)
     
-    scale5 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], 0.185244,'MJ/kg')
+    results_array.loc[4] = UF.getWriteRow('Ethanol', D.upgrading, 
+                                      D.tl_output, (0.05329162*corn_beer_qty)
+                                      +(0.001073185*corn_beer_qty))
+                                      # 0.05329... is ratio of BM to ethanol out
+                                      # divided by 4.727 (corn beer to BM)
+                                      # second term is just gasoline denat. term
+                                      
+    ratio_total_burnable_BM = 0.461171
+    total_burnable_BM = (ratio_total_burnable_BM/4.727)
+    
+    scale5 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], total_burnable_BM*1.89863,'MJ/kg')
+    
     results_array.loc[5] = UF.getWriteRow('Electricity', D.upgrading,
                                       D.tl_output, scale5.qty*corn_beer_qty) 
     

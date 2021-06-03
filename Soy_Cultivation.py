@@ -15,7 +15,9 @@ def grow_soy(land_area_val, yield_value):
     
     return_array = UF.createEmptyFrame()
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Soybean Seed'],233.514,'kg/ha/yr')
+    soybean_seed = 120000 # per ha
+    
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Soybean Seed'],0.00194595*soybean_seed,'kg/ha/yr')
     
     return_array.loc[0] = UF.getWriteRow('Soybean Seed', D.biomass_production,
                                          D.tl_input, scale1.qty*size.qty)
