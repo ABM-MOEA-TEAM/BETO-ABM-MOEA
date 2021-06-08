@@ -111,7 +111,7 @@ HHV_dict['DDGS'] = TEA_LCA_Qty(substance_dict['DDGS'], 22.7,'MJ/kg') # https://a
 HHV_dict['Soybean Meal'] = TEA_LCA_Qty(substance_dict['Soybean Meal'], 16.12,'MJ/kg') # https://nutrition.ansci.illinois.edu/sites/default/files/AnimFeedSciTechnol188.64-73.pdf
 HHV_dict['Glycerol'] = TEA_LCA_Qty(substance_dict['Glycerol'], 25.3,'MJ/kg') # https://www.intechopen.com/books/biofuels-status-and-perspective/glycerol-as-a-raw-material-for-hydrogen-production
 HHV_dict['Electricity'] = TEA_LCA_Qty(substance_dict['Electricity'], 1, 'MJ/MJ')
-
+HHV_dict['Biochar'] = TEA_LCA_Qty(substance_dict['Biochar'], 20.55, 'MJ/kg') # https://www.sciencedirect.com/science/article/pii/S258929912030046X#:~:text=The%20calorific%20value%20of%20the,potential%20use%20as%20solid%20fuel.
 
 # Assorted cited values used in calculations
 N20_emit_proportion = Qty_Cited(

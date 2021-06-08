@@ -71,14 +71,16 @@ prod = UF.returnProdlist(pathname)
 coprods = UF.returnCoProdlist(pathname)
 
 #Calculate EROI
-#eroi = LCA.calcEROI(IO_array)
+eroi = LCA.calcEROI(IO_array)
 
 # Calc GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
-                            
+print(ghg_impact)
+                      
 # Calculate MFSP
 mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
+print(new_mfsp)
 
 # Calculate Minimum Crop Selling Price at farm gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)

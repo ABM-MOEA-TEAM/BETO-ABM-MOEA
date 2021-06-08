@@ -37,9 +37,9 @@ def upgrade_soy_diesel(biomass_IO_array):
     results_array.loc[4] = UF.getWriteRow('Electricity', D.conv, 
                                       D.tl_input, scale1.qty*FAME_qty)
     
-    scale3 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], 475.78,'dollars') 
+    scale3 = D.TEA_LCA_Qty(D.substance_dict['Capital Cost'], (475.78/718.3),'dollars*yrs/kg') 
     results_array.loc[5] = UF.getWriteRow('Capital Cost', D.conv,
-                                      D.tl_input, scale3.qty)
+                                      D.tl_input, scale3.qty*FAME_qty)
     
     return results_array
 

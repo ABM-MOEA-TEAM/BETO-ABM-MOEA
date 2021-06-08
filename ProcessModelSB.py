@@ -64,6 +64,7 @@ coprods = UF.returnCoProdlist(pathname)
 
 # Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
+print(ghg_impact)
 
 # Calculate GHG Impact at Farm Gate
 MJ_out = 23635
@@ -72,6 +73,8 @@ ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO, MJ_out)
 # Calculate MFSP
 mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 135.13) # MJ/Gal BD (Check)
 new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 135.13) # MJ/Gal BD
+print(new_mfsp)
+
 # Calculate Minimum Crop Selling Price at Farm Gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 

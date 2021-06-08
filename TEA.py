@@ -12,61 +12,79 @@ yrs = 30 # userinputs.yrs
 
 
 def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
-             loanpay, tl_array):
+             loanpay, tl_array, prod):
+    
+    pint_price_per_MJ = D.returnPintQtyObj(price_per_MJ, 'yr/MJ')
+    
+    # I haven't been able to work out how to get the HHV dictionary to give us just the 
+    # values, not the pint quantities.  Because of this, I have this gross 'yr/MJ' unit
+    # on the pint_price_per_MJ value as the logic below demands a unitless value. I 
+    # am happy to change it to include pint units downstream, but it is nice being able
+    # to see the MFSP results as floats in the variable explorer (and not as a 'Quanti-
+    # ty object of pint.quantity module') (6/7)
     
     # Primary Fuel Products
-    jet_a_out = 0
-    diesel_out = 0
-    gasoline_out = 0
-    ethanol_out = 0
-    biodiesel_out = 0
+    # jet_a_out = 0
+    # diesel_out = 0
+    # gasoline_out = 0
+    # ethanol_out = 0
+    # biodiesel_out = 0
 
-    for i in range(len(tl_array)):
-        row_vals = tl_array.loc[i]
-        in_or_out = row_vals[UF.input_or_output]
-        subst_name = row_vals[UF.substance_name]
+    # for i in range(len(tl_array)):
+    #     row_vals = tl_array.loc[i]
+    #     in_or_out = row_vals[UF.input_or_output]
+    #     subst_name = row_vals[UF.substance_name]
         
-        if 'Jet-A' in subst_name and in_or_out == D.tl_output:                              # 43.2 MJ/kg from https://ecn.sandia.gov/diesel-spray-combustion/sandia-cv/fuels/
-            jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude
+    #     if 'Jet-A' in subst_name and in_or_out == D.tl_output:                              # 43.2 MJ/kg from https://ecn.sandia.gov/diesel-spray-combustion/sandia-cv/fuels/
+    #         jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
+    #                                         [UF.input_or_output, D.tl_output]]).magnitude
 
-        if 'Diesel' in subst_name and in_or_out == D.tl_output:
-            diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],         # 42.975 MJ/kg from ""
-                                            [UF.input_or_output, D.tl_output]]).magnitude
+    #     if 'Diesel' in subst_name and in_or_out == D.tl_output:
+    #         diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],         # 42.975 MJ/kg from ""
+    #                                         [UF.input_or_output, D.tl_output]]).magnitude
         
-        if 'Gasoline' in subst_name and in_or_out == D.tl_output:
+    #     if 'Gasoline' in subst_name and in_or_out == D.tl_output:
             
-            gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
-                                                      [UF.input_or_output, D.tl_output]]).magnitude     # 43.44 MJ/kg from https://h2tools.org/hyarc/calculator-tools/lower-and-higher-heating-values-fuels
+    #         gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
+    #                                                   [UF.input_or_output, D.tl_output]]).magnitude     # 43.44 MJ/kg from https://h2tools.org/hyarc/calculator-tools/lower-and-higher-heating-values-fuels
             
-        if 'Ethanol' in subst_name and in_or_out == D.tl_output:
-            ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
-                                            [UF.input_or_output, D.tl_output]]).magnitude   # 26.95 MJ/kg from ""
+    #     if 'Ethanol' in subst_name and in_or_out == D.tl_output:
+    #         ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
+    #                                         [UF.input_or_output, D.tl_output]]).magnitude   # 26.95 MJ/kg from ""
                 
-        if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
-            biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],   # 37.75 MJ/kg from Tesfa - "LHV Predication Models and LHV Effect on the 
-                                            [UF.input_or_output, D.tl_output]]).magnitude   # Performance of CI Engine Running with Biodiesel Blends" (Implies Compression Ignition Engine)
+    #     if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
+    #         biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],   # 37.75 MJ/kg from Tesfa - "LHV Predication Models and LHV Effect on the 
+    #                                         [UF.input_or_output, D.tl_output]]).magnitude   # Performance of CI Engine Running with Biodiesel Blends" (Implies Compression Ignition Engine)
 
             
-    transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) + (43.44*gasoline_out)
-                             + (26.95*ethanol_out) + (37.75*biodiesel_out))
+    # transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) + (43.44*gasoline_out)
+    #                           + (26.95*ethanol_out) + (37.75*biodiesel_out))
     
-    # Broke this out with the actual Lower Heating Values of each fuel; hardcoding of the values isn't great. 
-    # Was considering adding a new class in TEA_LCA_Data of maybe "Output_Fuel_LHV" which references a new column in 
-    # LCA_Inventory? Or in the Substances .csv?  (Just not sure where to put it; I am confident that I can get the logic
-    # changed for the transport_fuel_energy variable once we decide where to put this info)
+    # for i in range(len(tl_array)):
+        # row_vals = tl_array.loc[i]
+        # subst_name = row_vals[UF.substance_name]          
+        # in_or_out = row_vals[UF.input_or_output]
+        
+    match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
+    fuel_out = UF.returnPintQty(tl_array, match_list)
+    fuel_out_type = prod[0]
+    transport_fuel_kg = fuel_out
+    
+    HHV = D.HHV_dict[fuel_out_type].qty
+    
+    transport_fuel_energy = transport_fuel_kg * HHV
 
     ann_coproduct_revenue = 0   # Placeholder value for the eventual coproducts (might not be needed here anymore? 3/22)
       
     nonfuel_value = calcNonFuelValue(tl_array)
-    ann_fuel_revenue =  nonfuel_value + (price_per_MJ * transport_fuel_energy)
+    ann_fuel_revenue =  nonfuel_value + (pint_price_per_MJ * transport_fuel_energy)
     
     annrevenue = ann_fuel_revenue + ann_coproduct_revenue
     
     # print('Price Per MJ')
     # print(price_per_MJ)
     # print('--------------')
-    #calculating total annual revenue from annual fuel revenue and co product revenue
+    # calculating total annual revenue from annual fuel revenue and co product revenue
     # for key in prodcost:
     #     if key in prodcost and key in outputs:
     #         annrevenue += prodcost [key] * outputs[key]
@@ -237,7 +255,8 @@ def calc_MFSP(tl_array, prod, coprods):
                                                                  ecovar, 
                                                                  invequityshare,
                                                                  loanpay,
-                                                                 tl_array))
+                                                                 tl_array,
+                                                                 prod))
     
     # print('Result Value ?')
     # print(result)
