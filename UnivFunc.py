@@ -1,5 +1,6 @@
 import TEA_LCA_Data as D
 import pandas as pd
+import numpy as np
 
 import csv
 
@@ -212,3 +213,17 @@ def consolidateIO(multistep_array):
                     row_count += 1
                 
     return return_array
+
+def randomizeIO(input_IO_array, distribution_type_list):
+    return_array = createEmptyFrame()
+    for i in range(len(input_IO_array)):
+        row_vals = input_IO_array.loc[i]
+        flow_magnitude = row_vals[magnitude]
+        sampled_magnitude = (flow_magnitude + (distribution_type_list[0].std_dev * 
+                                               flow_magnitude) * np.random.standard_normal())
+        row_units = row_vals[units]
+        return_array.loc[i] = getWriteRow(row_vals[substance_name], row_vals[process_name], 
+            row_vals[input_or_output], D.returnPintQtyObj(sampled_magnitude, row_units))
+        
+    return return_array
+        
