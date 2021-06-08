@@ -2,6 +2,8 @@ import pandas as pd
 import pint
 import os
 from pathlib import Path
+import xlsxwriter
+
 cwd = os.getcwd()
 ureg = pint.UnitRegistry()
 ureg.define('dollars = [money]')
@@ -37,9 +39,16 @@ class Substance:
         self.name_str = name_str
         self.id_str = id_str
         
+class Probability_Distribution:
+    def __init__(self, dist_name, avg, std_dev):
+        self.dist_name = dist_name
+        self.avg = avg
+        self.std_dev = std_dev
+        
 # Paths and hard-coded strings
 path_list = [Path(cwd + '/LCA_Inventory.csv'), 
-             Path(cwd + '/Substances.csv')]
+             Path(cwd + '/Substances.csv'),
+             Path(cwd + '/AltJet_Excerpt_Example.xlsx')]
 
 # LCA Inventory Variables
 LCA_key_str = 'Key_String'
@@ -60,11 +69,14 @@ LCA_inventory_df = pd.read_csv(path_list[0])
 #     else:
 #         sub_list.append(row[LCA_key_str])
 
-DoNotConsolidateList = []
-DoNotConsolidateList.append('Electricity')# 
-DoNotConsolidateList.append('Diesel')
-DoNotConsolidateList.append('Gasoline')
-DoNotConsolidateList.append('Water')
+DoNotConsolidateList = ['Electricity', 
+                        'Diesel',
+                        'Gasoline',
+                        'Water']
+# DoNotConsolidateList.append('Electricity')# 
+# DoNotConsolidateList.append('Diesel')
+# DoNotConsolidateList.append('Gasoline')
+# DoNotConsolidateList.append('Water')
 
 # Non-funglist is an explicit list of substance to not be added/aggegregated.
 # This prevents the non-vertically integrated case from functioning
@@ -80,6 +92,9 @@ conv = 'Conversion/Extraction'
 upgrading = 'Upgrading'
 comb = 'Combustion'
 cons = 'Consolidated'
+
+# Related to Monte Carlo
+normal = 'Normal'
 
 # Substance Variables
 substance_id = 'substance_id'
@@ -97,7 +112,7 @@ for i in range(len(substances_df)):
 
 # Heating Values for each output substance (NOTE - 4/13 - 
 # need to change these to HHV's as they are currently the LHV's)
-
+# NP: Can also use TEA_LCA_Qty_Cited class to embed the citation in the object
 HHV_dict = {}
 
 HHV_dict['Ethanol'] = TEA_LCA_Qty(substance_dict['Ethanol'], 26.95, 'MJ/kg')
@@ -123,3 +138,10 @@ CO2_fixing_proportion_grass = Qty_Cited(
 forestry_woody_biomass_val = TEA_LCA_Qty_Cited(
     substance_dict['Woody Biomass'], 11525, 'kg/yr/ha',
     'Average of Kreutz et al., 2008--FT fuels from coal and switchgrass and Beal 2018 ABECCS')
+
+# EXAMPLE load of xlsx spreadsheet using tab name
+grass_io_df = pd.read_excel(path_list[2], sheet_name='Grass IO')
+user_lci_df = pd.read_excel(path_list[2], sheet_name='User Defined LCI')
+npv_parameters_df = pd.read_excel(path_list[2], sheet_name='NPV Parameters')
+
+distribution_list = [Probability_Distribution(normal, 0, 0.5)]
