@@ -20,7 +20,7 @@ def upgrade_stover_ethanol(biomass_IO_array):
     corn_beer_qty = UF.returnPintQty(biomass_IO_array, match_list)
     # 26295.56 kg Corn Beer/ha-yr
     
-    scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.01666,'MJ/kg')
+    scale1 = D.TEA_LCA_Qty(D.substance_dict['Electricity'],0.019065,'MJ/kg')     # 0.01666
     
     results_array.loc[0] = UF.getWriteRow('Electricity', D.upgrading, 
                                       D.tl_input, scale1.qty*corn_beer_qty)
@@ -41,8 +41,10 @@ def upgrade_stover_ethanol(biomass_IO_array):
     ratio_total_burnable_BM = 0.461171
     total_burnable_BM = (ratio_total_burnable_BM/4.727)
     
-    scale5 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], total_burnable_BM*1.89863,'MJ/kg')
     
+    scale5 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], .2117845,'MJ/kg')
+    #scale5 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], total_burnable_BM*1.89863,'MJ/kg')
+                                                                        # 1.89863
     results_array.loc[5] = UF.getWriteRow('Electricity', D.upgrading,
                                       D.tl_output, scale5.qty*corn_beer_qty) 
     
@@ -54,10 +56,10 @@ def upgrade_stover_ethanol(biomass_IO_array):
     results_array.loc[6] = UF.getWriteRow('Gasoline', D.upgrading, 
                                       D.tl_input, 0.001073185*corn_beer_qty)
     
-    capex = D.TEA_LCA_Qty('Capital Cost', (4496.84/26296.3), 'dollars*yrs/kg') 
+    capex = D.TEA_LCA_Qty('Capital Cost', (2901.97/22999.8), 'dollars*yrs/kg') 
     # Total Capital Cost (Equip and Working Capital) divided by full prod rate
     # times the Gallons per ha produced.  The '1' above corresponds to the 
-    # ratio of the plant to Humbirds' 61 MMGal/yr rate
+    # ratio of the plant to Humbirds' 61 MMGal/yr rate 4496.84, 26296.3
     
     results_array.loc[7] = UF.getWriteRow('Capital Cost', D.upgrading, 
                                       D.tl_input, capex.qty*corn_beer_qty)
@@ -69,7 +71,7 @@ def upgrade_stover_ethanol(biomass_IO_array):
 
 def main():
     land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
-    yield_value = 5563.08
+    yield_value = 4865.83
     biomass_IO_array = CSC.grow_stover(land_area_val, yield_value)
     conversion_IO_array = CSE.ethanol_stover(biomass_IO_array)
     return upgrade_stover_ethanol(conversion_IO_array)

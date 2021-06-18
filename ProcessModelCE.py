@@ -32,7 +32,7 @@ ds_results_array = UF.createEmptyFrame()
 # Scaling Value
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 
-yield_value = 5563.08 # will be replaced by the DayCent values
+yield_value = 4865.83 # will be replaced by the DayCent values
 
 stover_collected = 0.5 # Not currently being used (4/5)
 
@@ -78,7 +78,7 @@ ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
 print(ghg_impact)
                       
 # Calculate MFSP
-mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
+#mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 print(new_mfsp)
 
@@ -101,4 +101,4 @@ upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 # eroi_chksm = 2.51
 mfsp_chksm = 2.40
 
-print('Executed Corn Stover Fermentation to Ethanol PM')
+#print('Executed Corn Stover Fermentation to Ethanol PM')

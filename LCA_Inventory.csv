@@ -48,7 +48,7 @@ Lime (kg/yr),Lime,Input,kilogram / year,0,0.09,906.23,2.26199,0.00104,0.19846,0.
 Phosphoric Acid (kg/yr),Phosphoric Acid (H3PO4),Input,kilogram / year,0,0.37,2811.39,0,0.04801,39.13801,0.01667,2.06E-07,1.96E-06,4.79E-07,2.65E-01,7.01E+00,6.08E-03,"phosphoric acid production, dihydrate process | fluosilicic acid, without water, in 22% solution state | Cutoff, U - US",,Where used? (What Molarity?)
 Methanol (kg/yr),Methanol,Input,kilogram / year,0,0.34,11.4276,0,0.00198,2.52729,0.00096,1.51E-08,1.13E-07,2.36E-07,0.02388,,0.00022,,,
 Capital Cost ($),Capital Cost,Input,dollars,0,0,0,0,,,,,,,,,,,,
-Corn Steep Liquor (kg/yr),Corn Steep Liquor,Input,kilogram / year,0.01133,0,8.27,0,0.00846,5.04E-06,0.00014,3.19E-14,3.26E-15,0,0.00074,,0.00051,,,
+Corn Steep Liquor (kg/yr),Corn Steep Liquor,Input,kilogram / year,0.01133,0.055566,8.27,0,0.00846,5.04E-06,0.00014,3.19E-14,3.26E-15,0,0.00074,,0.00051,,,
 Air (kg/yr),Air,Input,kilogram / year,0,0,0,0,0,0,0,0,0,0,0,,0,,,
 Urea (kg/yr),Urea,Input,kilogram / year,0,0.22,0,0,0,0,0,0.00E+00,0.00E+00,0,0,0,0,,,
 Soybeans (kg/yr),Soybeans,Input,kilogram / year,0,0.38,0,0,0,0,0,0.00E+00,0.00E+00,0,0,0,0,,,

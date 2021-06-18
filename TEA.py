@@ -23,7 +23,7 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     # to see the MFSP results as floats in the variable explorer (and not as a 'Quanti-
     # ty object of pint.quantity module') (6/7)
     
-    # Primary Fuel Products
+    #Primary Fuel Products
     # jet_a_out = 0
     # diesel_out = 0
     # gasoline_out = 0
@@ -32,43 +32,15 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
 
     # for i in range(len(tl_array)):
     #     row_vals = tl_array.loc[i]
+    #     subst_name = row_vals[UF.substance_name]          
     #     in_or_out = row_vals[UF.input_or_output]
-    #     subst_name = row_vals[UF.substance_name]
-        
-    #     if 'Jet-A' in subst_name and in_or_out == D.tl_output:                              # 43.2 MJ/kg from https://ecn.sandia.gov/diesel-spray-combustion/sandia-cv/fuels/
-    #         jet_a_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Jet-A'],
-    #                                         [UF.input_or_output, D.tl_output]]).magnitude
-
-    #     if 'Diesel' in subst_name and in_or_out == D.tl_output:
-    #         diesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Diesel'],         # 42.975 MJ/kg from ""
-    #                                         [UF.input_or_output, D.tl_output]]).magnitude
-        
-    #     if 'Gasoline' in subst_name and in_or_out == D.tl_output:
-            
-    #         gasoline_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Gasoline'],
-    #                                                   [UF.input_or_output, D.tl_output]]).magnitude     # 43.44 MJ/kg from https://h2tools.org/hyarc/calculator-tools/lower-and-higher-heating-values-fuels
-            
-    #     if 'Ethanol' in subst_name and in_or_out == D.tl_output:
-    #         ethanol_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Ethanol'],
-    #                                         [UF.input_or_output, D.tl_output]]).magnitude   # 26.95 MJ/kg from ""
-                
-    #     if 'Biodiesel' in subst_name and in_or_out == D.tl_output:
-    #         biodiesel_out = UF.returnPintQty(tl_array, [[UF.substance_name, 'Biodiesel'],   # 37.75 MJ/kg from Tesfa - "LHV Predication Models and LHV Effect on the 
-    #                                         [UF.input_or_output, D.tl_output]]).magnitude   # Performance of CI Engine Running with Biodiesel Blends" (Implies Compression Ignition Engine)
-
-            
-    # transport_fuel_energy = ((43.2*jet_a_out) + (42.975*diesel_out) + (43.44*gasoline_out)
-    #                           + (26.95*ethanol_out) + (37.75*biodiesel_out))
-    
-    # for i in range(len(tl_array)):
-        # row_vals = tl_array.loc[i]
-        # subst_name = row_vals[UF.substance_name]          
-        # in_or_out = row_vals[UF.input_or_output]
         
     match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
     fuel_out = UF.returnPintQty(tl_array, match_list)
     fuel_out_type = prod[0]
     transport_fuel_kg = fuel_out
+    
+    #print(transport_fuel_kg)
     
     HHV = D.HHV_dict[fuel_out_type].qty
     
@@ -167,6 +139,17 @@ def calc_MFSP(tl_array, prod, coprods):
     
     HHV = D.HHV_dict[fuel_out_type].qty      
  
+    # coprods_vals = []
+    # coprods_HHV = []
+    # coprods_MJ = []
+    
+
+    # for j in range(len(coprods)):
+    #     match_list = [[UF.substance_name, coprods[j]],[UF.input_or_output, D.tl_output]]
+    #     coprods_vals.append(UF.returnPintQty(tl_array,match_list))
+    #     coprods_HHV.append(D.HHV_dict[coprods[j]])
+    #     coprods_MJ.append(coprods_vals[j]*coprods_HHV[j].qty)
+        
     #print(fuel_out_type)
     
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
@@ -192,7 +175,10 @@ def calc_MFSP(tl_array, prod, coprods):
     invloanshare = capex * (1-ecovar['equity'])
     #Loan annual payment
     loanannpay = capex*(1-ecovar['equity'])*ecovar['interest']*(1+ecovar['interest'])**ecovar['loan term']/((1+ecovar['interest'])**ecovar['loan term']-1)
-    #print(loanannpay)
+    # print('---------')
+    # print('Loan Annual Payment')
+    # print(loanannpay)
+    # print('---------')
     #Investment-equity share
     invequityshare = capex * (ecovar['equity'])
     #Salvage value end of life
@@ -284,10 +270,10 @@ def calcOPEX(tl_array):
                                       match_list, 
                                       D.LCA_cost)
             if in_or_out == D.tl_input:
+                total = LCA_val*mag
                 # print(subst_name)
                 # print(LCA_val)
                 # print(mag)
-                total = LCA_val*mag
                 # print(total)
                 # print('-----------')
                 inputs_cost += (LCA_val * mag)
@@ -314,6 +300,13 @@ def calcNonFuelValue(tl_array):
                                              subst_name != 'Gasoline' and 
                                              subst_name != 'Ethanol' and 
                                              subst_name != 'Biodiesel'):
+                total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
-    #print(outputs_value)
+    #             print(subst_name)
+    #             print(LCA_val)
+    #             print(mag)
+    #             print(total)
+    #             print('--------')
+                
+    # print(outputs_value)
     return outputs_value

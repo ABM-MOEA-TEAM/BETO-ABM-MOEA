@@ -70,10 +70,10 @@ coprods = UF.returnCoProdlist(pathname)
 
 # Calculate GHG Impact
 ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
-print(ghg_impact)
+# print(ghg_impact)
 
 # Calculate MFSP
-mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
+# mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 80.49) # MJ/Gal EtOH
 print(new_mfsp)
 

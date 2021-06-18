@@ -26,27 +26,27 @@ def ethanol_stover(biomass_IO_array):
                                       D.tl_input, 0.031041*corn_stover_qty)
 
     return_array.loc[2] = UF.getWriteRow('Ammonia', D.conv, 
-                                      D.tl_input, 0.013723*corn_stover_qty)
+                                      D.tl_input, 0.01183926*corn_stover_qty)   # 0.013723
     
-    return_array.loc[3] = UF.getWriteRow('Glucose', D.conv, 
-                                      D.tl_input, 0.0252*corn_stover_qty)
+    return_array.loc[3] = UF.getWriteRow('Glucose', D.conv,                     # 0.0252
+                                      D.tl_input, 0.0287769*corn_stover_qty)       
     
     return_array.loc[4] = UF.getWriteRow('Corn Steep Liquor', D.conv, 
-                                      D.tl_input, 0.015684*corn_stover_qty)
+                                      D.tl_input, 0.01658294*corn_stover_qty)   # 0.015684
     
     return_array.loc[5] = UF.getWriteRow('Lime', D.conv, 
-                                      D.tl_input, 0.01374*corn_stover_qty)
+                                      D.tl_input, 0.01459404*corn_stover_qty)   # 0.01374
     
     return_array.loc[6] = UF.getWriteRow('Sodium Hydroxide', D.conv, 
-                                      D.tl_input, 0.024668*corn_stover_qty)
+                                      D.tl_input, 0.028160*corn_stover_qty)     # 0.024668
 
     return_array.loc[7] = UF.getWriteRow('Corn Beer', D.conv, 
-                                      D.tl_output, 4.727*corn_stover_qty)
+                                      D.tl_output, 4.7276*corn_stover_qty)
     
     return_array.loc[8] = UF.getWriteRow('Corn Stover', D.conv,
                                       D.tl_input, corn_stover_qty)
     
-    scale9 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], 0.519228,'MJ/kg')
+    scale9 = D.TEA_LCA_Qty(D.substance_dict['Electricity'], 0.5937328,'MJ/kg')  # 0.519228
     return_array.loc[9] = UF.getWriteRow('Electricity', D.conv,
                                       D.tl_input, scale9.qty*corn_stover_qty)
     # 2888.51 MJ/ha from summing electricity inputs in Excel Model Blocks
@@ -63,7 +63,7 @@ def ethanol_stover(biomass_IO_array):
     
 def main():
     land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
-    yield_value = 5563.08
+    yield_value = 4865.83
     biomass_IO_array = CSC.grow_stover(land_area_val,yield_value)
    
     return ethanol_stover(biomass_IO_array)

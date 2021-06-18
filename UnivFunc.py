@@ -4,12 +4,55 @@ import numpy as np
 
 import csv
 
+import os
+from pathlib import Path
+cwd = os.getcwd()
+
 # Column Headings for Results Dataframe
 substance_name = 'Substance_Name'
 process_name = 'Process_Name'
 input_or_output = 'In_or_out'
 magnitude = 'Magnitude'
 units = 'Units'
+
+def collectDayCentData():
+    path_list = [Path(cwd + '/DayCent/tabular_results/corn-stover_county_results.csv')]    
+    excel_read = pd.read_csv(path_list[0])
+    return excel_read
+
+def DayCentYields(crop_selection, percent_collected_ID):
+    
+    excel_read = collectDayCentData()
+    
+    Daycent_Yields = []
+    
+    for i in range(len(excel_read)):
+        row = excel_read.loc[i]
+        Daycent_Yields.append(row[crop_selection])
+        
+    if crop_selection != 'stover_yield_Mg_ha':
+        return Daycent_Yields
+    
+    stover_results_raw = Daycent_Yields
+    
+    stover_collected = []
+    
+    i = 0
+    if percent_collected_ID == 1:
+        i = 1
+    if percent_collected_ID == 2:
+        i = 2
+    if percent_collected_ID == 3:
+        i = 3
+    if percent_collected_ID >= 4:
+        print('Error - 1 = 25%, 2 = 50%, 3 = 75% - Pathway ID unrecognized')
+        
+    while i < len(stover_results_raw):
+        value = stover_results_raw[i]
+        stover_collected.append(value)
+        i = i + 4
+    
+    return stover_collected
 
 # Instantiate an empty dataframe
 def createEmptyFrame():

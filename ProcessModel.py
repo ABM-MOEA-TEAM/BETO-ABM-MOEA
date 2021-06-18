@@ -67,7 +67,7 @@ print(ghg_impact)
 # Calculate MFSP
 mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 152.79) # MJ/Gal Jet-A
 new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods) * 152.79) # MJ/Gal Jet-A
-print(new_mfsp)
+print(mfsp)
 
 # Calculate MCSP at Farm Gate
 mcsp = Ag_TEA.calc_MCSP(biomass_IO)
