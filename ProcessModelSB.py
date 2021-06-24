@@ -34,6 +34,7 @@ AllocationID = 3
 
 # Biomass Production
 biomass_IO = SC.grow_soy(land_area_val, yield_value)
+#biomass_IO = SC.grow_soybean(land_area_val, yield_value)
 results_array = results_array.append(biomass_IO, ignore_index=True)
 
 # Extraction/Conversion

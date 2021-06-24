@@ -13,4 +13,3 @@ corn_stover_75 = UF.DayCentYields('stover_yield_Mg_ha', 3)
 corn_grain = UF.DayCentYields('corn_yield_Mg_ha', 0)
 
 soy_yield = UF.DayCentYields('soy_yield_Mg_ha', 0)
-

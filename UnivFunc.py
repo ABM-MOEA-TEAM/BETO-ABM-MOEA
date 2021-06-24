@@ -14,11 +14,36 @@ process_name = 'Process_Name'
 input_or_output = 'In_or_out'
 magnitude = 'Magnitude'
 units = 'Units'
+I_O = 'I/O'
+name = 'Name'
+base_value = 'Base Value'
 
 def collectDayCentData():
     path_list = [Path(cwd + '/DayCent/tabular_results/corn-stover_county_results.csv')]    
     excel_read = pd.read_csv(path_list[0])
     return excel_read
+
+def collectIndepVars():
+    
+    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_061321.xlsx')]
+    excel_read = pd.read_excel(path_list[0],'SoyCult')
+    
+    name_list = []
+    indep_vars_list = []
+    units_list = []
+    I_O_list = []
+    return_array = [[],[],[]]
+    
+    for i in range(len(excel_read)):
+        row = excel_read.loc[i]
+        name_list.append(row[name])
+        indep_vars_list.append(row[base_value])
+        units_list.append(row[units])
+        I_O_list.append(row[I_O])
+        
+    return_array = [name_list,indep_vars_list,I_O_list,units_list]
+    
+    return return_array
 
 def DayCentYields(crop_selection, percent_collected_ID):
     
