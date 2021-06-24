@@ -25,7 +25,7 @@ def collectDayCentData():
 
 def collectIndepVars():
     
-    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_061321.xlsx')]
+    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_062421.xlsx')]
     excel_read = pd.read_excel(path_list[0],'SoyCult')
     
     name_list = []

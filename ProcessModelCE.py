@@ -101,4 +101,5 @@ upgr_out = UF.sumProcessIO(results_array, D.upgrading, D.tl_output)
 # eroi_chksm = 2.51
 mfsp_chksm = 2.40
 
+z_output = TEA.calc_NPV(biomass_IO)
 #print('Executed Corn Stover Fermentation to Ethanol PM')

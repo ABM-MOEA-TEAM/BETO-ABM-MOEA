@@ -5,11 +5,21 @@ Created on Fri Jun 18 10:02:53 2021
 @author: Jack Smith
 """
 import UnivFunc as UF
+import TEA_LCA_Data as D
+import Soy_Cultivation as SC
+import TEA 
 
-corn_stover_25 = UF.DayCentYields('stover_yield_Mg_ha', 1)
-corn_stover_50 = UF.DayCentYields('stover_yield_Mg_ha', 2)
-corn_stover_75 = UF.DayCentYields('stover_yield_Mg_ha', 3)
+land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 100, 'hectare')
+yield_value = 3017  # Not actually used (need to remove - 6/24)
 
-corn_grain = UF.DayCentYields('corn_yield_Mg_ha', 0)
+biomass_IO = SC.grow_soybean(land_area_val, yield_value)
 
-soy_yield = UF.DayCentYields('soy_yield_Mg_ha', 0)
+output = TEA.calc_NPV(biomass_IO)
+
+# corn_stover_25 = UF.DayCentYields('stover_yield_Mg_ha', 1)
+# corn_stover_50 = UF.DayCentYields('stover_yield_Mg_ha', 2)
+# corn_stover_75 = UF.DayCentYields('stover_yield_Mg_ha', 3)
+
+# corn_grain = UF.DayCentYields('corn_yield_Mg_ha', 0)
+
+# soy_yield = UF.DayCentYields('soy_yield_Mg_ha', 0)

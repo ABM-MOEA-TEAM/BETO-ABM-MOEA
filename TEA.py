@@ -10,6 +10,183 @@ yrs = 30 # userinputs.yrs
 
 # function used for goal finding
 
+def calc_NPV(tl_array):
+    
+    for i in range(len(tl_array)):
+        row_vals = tl_array.loc[i]
+        subst_name = row_vals[UF.substance_name]          
+    
+    capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
+    land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Capital Cost']])
+    capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
+    labor =  UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude
+
+    opex = calcOPEX(tl_array)
+
+    ecovar = {'disc rate': 0.1, 't': 0.2, 'equity': 0.4, 'interest': 0.08, 'loan term': 10, 
+              'maint rate': 0.03, 'ins rate': 0.01, 'land lease': 0, 'dep capex': 0.85}
+    macrs = [0.143, 0.245, 0.175, 0.125, 0.089, 0.089, 0.089, 0.045]
+    ###yrs = input('What is the project lifespan? ')
+    landcapex =  land_cost_qty.magnitude 
+    
+    #Total depreciable investment
+    depinv =  capex_qty.magnitude * ecovar['dep capex']
+    #Investment-loan share
+    invloanshare = capex * (1-ecovar['equity'])
+    #Loan annual payment
+    loanannpay = capex*(1-ecovar['equity'])*ecovar['interest']*(1+ecovar['interest'])**ecovar['loan term']/((1+ecovar['interest'])**ecovar['loan term']-1)
+    # print('---------')
+    # print('Loan Annual Payment')
+    # print(loanannpay)
+    # print('---------')
+    #Investment-equity share
+    invequityshare = capex * (ecovar['equity'])
+    #Salvage value end of life
+    salvage = landcapex
+    #Annual insurance
+    annins = depinv * ecovar ['ins rate']
+    #Annual maintenance
+    annmaint = depinv * ecovar['maint rate']
+    #Annual material and energy costs = opex, Annual labor costs = labor
+    #Fixed operating costs in $/yr
+    fopex =  annins + annmaint + opex + labor
+    
+    #creating MACRS list with zeros at the end to match duration of project
+    depyrs = len (macrs)
+    dif = int(yrs) - depyrs
+    if dif > 0:
+        addzero = [0] * dif
+        macrs.extend (addzero)
+    
+    depreciation = []
+    i = 0
+    
+    #calculating depreciation of depreciable investment in each year
+    while i < len(macrs) :
+        depreciation.append (depinv * macrs [i])
+        i += 1
+    
+    i = 0
+    
+    #calculating loan payment, interest, and principle for each time step
+    loanpay = [ ]
+    loanint = [ ]
+    loanprin = [ ]
+    
+    while i < int(ecovar['loan term']):
+        loanpay.append (loanannpay)
+        if i == 0:
+            loanint.append (invloanshare*ecovar ['interest'])
+            loanprin.append (invloanshare-loanpay[i]+loanint [i])
+        else:
+            loanint.append (loanprin [i-1]*ecovar ['interest'])
+            loanprin.append (loanprin[i-1]-loanpay[i] + loanint[i])
+        
+        i += 1
+    
+    #adding zeros to the end of loan payment, interest, and principle for duration of project
+    dif = int(yrs) - len(loanprin)
+    
+    if dif > 0:
+        addzero = [0] * dif
+        loanpay.extend (addzero)
+        loanint.extend (addzero)
+        loanprin.extend (addzero)
+
+    result = NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, 
+                      loanpay, tl_array)        
+    
+    print('---------')
+    print('CAPEX')
+    print(capex)  
+    print('-------')
+    
+    return result
+
+
+def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
+             tl_array):
+    
+    # If no output fuel exists, I want to either call this loop or have it be run
+    # automatically.
+    
+    ann_coproduct_revenue = 0   # Not really needed
+    transport_fuel_energy = 0   # But now I don't have to change any logic
+    pint_price_per_MJ = 0
+    
+    nonfuel_value = calcNonFuelValue(tl_array)
+    ann_fuel_revenue =  nonfuel_value + (pint_price_per_MJ * transport_fuel_energy)
+    
+    annrevenue = ann_fuel_revenue + ann_coproduct_revenue
+  
+    # print('----- Non-Fuel Value -----')
+    # print(nonfuel_value)
+    # print('--------------------------')
+    
+    #calculating net income
+    netincome = []
+    years = int(yrs)
+    i = 0
+    
+    while i < years:
+        netincome.append (annrevenue - fopex -depreciation [i] -loanint [i])
+        i += 1
+    
+    #calculating losses forward and taxable income
+    lossforward = []
+    taxincome = [0]
+    i = 0
+    
+    while i < years:
+        if taxincome [i] < 0:
+            lossforward.append (taxincome [i])
+        else:
+            lossforward.append (0)
+        taxincome.append (lossforward [i] + netincome [i])
+        i += 1
+    taxincome.pop(0)
+    
+    #calculating income tax
+    
+    i = 0
+    incometax = []
+    while i < years:
+        if taxincome [i] < 0:
+            incometax.append (0)
+        else:
+            incometax.append (taxincome [i] * ecovar['t'])
+        i += 1
+    # calculating cash flow
+    cashflow = [-invequityshare]
+    i = 1
+    
+    while i < years + 1:
+        cashflow.append (annrevenue - fopex - loanpay [i-1] - incometax [i-1])
+        i += 1 
+    
+    # calculating discounted cash flow
+    disccashflow = []
+    i = 0
+    
+    while i < years + 1:
+        disccashflow.append (cashflow [i]/(1+ecovar['disc rate'])**i)
+        i += 1
+    
+    # calculating cumulative discounted cash flow
+    cumdisccashflow = [disccashflow [0]]
+    
+    i = 1
+    
+    while i < years + 1:
+        cumdisccashflow.append (cumdisccashflow [i - 1] + disccashflow [i])
+        i += 1
+    
+    # NPV retrieval from cumulative discounted cash flow
+    npv = cumdisccashflow
+    
+    # print(abs(npv[-1]))
+    return npv[-1]
+    
 
 def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
              loanpay, tl_array, prod):
@@ -252,8 +429,6 @@ def calc_MFSP(tl_array, prod, coprods):
     # print('-------')
     return result.x     # $/MJ (above optimization) * MJ/gge
 
-    # Will need to switch this 
-
 # Calculate cost of inputs (opex)
 def calcOPEX(tl_array):
     inputs_cost = 0
@@ -271,13 +446,14 @@ def calcOPEX(tl_array):
                                       D.LCA_cost)
             if in_or_out == D.tl_input:
                 total = LCA_val*mag
+                # print('-----------')
                 # print(subst_name)
                 # print(LCA_val)
                 # print(mag)
                 # print(total)
                 # print('-----------')
                 inputs_cost += (LCA_val * mag)
-    # print(inputs_cost)
+    print(inputs_cost)
     return inputs_cost
 
 # Calculate value of non-fuel outputs
@@ -302,11 +478,12 @@ def calcNonFuelValue(tl_array):
                                              subst_name != 'Biodiesel'):
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
-    #             print(subst_name)
-    #             print(LCA_val)
-    #             print(mag)
-    #             print(total)
-    #             print('--------')
+                # print('--------')
+                # print(subst_name)
+                # print(LCA_val)
+                # print(mag)
+                # print(total)
+                # print('--------')
                 
     # print(outputs_value)
     return outputs_value
