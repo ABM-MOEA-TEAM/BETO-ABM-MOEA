@@ -23,10 +23,11 @@ def collectDayCentData():
     excel_read = pd.read_csv(path_list[0])
     return excel_read
 
-def collectIndepVars():
+def collectIndepVars(tab_string):
     
-    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_062421.xlsx')]
-    excel_read = pd.read_excel(path_list[0],'SoyCult')
+    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_062421.xlsx')] # Presumably will all be in this file
+    
+    excel_read = pd.read_excel(path_list[0],tab_string)
     
     name_list = []
     indep_vars_list = []
@@ -98,6 +99,381 @@ col_count = len(list(empty_frame.columns))
 state_name_col = 'State_Name'
 avg_yield_col = 'Average_Yield'
 eroi_col = 'EROI'
+
+def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator, 
+                           downstream_indicator, tl_array, input_substance_string,
+                           step_ID):
+
+################## DOWNSTREAM NESTED IF LOGIC ######################
+    if step_ID == 0:
+        which_step = D.biomass_production
+    if step_ID == 1:
+        which_step = D.conv
+    if step_ID == 2:
+        which_step = D.upgrading
+    if step_ID != 0 and step_ID != 1 and step_ID != 2:
+        print('Error - Expected final argument (step_ID) to be 0, 1, or 2')
+        print('0 --------- Biomass Production Step')
+        print('1 --------- Conversion/Extraction Step')
+        print('2 --------- Upgrading Step')
+        return
+
+    if downstream_indicator == 1:
+        match_list = [[input_or_output, D.tl_output],
+                     [substance_name, input_substance_string]] 
+        
+        input_substance_amount = returnPintQty(tl_array, match_list) 
+        
+        vars_list = collectIndepVars(tab_string)
+        
+        for i in range(len(vars_list)):
+            name_list = []
+            val_list = []
+            
+            val_list = vars_list[i]
+            name_list = vars_list[i-1]
+            I_O_list = vars_list[i-2]
+            unit_list = vars_list[i-3]
+            
+            quad_list = list(zip(name_list, val_list, I_O_list, unit_list))
+
+        size = 0  
+        return_array = createEmptyFrame()
+        output_name_list = []
+        output_value_list = []
+        output_units_list = []
+        
+        output_name_list.append(input_substance_string)
+        output_value_list.append(input_substance_amount)
+        output_units_list.append('kg/yr')
+
+
+        i = 0
+    
+        scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
+                                            output_units_list[0])
+        return_array.loc[0] = getWriteRow(output_name_list[0], which_step,
+                                            D.tl_input, scale0.qty)
+        
+        Main_Substance_Amount = input_substance_amount
+        
+        i = 1
+        j = 0
+
+        while j < len(quad_list):
+            rows = quad_list[j]
+            
+            if rows[0] == 'In' and rows[1] == 'dollars/yr':
+                
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],rows[1])
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty)
+                i += 1
+            
+                
+            if rows[0] == 'In' and rows[1] == 'dollars/kg Feedstock':
+              
+                if rows[3] == 'Labor': # As the other two $'s are not /yr
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                                rows[2],'dollars/kg')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty
+                                            *Main_Substance_Amount)
+                    i += 1
+                    
+                else:
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                                rows[2],'dollars*yr/kg')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                                D.tl_input, scale_value.qty
+                                                *Main_Substance_Amount)
+                    i += 1
+            
+            if rows[0] == 'In' and rows[1] == 'MJ/yr':
+                
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                        rows[2],rows[1])
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty) 
+                i += 1    
+            
+            if rows[0] == 'In' and rows[1] == 'kg/kg Feedstock':
+                if rows[3] == 'LNG':
+                    
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                                rows[2],'')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                                D.tl_input, scale_value.qty*
+                                                Main_Substance_Amount*D.HHV_dict['LNG'].qty) 
+                    i += 1
+                    
+                else:
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                                rows[2],'kg/kg')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                                D.tl_input, scale_value.qty*
+                                                Main_Substance_Amount)    
+                    i += 1
+            
+            if rows[0] == 'In' and rows[1] == 'm3/kg Feedstock':
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],'m**3/kg')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*
+                                            Main_Substance_Amount) 
+                i += 1
+                
+            if rows[0] == 'In' and rows[1] == 'MJ/kg Feedstock':
+                
+                if rows[3] == 'LNG':
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                        rows[2],'')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty
+                                            *Main_Substance_Amount/D.HHV_dict['LNG'].qty) 
+                else:
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                        rows[2],'MJ/kg')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty
+                                            *Main_Substance_Amount) 
+                i += 1
+                
+            if rows[0] == 'Out' and rows[1] == 'kg/kg Feedstock':
+                
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],'')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                                D.tl_output, scale_value.qty*
+                                                Main_Substance_Amount) 
+                i += 1
+            j += 1
+                
+        return return_array
+        
+ ################## CULTIVATION NESTED IF LOGIC ######################   
+    vars_list = collectIndepVars(tab_string)
+    
+    for i in range(len(vars_list)):
+        name_list = []
+        val_list = []
+        
+        val_list = vars_list[i]
+        name_list = vars_list[i-1]
+        I_O_list = vars_list[i-2]
+        unit_list = vars_list[i-3]
+        
+        quad_list = list(zip(name_list, val_list, I_O_list, unit_list))
+    
+    size = 0  # ! Need to change this to pull from excel sheet
+    return_array = createEmptyFrame()
+    output_name_list = []
+    output_value_list = []
+    output_units_list = []
+    stover_collection_percentage = 0
+    
+    # While loop runs through the list of quads to grab the ha's & outputs 
+    
+    i = 0
+    while i < len(quad_list):
+        rows = quad_list[i]
+        if rows[3] == 'Stover Collected':
+            stover_collection_percentage = rows[2]
+        if rows[0] == 'Out':
+              output_name_list.append(rows[3])
+              output_value_list.append(rows[2])
+              output_units_list.append(rows[1])
+        if rows[1] == 'ha':
+            size = D.TEA_LCA_Qty(D.substance_dict['Land Area'], rows[2], 'hectare')
+        i += 1
+        
+    
+    if len(output_name_list) == 0:
+        print('Error - No Out Substances Found From Excel Sheet')
+        return
+    if size == 0:
+        print('Error - No land Area Argument Detected, expects ha')
+        return 
+    if tab_string == 'CornCult' and stover_collection_percentage == 0:
+        print('Error - expected non-zero argument for stover collection %')
+    
+    i = 0
+    
+    scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
+                                        output_units_list[0])        
+    return_array.loc[0] = getWriteRow(output_name_list[0], which_step,
+                                        D.tl_output, scale0.qty*size.qty)
+    i = i + 1
+    
+    if len(output_name_list) >= 2:
+        
+        if output_name_list[1] == 'Corn Stover':
+            
+            scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[1]],output_value_list[1],
+                                        output_units_list[1])        
+            return_array.loc[1] = getWriteRow(output_name_list[1], which_step,
+                                                D.tl_output, scale1.qty*size.qty
+                                                *stover_collection_percentage/100)
+            corn_stover_yield = scale1.qty*size.qty*(stover_collection_percentage/100)
+        
+        else:
+            
+            scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[1]],output_value_list[1],
+                                            output_units_list[1])        
+            return_array.loc[1] = getWriteRow(output_name_list[1], which_step,
+                                                D.tl_output, scale1.qty*size.qty)
+        i = i + 1
+    
+    Main_Substance_Amount = scale0.qty*size.qty
+    
+    
+    
+    #print(soybean_yield)
+    
+    j = 0
+
+    while j < len(quad_list):
+        rows = quad_list[j]
+        if rows[0] == 'In' and rows[1] == 'kg/ha/yr':
+            
+            if rows[3] == 'Corn Stover':
+                
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],rows[1])
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*size.qty)
+                
+            else:
+                
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],rows[1])
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*size.qty)
+            i += 1
+            
+        # And now a million exceptions for different unit types
+        
+        if rows[0] == 'In' and rows[1] == 'dollars/ha/yr':
+            
+            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],rows[1])
+            return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty*size.qty)
+            i += 1
+        
+        if rows[0] == 'In' and rows[1] == 'dollars/ha':
+            
+            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],rows[1])
+            return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty*size.qty)
+            i += 1
+            
+        if rows[0] == 'In' and rows[1] == 'dollars/kg Feedstock':
+          
+            if rows[3] == 'Labor': # As the other two $'s are not /yr
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],'dollars/kg')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty
+                                        *Main_Substance_Amount)
+                i += 1
+                
+            else:
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],'dollars*yr/kg')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty
+                                            *Main_Substance_Amount)
+                i += 1
+        
+        if rows[0] == 'In' and rows[1] == '#/ha/yr':
+            if rows[3] == 'Soybean Seed':
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2]*0.00194595,'kg/ha/yr')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*size.qty) 
+            
+            if rows[3] == 'Corn Seed':
+                scale_value = D.TEA_LCA_Qty(D.substance_dict['Corn Seed'],
+                                        rows[2]/1695.433,'kg/ha/yr')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*size.qty)
+                
+            if rows[3] == 'Rhizome Plugs':
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                        rows[2],'ha**-1/yr')  # Need a guess on the mass of 1 plug
+            return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty*size.qty)
+            i += 1
+        
+        if rows[0] == 'In' and rows[1] == 'MJ/ha/yr':
+            
+            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                    rows[2],rows[1])
+            return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty*size.qty) 
+            i += 1    
+        
+        if rows[0] == 'In' and rows[1] == 'kg/kg Feedstock':
+            if rows[3] == 'LNG':
+                
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],'')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*
+                                            Main_Substance_Amount*D.HHV_dict['LNG'].qty) 
+                i += 1
+                
+            else:
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                            rows[2],'kg/kg')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty*
+                                            Main_Substance_Amount)    
+                i += 1
+        
+        if rows[0] == 'In' and rows[1] == 'm3/ha/yr':
+            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                        rows[2],'m**3/ha/yr')
+            return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty*size.qty) 
+            i += 1
+            
+        if rows[0] == 'In' and rows[1] == 'MJ/kg Feedstock':
+            
+            if rows[3] == 'LNG':
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                    rows[2],'')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty
+                                        *Main_Substance_Amount/D.HHV_dict['LNG'].qty) 
+            else:
+                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                    rows[2],'MJ/kg')
+                return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                        D.tl_input, scale_value.qty
+                                        *Main_Substance_Amount) 
+            i += 1
+        
+        if rows[1] == '%':
+            if tab_string == 'CornCult' and rows[3] == 'Carbon Content':
+                
+                carbon_content = rows[2]
+                value = ((carbon_content/100)*(44/12)*(Main_Substance_Amount + corn_stover_yield))
+                return_array.loc[i] = getWriteRow('Atmospheric CO2', which_step,
+                                        D.tl_input, ((carbon_content/100)*(44/12)
+                                                      *(Main_Substance_Amount + corn_stover_yield)))
+               
+            if tab_string != 'CornCult':
+                scale_value = D.TEA_LCA_Qty(D.substance_dict['Atmospheric CO2'],
+                                            rows[2],'kg/kg')
+                return_array.loc[i] = getWriteRow('Atmospheric CO2', which_step,
+                                            D.tl_input, (44/12)*scale_value.qty
+                                            *Main_Substance_Amount/100) 
+
+            i += 1    
+        
+        j += 1
+            
+    return return_array
 
 # Instantiate an empty dataframe
 def createEmptySummaryFrame():

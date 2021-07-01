@@ -48,7 +48,8 @@ class Probability_Distribution:
 # Paths and hard-coded strings
 path_list = [Path(cwd + '/LCA_Inventory.csv'), 
              Path(cwd + '/Substances.csv'),
-             Path(cwd + '/AltJet_Excerpt_Example.xlsx')]
+             Path(cwd + '/AltJet_Excerpt_Example.xlsx'),
+             Path(cwd + '/CSU_All_Pathway_TEALCA_062421.xlsx')]
 
 # LCA Inventory Variables
 LCA_key_str = 'Key_String'
@@ -58,6 +59,9 @@ LCA_energy_impact = 'Energy_Impact (MJ/X)'
 LCA_cost = 'Cost'
 LCA_GHG_impact = 'GHG_Impact'
 LCA_inventory_df = pd.read_csv(path_list[0])
+# LCA_inventory_df = pd.read_excel(path_list[3],'LCI')
+
+# Going to just try switching the read source over to the all_pathways sheet (6/29)
 
 # Get [short] list of substances that are NOT fungible, depends on LCA Inventory
 # sub_list = []
@@ -115,6 +119,7 @@ for i in range(len(substances_df)):
 # NP: Can also use TEA_LCA_Qty_Cited class to embed the citation in the object
 HHV_dict = {}
 
+HHV_dict['LNG'] = TEA_LCA_Qty(substance_dict['LNG'], 50, 'MJ/kg')       # AltJet
 HHV_dict['Ethanol'] = TEA_LCA_Qty(substance_dict['Ethanol'], 26.95, 'MJ/kg')
 HHV_dict['Diesel'] = TEA_LCA_Qty(substance_dict['Diesel'], 42.975, 'MJ/kg')
 HHV_dict['Gasoline'] = TEA_LCA_Qty(substance_dict['Gasoline'], 43.44, 'MJ/kg')

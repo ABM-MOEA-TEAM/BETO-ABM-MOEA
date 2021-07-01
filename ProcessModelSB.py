@@ -8,14 +8,14 @@ import TEA_LCA_Data as D
 import UnivFunc as UF
 
 import TEA
-import Ag_TEA
 import LCA
-import Ag_LCA
 
 # Process steps
 import Soy_Cultivation as SC
 import Soy_Diesel as SD
+import Hexane_Extraction as HE
 import Soy_Diesel_Upgrade as SDU
+import Transesterification as T
 
 import os
 from pathlib import Path
@@ -39,11 +39,13 @@ results_array = results_array.append(biomass_IO, ignore_index=True)
 
 # Extraction/Conversion
 conversion_IO = SD.diesel_soy(biomass_IO)
+#conversion_IO = HE.Hexane_Extraction(biomass_IO)
 results_array = results_array.append(conversion_IO, ignore_index=True)
 ds_results_array = ds_results_array.append(conversion_IO, ignore_index=True)
 
-# # Upgrading
+# Upgrading
 upgrading_IO = SDU.upgrade_soy_diesel(conversion_IO)
+#upgrading_IO = T.Transesterification(conversion_IO)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
 ds_results_array =ds_results_array.append(upgrading_IO, ignore_index=True)
 
@@ -52,7 +54,7 @@ IO_array = UF.consolidateIO(results_array)
 ds_IO_array = UF.consolidateIO(ds_results_array)
 #IO_ds_array = UF.consolidateIO()
 # Calculate EROI
-eroi = LCA.calcEROI(IO_array)
+# eroi = LCA.calcEROI(IO_array)
 
 # Read prodlist .csv
 cwd = os.getcwd()    
@@ -67,17 +69,11 @@ coprods = UF.returnCoProdlist(pathname)
 ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
 #print(ghg_impact)
 
-# Calculate GHG Impact at Farm Gate
-MJ_out = 23635
-ghg_impact_farm = Ag_LCA.calcGHGImpactAg(biomass_IO, MJ_out)
 
 # Calculate MFSP
 # mfsp = (TEA.calc_MFSP(IO_array, prod, coprods) * 135.13) # MJ/Gal BD (Check)
 new_mfsp = (TEA.calc_MFSP(ds_IO_array, prod, coprods)* 135.13) # MJ/Gal BD
 print(new_mfsp)
-
-# Calculate Minimum Crop Selling Price at Farm Gate
-mcsp = Ag_TEA.calc_MCSP(biomass_IO)
 
 # CheckSum for spreadsheet/Python agreement
 bp_in = UF.sumProcessIO(results_array, D.biomass_production, D.tl_input)

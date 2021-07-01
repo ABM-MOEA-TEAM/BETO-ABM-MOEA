@@ -96,10 +96,10 @@ def calc_NPV(tl_array):
     result = NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, 
                       loanpay, tl_array)        
     
-    print('---------')
-    print('CAPEX')
-    print(capex)  
-    print('-------')
+    # print('---------')
+    # print('CAPEX')
+    # print(capex)  
+    # print('-------')
     
     return result
 
@@ -328,11 +328,11 @@ def calc_MFSP(tl_array, prod, coprods):
     #     coprods_MJ.append(coprods_vals[j]*coprods_HHV[j].qty)
         
     #print(fuel_out_type)
-    
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Capital Cost']])
     capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
     labor =  UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude
+    
     
     #calculating total costs for inputs to the pathway (opex)
     
@@ -453,7 +453,7 @@ def calcOPEX(tl_array):
                 # print(total)
                 # print('-----------')
                 inputs_cost += (LCA_val * mag)
-    print(inputs_cost)
+    # print(inputs_cost)
     return inputs_cost
 
 # Calculate value of non-fuel outputs
