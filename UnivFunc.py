@@ -25,7 +25,7 @@ def collectDayCentData():
 
 def collectIndepVars(tab_string):
     
-    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_062421.xlsx')] # Presumably will all be in this file
+    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_ACTIVE.xlsx')] # Presumably will all be in this file
     
     excel_read = pd.read_excel(path_list[0],tab_string)
     
@@ -80,7 +80,50 @@ def DayCentYields(crop_selection, percent_collected_ID):
     
     return stover_collected
 
-# Instantiate an empty dataframe
+def collectEconIndepVars(column_id):
+    
+    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_ACTIVE.xlsx')]
+    
+    excel_read = pd.read_excel(path_list[0], 'TEA')
+    
+    return_list = []
+    
+    column_number = 0
+    
+    if column_id == 'Soy Biodiesel' or column_id == 0:
+        column_number = 1
+    
+    if column_number == 0:
+        print('Error - unrecognized column ID string')
+        
+    Operating_Capacity_Row = excel_read.loc[13]
+    Discount_Rate_Row = excel_read.loc[14]
+    Tax_Rate_Row = excel_read.loc[15]
+    Equity_Share_Row = excel_read.loc[16]
+    Interest_Rate_Row = excel_read.loc[17]
+    Loan_Term_Row = excel_read.loc[18]
+    Maintenance_Rate_Row = excel_read.loc[19]
+    Insurance_Rate_Row = excel_read.loc[20]
+    Depreciable_Amount_Row = excel_read.loc[21]
+    Tax_Credit_Row = excel_read.loc[22]
+    Salvage_Row = excel_read.loc[23]
+    
+    
+    return_list.append(Operating_Capacity_Row[column_number])
+    return_list.append(Discount_Rate_Row[column_number])
+    return_list.append(Tax_Rate_Row[column_number])
+    return_list.append(Equity_Share_Row[column_number])
+    return_list.append(Interest_Rate_Row[column_number])
+    return_list.append(Loan_Term_Row[column_number])
+    return_list.append(Maintenance_Rate_Row[column_number])
+    return_list.append(Insurance_Rate_Row[column_number])
+    return_list.append(Depreciable_Amount_Row[column_number])
+    return_list.append(Tax_Credit_Row[column_number])
+    return_list.append(Salvage_Row[column_number])
+    
+    return return_list
+
+# Instantiate an empty datafram
 def createEmptyFrame():
     # Data structure to store all results
     return pd.DataFrame({substance_name : [], process_name : [], 
@@ -102,9 +145,13 @@ eroi_col = 'EROI'
 
 def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator, 
                            downstream_indicator, tl_array, input_substance_string,
-                           step_ID):
+                           step_ID, DayCent_read_string):
+# This needs to be decentralized and cleaned up. Ideally, I would find a work around
+# for the gross nested-if statement logic (7/1)    
+    
+    yield_input_list = []
 
-################## DOWNSTREAM NESTED IF LOGIC ######################
+# Identify the step - cultivation, conversion or upgrading from the given argument
     if step_ID == 0:
         which_step = D.biomass_production
     if step_ID == 1:
@@ -117,13 +164,67 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
         print('1 --------- Conversion/Extraction Step')
         print('2 --------- Upgrading Step')
         return
+    
+##################### GEOSPATIAL DATA LOGIC ########################
+    
+    if geospatial_indicator == 1:
+        print('Here, I would do something spectacular.  I am not sure what,')
+        print('but I know it will be spectacular when I figure it out')
 
+        # Need a new argument that is the name of the column in the DayCent
+        # Tabular Data csv. 
+        input_string = ''
+        
+        if DayCent_read_string == 'Corn Grain':
+            input_string = 'corn_yield_Mg_ha'
+        if DayCent_read_string == 'Soy':
+            input_string = 'soy_yield_Mg_ha'
+        if DayCent_read_string == 'Corn Stover':
+            input_string = 'stover_yield_Mg_ha'
+        if input_string == '':
+            print('Error - unrecognized DayCent Read String, expected')
+            print('Corn Grain')
+            print('Corn Stover')
+            print('Soy')
+            return 
+        
+        # Need to add logic and probably another argument for the percent of stover
+        # that is collected.  In order to be able to loop this how I want, this 
+        # piece of the code has to be outside of the nested if statement logic completely;
+        # I will need to decentralize before I am able to eat the daycent data. (7/1)
+
+        yield_input_list = DayCentYields(input_string,0)
+        
+        print(yield_input_list)
+        
+        # now with a non-zero yield_input_list length, we can loop through this
+        # set with new biomass_IO_arrays.  Need to alter the reader, however
+        # to recognize that we are being fed a yield value now.... maybe could
+        # work around by making a "Biomass_IO" array that is just one instance
+        # of one substance... that is all that is needed, right? i.e.
+        # Input_IO_frame = UF.createEmptyFrame()
+        # UF.getWriteRow('Soybean Seed', D.biomass_production,
+        #                                D.tl_input, yield_input_list[i])
+        # output_array.append(collect_IndepVars_Loop) (or some way to write values)
+        
+################## DOWNSTREAM NESTED IF LOGIC ######################
+    
+    # If indicator is engaged, you will need to read the given tl_array to find
+    # some particular substance (the feedstock) and its amount. I think this is
+    # the only real difference in the two branches.  A good place to begin with 
+    # edits could be to merge the two branches somehow (might not be easy to do
+    # with the numerous different unit types that appear in cult or conversion)
+    # (7/1)
     if downstream_indicator == 1:
+        
+        # Create Match_List ID with given substance input string 
         match_list = [[input_or_output, D.tl_output],
                      [substance_name, input_substance_string]] 
         
+        # Grab the Amount of that input substance (used for scaling later)
         input_substance_amount = returnPintQty(tl_array, match_list) 
         
+        # Executes loop above to grab all relevant rows from All_PW's
         vars_list = collectIndepVars(tab_string)
         
         for i in range(len(vars_list)):
@@ -135,9 +236,11 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
             I_O_list = vars_list[i-2]
             unit_list = vars_list[i-3]
             
+            # Formats all of this data as a set of quads (or tuples?) - there 
+            # is definitely a more elegant way to do this, but it is flexible 
+            # enough for first iteration I think. (7/1)
             quad_list = list(zip(name_list, val_list, I_O_list, unit_list))
-
-        size = 0  
+             
         return_array = createEmptyFrame()
         output_name_list = []
         output_value_list = []
@@ -204,7 +307,7 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
                                                 rows[2],'')
                     return_array.loc[i] = getWriteRow(rows[3], which_step,
                                                 D.tl_input, scale_value.qty*
-                                                Main_Substance_Amount*D.HHV_dict['LNG'].qty) 
+                                                Main_Substance_Amount/D.HHV_dict['LNG'].qty) 
                     i += 1
                     
                 else:
@@ -230,7 +333,15 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
                                         rows[2],'')
                     return_array.loc[i] = getWriteRow(rows[3], which_step,
                                             D.tl_input, scale_value.qty
-                                            *Main_Substance_Amount/D.HHV_dict['LNG'].qty) 
+                                            *Main_Substance_Amount*D.HHV_dict['LNG'].qty)
+                    print('Potential Error in Units - Rows 287/294')
+                if rows[3] == 'Natural Gas':
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
+                                        rows[2],'MJ/kg')
+                    return_array.loc[i] = getWriteRow(rows[3], which_step,
+                                            D.tl_input, scale_value.qty
+                                            *Main_Substance_Amount/D.HHV_dict['Natural Gas'].qty)
+                    # print('Engaged')
                 else:
                     scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],
                                         rows[2],'MJ/kg')
@@ -252,6 +363,10 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
         return return_array
         
  ################## CULTIVATION NESTED IF LOGIC ######################   
+ 
+ # Point is that this portion of the loop cannot be reached if the downstream
+ # indicator is engaged.  This constitutes the second branch of the loop
+ 
     vars_list = collectIndepVars(tab_string)
     
     for i in range(len(vars_list)):
@@ -325,10 +440,6 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
         i = i + 1
     
     Main_Substance_Amount = scale0.qty*size.qty
-    
-    
-    
-    #print(soybean_yield)
     
     j = 0
 
@@ -458,14 +569,14 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
                 
                 carbon_content = rows[2]
                 value = ((carbon_content/100)*(44/12)*(Main_Substance_Amount + corn_stover_yield))
-                return_array.loc[i] = getWriteRow('Atmospheric CO2', which_step,
+                return_array.loc[i] = getWriteRow('CO2, Atmospheric', which_step,
                                         D.tl_input, ((carbon_content/100)*(44/12)
                                                       *(Main_Substance_Amount + corn_stover_yield)))
                
             if tab_string != 'CornCult':
-                scale_value = D.TEA_LCA_Qty(D.substance_dict['Atmospheric CO2'],
+                scale_value = D.TEA_LCA_Qty(D.substance_dict['CO2, Atmospheric'],
                                             rows[2],'kg/kg')
-                return_array.loc[i] = getWriteRow('Atmospheric CO2', which_step,
+                return_array.loc[i] = getWriteRow('CO2, Atmospheric', which_step,
                                             D.tl_input, (44/12)*scale_value.qty
                                             *Main_Substance_Amount/100) 
 

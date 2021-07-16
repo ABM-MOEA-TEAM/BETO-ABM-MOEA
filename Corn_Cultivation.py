@@ -9,7 +9,7 @@ import UnivFunc as UF
 
 def grow_corn(land_area_val):
     
-    return UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0)
+    return UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0, 0)
     
     # tab_string = 'CornCult'
     

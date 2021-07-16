@@ -12,7 +12,7 @@ import Soy_Cultivation as SC
 def Hexane_Extraction(biomass_IO_array):
     
     return UF.Collect_IndepVars_Loop('HexExt', 0, 0, 1, biomass_IO_array, 
-                                     'Soybeans', 1)
+                                     'Soybeans', 1, 0)
     # match_list = [[UF.input_or_output, D.tl_output],
     #              [UF.substance_name, 'Soybeans']]      
     

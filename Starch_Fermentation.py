@@ -12,7 +12,7 @@ import Corn_Cultivation as CC
 def starch_fermentation(biomass_IO_array):
     
     return UF.Collect_IndepVars_Loop('StarchFerm', 0, 0, 1, biomass_IO_array,
-                                     'Corn Grain', 1)
+                                     'Corn Grain', 1, 0)
     # match_list = [[UF.input_or_output, D.tl_output],
     #               [UF.substance_name, 'Corn Grain']]      
     

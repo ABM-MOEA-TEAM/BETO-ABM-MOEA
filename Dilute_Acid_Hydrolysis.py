@@ -11,100 +11,101 @@ import Corn_Cultivation as CC
 
 def Dilute_Acid_Hydrolysis(biomass_IO_array):
     
-    match_list = [[UF.input_or_output, D.tl_output],
-                  [UF.substance_name, 'Corn Stover']]      
+    return UF.Collect_IndepVars_Loop('AcidHydFerm',0,0,1,biomass_IO_array,'Corn Stover',1,0)
+    # match_list = [[UF.input_or_output, D.tl_output],
+    #               [UF.substance_name, 'Corn Stover']]      
     
-    corn_stover_qty = UF.returnPintQty(biomass_IO_array, match_list)
+    # corn_stover_qty = UF.returnPintQty(biomass_IO_array, match_list)
 
-    tab_string = 'AcidHydFerm'
+    # tab_string = 'AcidHydFerm'
     
-    vars_list = UF.collectIndepVars(tab_string)
+    # vars_list = UF.collectIndepVars(tab_string)
     
-    for i in range(len(vars_list)):
-        name_list = []
-        val_list = []
+    # for i in range(len(vars_list)):
+    #     name_list = []
+    #     val_list = []
         
-        val_list = vars_list[i]
-        name_list = vars_list[i-1]
-        I_O_list = vars_list[i-2]
-        unit_list = vars_list[i-3]
+    #     val_list = vars_list[i]
+    #     name_list = vars_list[i-1]
+    #     I_O_list = vars_list[i-2]
+    #     unit_list = vars_list[i-3]
         
-        quad_list = list(zip(name_list, val_list, I_O_list, unit_list))
-        # Zip together the names, values, I/O's and Units
+    #     quad_list = list(zip(name_list, val_list, I_O_list, unit_list))
+    #     # Zip together the names, values, I/O's and Units
         
-        #print(quad_list)
+    #     #print(quad_list)
         
-    return_array = UF.createEmptyFrame()
-    output_name_list = []
-    output_value_list = []
-    output_units_list = []
+    # return_array = UF.createEmptyFrame()
+    # output_name_list = []
+    # output_value_list = []
+    # output_units_list = []
     
-    output_name_list.append('Corn Stover')
-    output_value_list.append(corn_stover_qty)
-    output_units_list.append('kg/yr')
+    # output_name_list.append('Corn Stover')
+    # output_value_list.append(corn_stover_qty)
+    # output_units_list.append('kg/yr')
     
     
-    scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
-                                        output_units_list[0])
-    return_array.loc[0] = UF.getWriteRow(output_name_list[0], D.conv,
-                                        D.tl_input, scale0.qty)
+    # scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
+    #                                     output_units_list[0])
+    # return_array.loc[0] = UF.getWriteRow(output_name_list[0], D.conv,
+    #                                     D.tl_input, scale0.qty)
     
-    j = 0
-    i = 1
-    while j < len(quad_list):
-        rows = quad_list[j]
+    # j = 0
+    # i = 1
+    # while j < len(quad_list):
+    #     rows = quad_list[j]
         
-        if rows[0] == 'Out' and rows[1] == 'kg/kg Corn Stover':
+    #     if rows[0] == 'Out' and rows[1] == 'kg/kg Corn Stover':
             
-            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'')
-            return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                        D.tl_output, scale_value.qty*corn_stover_qty)
-            i += 1
+    #         scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'')
+    #         return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                     D.tl_output, scale_value.qty*corn_stover_qty)
+    #         i += 1
         
-        if rows[0] == 'Out' and rows[1] == 'MJ/kg Corn Stover':
-            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'MJ/kg')
-            return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                        D.tl_output, scale_value.qty*corn_stover_qty)
-            i += 1
+    #     if rows[0] == 'Out' and rows[1] == 'MJ/kg Corn Stover':
+    #         scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'MJ/kg')
+    #         return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                     D.tl_output, scale_value.qty*corn_stover_qty)
+    #         i += 1
         
-        if rows[0] == 'In' and rows[1] == 'dollars/kg Corn Stover':
+    #     if rows[0] == 'In' and rows[1] == 'dollars/kg Corn Stover':
           
-            if rows[3] == 'Labor': # As the other two $'s are not /yr
-                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'dollars/kg')
-                return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                        D.tl_input, scale_value.qty*corn_stover_qty)
-                i += 1
+    #         if rows[3] == 'Labor': # As the other two $'s are not /yr
+    #             scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'dollars/kg')
+    #             return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                     D.tl_input, scale_value.qty*corn_stover_qty)
+    #             i += 1
                 
-            else:
-                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'dollars*yr/kg')
-                return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                            D.tl_input, scale_value.qty*corn_stover_qty)
-                i += 1
+    #         else:
+    #             scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'dollars*yr/kg')
+    #             return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                         D.tl_input, scale_value.qty*corn_stover_qty)
+    #             i += 1
             
-        if rows[0] == 'In' and rows[1] == 'kg/kg Corn Stover':
+    #     if rows[0] == 'In' and rows[1] == 'kg/kg Corn Stover':
             
-            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'')          
-            return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                        D.tl_input, scale_value.qty*corn_stover_qty)
-            i += 1
+    #         scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'')          
+    #         return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                     D.tl_input, scale_value.qty*corn_stover_qty)
+    #         i += 1
         
-        if rows[0] == 'In' and rows[1] == 'MJ/kg Corn Stover':
+    #     if rows[0] == 'In' and rows[1] == 'MJ/kg Corn Stover':
             
-            if rows[3] == 'LNG':
-                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'MJ/kg')
-                return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                            D.tl_input, scale_value.qty*corn_stover_qty)
-                i += 1
+    #         if rows[3] == 'LNG':
+    #             scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'MJ/kg')
+    #             return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                         D.tl_input, scale_value.qty*corn_stover_qty)
+    #             i += 1
             
-            else:
-                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'MJ/kg')
-                return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
-                                            D.tl_input, scale_value.qty*corn_stover_qty)
-                i += 1
+    #         else:
+    #             scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[3]],rows[2],'MJ/kg')
+    #             return_array.loc[i] = UF.getWriteRow(rows[3], D.conv,
+    #                                         D.tl_input, scale_value.qty*corn_stover_qty)
+    #             i += 1
 
-        j += 1
+    #     j += 1
     
-    return return_array
+    # return return_array
 
 def main():
     

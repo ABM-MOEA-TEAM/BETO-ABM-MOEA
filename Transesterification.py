@@ -14,7 +14,7 @@ import Hexane_Extraction as HE
 def Transesterification(conversion_IO_array):
     
     return UF.Collect_IndepVars_Loop('Transest', 0, 0, 1, conversion_IO_array,
-                                     'Soybean Oil', 2)
+                                     'Soybean Oil', 2, 0)
     
     # match_list = [[UF.input_or_output, D.tl_output],
     #              [UF.substance_name, 'Soybean Oil']]      

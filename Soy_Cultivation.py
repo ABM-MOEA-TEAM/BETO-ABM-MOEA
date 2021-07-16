@@ -10,7 +10,7 @@ import UnivFunc as UF
 
 def grow_soybean(land_area_val, yield_value): # Need to remove yield arg I think
    
-    return UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0)
+    return UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 'Soy')
     
     # tab_string = 'SoyCult'
     

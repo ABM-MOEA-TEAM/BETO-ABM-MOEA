@@ -93,6 +93,7 @@ def calcGHGImpact(tl_array, prod, coprods): # Needs additional argument (calcGHG
                                       match_list, 
                                       D.LCA_GHG_impact)
             GHG_impact_val += (LCA_val * mag)
+        # print('-----------')
         # print(subst_name)
         # print(LCA_val)
         # print(mag)

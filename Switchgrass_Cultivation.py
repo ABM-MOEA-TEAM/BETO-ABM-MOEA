@@ -10,7 +10,7 @@ import UnivFunc as UF
 
 def Grow_Switchgrass(land_area_val):
     
-    return UF.Collect_IndepVars_Loop('SwitchCult', 0, 0, 0, 0, 0, 0)
+    return UF.Collect_IndepVars_Loop('SwitchCult', 0, 0, 0, 0, 0, 0, 0)
     # tab_string = 'SwitchCult'
     
     # vars_list = UF.collectIndepVars(tab_string)
