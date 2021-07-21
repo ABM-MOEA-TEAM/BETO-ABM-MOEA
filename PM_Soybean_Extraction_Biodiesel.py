@@ -12,9 +12,9 @@ import pandas as pd
 import TEA
 import LCA
 
-import Soy_Cultivation as SC
-import Hexane_Extraction as HE
-import Transesterification as T
+# import Soy_Cultivation as SC
+# import Hexane_Extraction as HE
+# import Transesterification as T
 
 import os
 from pathlib import Path
@@ -27,23 +27,32 @@ biomass_yield = 1
 
 results_array = UF.createEmptyFrame()
 #ds_results_array = UF.createEmptyFrame()
-biomass_IO = SC.grow_soybean(land_area_val, biomass_yield)
+
+
+biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
-conversion_IO = HE.Hexane_Extraction(biomass_IO)
+conversion_IO = UF.Collect_IndepVars_Loop('HexExt', 0, 1, 1, biomass_IO,'Soybeans', 1, 0)
 results_array = results_array.append(conversion_IO, ignore_index=True)
-upgrading_IO = T.Transesterification(conversion_IO)
+upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
 IO_array = UF.consolidateIO(results_array)
 
 cwd = os.getcwd()    
 path_list = [Path(cwd + '/soy_biodiesel_prodlist.csv'),
-             Path(cwd + '/output.xlsx')]
+              Path(cwd + '/output.xlsx')]
 
 pathname = path_list[0]
 
-prod = UF.returnProdlist(pathname)
-coprods = UF.returnCoProdlist(pathname)
+# prod = UF.returnProdlist(pathname)
+# coprods = UF.returnCoProdlist(pathname)
 
+# Don't know if we want to add logic to collect the product and coproduct lists
+# from the CSU all pathways file - it seems like an important step to be flexible 
+# with but I don't know how often this will change and I don't know if there is 
+# going to be a lot of formatting lift for the IO to do this. (7/19)
+
+prod = ['Biodiesel, Produced']
+coprods = ['Soybean Meal','Glycerin']
 
 MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel')
 #print(MFSP*37.75)
@@ -52,10 +61,10 @@ MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel')
 
 # IO_array.to_excel(path_list[1])
 
-#ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
+# ghg_impact = LCA.calcGHGImpact(IO_array, prod, coprods)
 
 # NPV_Biomass = TEA.calc_NPV(biomass_IO)
-# NPV_Conversion = TEA.calc_NPV(conversion_IO)  5.46680706628588
+# NPV_Conversion = TEA.calc_NPV(conversion_IO)  #5.46680706628588
 # NPV_Upgrading = TEA.calc_NPV(upgrading_IO)
 
 # Biomass_Conversion_array = UF.createEmptyFrame()

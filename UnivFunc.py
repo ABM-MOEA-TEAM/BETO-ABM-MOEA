@@ -31,9 +31,10 @@ def collectIndepVars(tab_string):
     
     name_list = []
     indep_vars_list = []
-    units_list = []
     I_O_list = []
-    return_array = [[],[],[]]
+    units_list = []
+
+    return_array = [[],[],[],[]]
     
     for i in range(len(excel_read)):
         row = excel_read.loc[i]
@@ -56,8 +57,8 @@ def DayCentYields(crop_selection, percent_collected_ID):
         row = excel_read.loc[i]
         Daycent_Yields.append(row[crop_selection])
         
-    if crop_selection != 'stover_yield_Mg_ha':
-        return Daycent_Yields
+    # if crop_selection != 'stover_yield_Mg_ha':
+    #     return Daycent_Yields
     
     stover_results_raw = Daycent_Yields
     
@@ -143,7 +144,8 @@ state_name_col = 'State_Name'
 avg_yield_col = 'Average_Yield'
 eroi_col = 'EROI'
 
-def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator, 
+
+def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
                            downstream_indicator, tl_array, input_substance_string,
                            step_ID, DayCent_read_string):
 # This needs to be decentralized and cleaned up. Ideally, I would find a work around
@@ -152,6 +154,7 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
     yield_input_list = []
 
 # Identify the step - cultivation, conversion or upgrading from the given argument
+# This gets passed on to the nested if logic loop (the big boolean rats nest)
     if step_ID == 0:
         which_step = D.biomass_production
     if step_ID == 1:
@@ -164,50 +167,63 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
         print('1 --------- Conversion/Extraction Step')
         print('2 --------- Upgrading Step')
         return
-    
-##################### GEOSPATIAL DATA LOGIC ########################
-    
-    if geospatial_indicator == 1:
-        print('Here, I would do something spectacular.  I am not sure what,')
-        print('but I know it will be spectacular when I figure it out')
+      
+    return nested_if_logic(tab_string, yield_value, yield_input_list, 
+                           downstream_indicator, tl_array, input_substance_string,
+                           which_step, DayCent_read_string)
 
-        # Need a new argument that is the name of the column in the DayCent
-        # Tabular Data csv. 
-        input_string = ''
+def nested_if_logic(tab_string, yield_value, yield_input_list, 
+                           downstream_indicator, tl_array, input_substance_string,
+                           which_step, DayCent_read_string):
+   
+    # ##################### GEOSPATIAL DATA LOGIC ########################
+    
+    # if geospatial_indicator == 1:
         
-        if DayCent_read_string == 'Corn Grain':
-            input_string = 'corn_yield_Mg_ha'
-        if DayCent_read_string == 'Soy':
-            input_string = 'soy_yield_Mg_ha'
-        if DayCent_read_string == 'Corn Stover':
-            input_string = 'stover_yield_Mg_ha'
-        if input_string == '':
-            print('Error - unrecognized DayCent Read String, expected')
-            print('Corn Grain')
-            print('Corn Stover')
-            print('Soy')
-            return 
+    #     # Need a new argument that is the name of the column in the DayCent
+    #     # Tabular Data csv. 
+    #     input_string = ''
         
-        # Need to add logic and probably another argument for the percent of stover
-        # that is collected.  In order to be able to loop this how I want, this 
-        # piece of the code has to be outside of the nested if statement logic completely;
-        # I will need to decentralize before I am able to eat the daycent data. (7/1)
+    #     if DayCent_read_string == 'Corn Grain':
+    #         input_string = 'corn_yield_Mg_ha'
+    #     if DayCent_read_string == 'Soy':
+    #         input_string = 'soy_yield_Mg_ha'
+    #     if DayCent_read_string == 'Corn Stover':
+    #         input_string = 'stover_yield_Mg_ha'
+    #     if input_string == '':
+    #         print('Error - unrecognized DayCent Read String, expected')
+    #         print('Corn Grain')
+    #         print('Corn Stover')
+    #         print('Soy')
+    #         return 
+        
+    #     # Need to add logic and probably another argument for the percent of stover
+    #     # that is collected.  In order to be able to loop this how I want, this 
+    #     # piece of the code has to be outside of the nested if statement logic completely;
+    #     # I will need to decentralize before I am able to eat the daycent data. (7/1)
 
-        yield_input_list = DayCentYields(input_string,0)
+    #     yield_input_list = DayCentYields(input_string,0)
         
-        print(yield_input_list)
+    #     # !! Very important. Currently, the DayCent data set has 4 cases for each
+    #     # county in the selected region - one with no stover collected (BAU), one
+    #     # with 25% stover collection rates, and one with 50% (and a final w/ 75%)
+    #     # The second argument of the DayCentYields function determines which case
+    #     # we are using.  Right now have it set on the BAU case - but might need to 
+    #     # add another argument so that we can specify (or add a read from all pws)
         
-        # now with a non-zero yield_input_list length, we can loop through this
-        # set with new biomass_IO_arrays.  Need to alter the reader, however
-        # to recognize that we are being fed a yield value now.... maybe could
-        # work around by making a "Biomass_IO" array that is just one instance
-        # of one substance... that is all that is needed, right? i.e.
-        # Input_IO_frame = UF.createEmptyFrame()
-        # UF.getWriteRow('Soybean Seed', D.biomass_production,
-        #                                D.tl_input, yield_input_list[i])
-        # output_array.append(collect_IndepVars_Loop) (or some way to write values)
+    #     print(yield_input_list)
         
-################## DOWNSTREAM NESTED IF LOGIC ######################
+    #     # now with a non-zero yield_input_list length, we can loop through this
+    #     # set with new biomass_IO_arrays.  Need to alter the reader, however
+    #     # to recognize that we are being fed a yield value now.... maybe could
+    #     # work around by making a "Biomass_IO" array that is just one instance
+    #     # of one substance... that is all that is needed, right? i.e.
+    #     # Input_IO_frame = UF.createEmptyFrame()
+    #     # UF.getWriteRow('Soybean Seed', D.biomass_production,
+    #     #                                D.tl_input, yield_input_list[i])
+    #     # output_array.append(collect_IndepVars_Loop) (or some way to write values)
+
+    ################## DOWNSTREAM NESTED IF LOGIC ######################
     
     # If indicator is engaged, you will need to read the given tl_array to find
     # some particular substance (the feedstock) and its amount. I think this is
@@ -215,13 +231,19 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
     # edits could be to merge the two branches somehow (might not be easy to do
     # with the numerous different unit types that appear in cult or conversion)
     # (7/1)
+    
+    # Disagree with this more and more that I think about it. The cultivation 
+    # and downstream steps are just a bit different in terms of the independent
+    # parameters which we feed them (most cultivation is a fixed amount, most
+    # downstream indepvars are scales against the feedstock amount)
+    
     if downstream_indicator == 1:
         
         # Create Match_List ID with given substance input string 
         match_list = [[input_or_output, D.tl_output],
                      [substance_name, input_substance_string]] 
         
-        # Grab the Amount of that input substance (used for scaling later)
+        # Grab the amount of that input substance (used for scaling later)
         input_substance_amount = returnPintQty(tl_array, match_list) 
         
         # Executes loop above to grab all relevant rows from All_PW's

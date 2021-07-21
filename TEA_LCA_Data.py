@@ -3,6 +3,7 @@ import pint
 import os
 from pathlib import Path
 import xlsxwriter
+import math
 
 cwd = os.getcwd()
 ureg = pint.UnitRegistry()
@@ -97,6 +98,7 @@ upgrading = 'Upgrading'
 comb = 'Combustion'
 cons = 'Consolidated'
 
+
 # Related to Monte Carlo
 normal = 'Normal'
 
@@ -104,6 +106,7 @@ normal = 'Normal'
 substance_id = 'substance_id'
 key_string = 'Key_String'
 substances_df = pd.read_excel(path_list[3],'SubstanceList')
+hhv = 'HHV'
 
 substance_dict = {}
 substance_id_dict = {}
@@ -122,6 +125,24 @@ for i in range(len(substances_df)):
 # NP: Can also use TEA_LCA_Qty_Cited class to embed the citation in the object
 HHV_dict = {}
 
+HHV_Data = pd.read_excel(path_list[3],'LCI')
+
+key_string_list = []
+HHV_list = []
+
+# for i in range(len(HHV_Data)):    
+#     row = HHV_Data.loc[i]
+#     key_string_list.append(row[key_string])
+#     HHV_list.append(row[hhv])
+    
+# for i in range(len(HHV_list)):
+#     if math.isnan(HHV_list[i]) == False:
+#         units = 'MJ/kg'
+#         if key_string_list == 'Electricity, Generation':
+#             units = ''
+#         HHV_dict[key_string_list[i]] = TEA_LCA_Qty(substance_dict[key_string_list[i]],
+#                                                     HHV_list[i], units)
+            
 HHV_dict['LNG'] = TEA_LCA_Qty(substance_dict['LNG'], 50, 'MJ/kg')       # AltJet
 HHV_dict['Natural Gas'] = TEA_LCA_Qty(substance_dict['Natural Gas'], 50, 'MJ/kg')
 HHV_dict['Ethanol'] = TEA_LCA_Qty(substance_dict['Ethanol'], 26.95, 'MJ/kg')

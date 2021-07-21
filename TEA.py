@@ -382,10 +382,10 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     
     # NPV retrieval from cumulative discounted cash flow
     npv = cumdisccashflow
-    print(netincome)    
+    # print(netincome)    
     #print(abs(npv[-1]))
     #print(price_per_MJ)
-    #print(npv)
+    print(npv)
     return abs(npv[-1])
 
 def calc_MFSP(tl_array, prod, coprods, path_string):
