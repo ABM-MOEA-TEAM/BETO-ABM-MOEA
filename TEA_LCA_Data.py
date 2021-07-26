@@ -130,35 +130,35 @@ HHV_Data = pd.read_excel(path_list[3],'LCI')
 key_string_list = []
 HHV_list = []
 
-# for i in range(len(HHV_Data)):    
-#     row = HHV_Data.loc[i]
-#     key_string_list.append(row[key_string])
-#     HHV_list.append(row[hhv])
+for i in range(len(HHV_Data)):    
+    row = HHV_Data.loc[i]
+    key_string_list.append(row[key_string])
+    HHV_list.append(row[hhv])
     
-# for i in range(len(HHV_list)):
-#     if math.isnan(HHV_list[i]) == False:
-#         units = 'MJ/kg'
-#         if key_string_list == 'Electricity, Generation':
-#             units = ''
-#         HHV_dict[key_string_list[i]] = TEA_LCA_Qty(substance_dict[key_string_list[i]],
-#                                                     HHV_list[i], units)
+for i in range(len(HHV_list)):
+    if math.isnan(HHV_list[i]) == False:
+        units = 'MJ/kg'
+        if key_string_list == 'Electricity, Generation':
+            units = ''
+        HHV_dict[key_string_list[i]] = TEA_LCA_Qty(substance_dict[key_string_list[i]],
+                                                    HHV_list[i], units)
             
-HHV_dict['LNG'] = TEA_LCA_Qty(substance_dict['LNG'], 50, 'MJ/kg')       # AltJet
-HHV_dict['Natural Gas'] = TEA_LCA_Qty(substance_dict['Natural Gas'], 50, 'MJ/kg')
-HHV_dict['Ethanol'] = TEA_LCA_Qty(substance_dict['Ethanol'], 26.95, 'MJ/kg')
-HHV_dict['Diesel'] = TEA_LCA_Qty(substance_dict['Diesel'], 42.975, 'MJ/kg')
-HHV_dict['Gasoline'] = TEA_LCA_Qty(substance_dict['Gasoline'], 43.44, 'MJ/kg')
-HHV_dict['Jet-A'] = TEA_LCA_Qty(substance_dict['Jet-A'], 43.2, 'MJ/kg')
-#HHV_dict['Biodiesel'] = TEA_LCA_Qty(substance_dict['Biodiesel'], 37.75, 'MJ/kg')
-HHV_dict['Biodiesel, Produced'] = TEA_LCA_Qty(substance_dict['Biodiesel, Produced'], 37.75, 'MJ/kg')
-HHV_dict['Corn Grain'] = TEA_LCA_Qty(substance_dict['Corn Grain'], 16.1, 'MJ/kg') # https://feedtables.com/charts/energy-mj
-HHV_dict['Corn Stover'] = TEA_LCA_Qty(substance_dict['Corn Stover'], 17.64, 'MJ/kg') # https://www.researchgate.net/publication/277311384_Ash_Content_and_Calorific_Energy_of_Corn_Stover_Components_in_Eastern_Canada
-HHV_dict['DDGS'] = TEA_LCA_Qty(substance_dict['DDGS'], 22.7,'MJ/kg') # https://agritrop.cirad.fr/582534/1/ID582534.pdf
-HHV_dict['Soybean Meal'] = TEA_LCA_Qty(substance_dict['Soybean Meal'], 16.12,'MJ/kg') # https://nutrition.ansci.illinois.edu/sites/default/files/AnimFeedSciTechnol188.64-73.pdf
-#HHV_dict['Glycerol'] = TEA_LCA_Qty(substance_dict['Glycerol'], 25.3,'MJ/kg') # https://www.intechopen.com/books/biofuels-status-and-perspective/glycerol-as-a-raw-material-for-hydrogen-production
-HHV_dict['Glycerin'] = TEA_LCA_Qty(substance_dict['Glycerin'], 25.3,'MJ/kg')
-HHV_dict['Electricity, Generation'] = TEA_LCA_Qty(substance_dict['Electricity, Generation'], 1, 'MJ/MJ')
-HHV_dict['Biochar'] = TEA_LCA_Qty(substance_dict['Biochar'], 20.55, 'MJ/kg') # https://www.sciencedirect.com/science/article/pii/S258929912030046X#:~:text=The%20calorific%20value%20of%20the,potential%20use%20as%20solid%20fuel.
+# HHV_dict['LNG'] = TEA_LCA_Qty(substance_dict['LNG'], 50, 'MJ/kg')       # AltJet
+# HHV_dict['Natural Gas'] = TEA_LCA_Qty(substance_dict['Natural Gas'], 50, 'MJ/kg')
+# HHV_dict['Ethanol'] = TEA_LCA_Qty(substance_dict['Ethanol'], 26.95, 'MJ/kg')
+# HHV_dict['Diesel'] = TEA_LCA_Qty(substance_dict['Diesel'], 42.975, 'MJ/kg')
+# HHV_dict['Gasoline'] = TEA_LCA_Qty(substance_dict['Gasoline'], 43.44, 'MJ/kg')
+# HHV_dict['Jet-A'] = TEA_LCA_Qty(substance_dict['Jet-A'], 43.2, 'MJ/kg')
+# #HHV_dict['Biodiesel'] = TEA_LCA_Qty(substance_dict['Biodiesel'], 37.75, 'MJ/kg')
+# HHV_dict['Biodiesel, Produced'] = TEA_LCA_Qty(substance_dict['Biodiesel, Produced'], 37.75, 'MJ/kg')
+# HHV_dict['Corn Grain'] = TEA_LCA_Qty(substance_dict['Corn Grain'], 16.1, 'MJ/kg') # https://feedtables.com/charts/energy-mj
+# HHV_dict['Corn Stover'] = TEA_LCA_Qty(substance_dict['Corn Stover'], 17.64, 'MJ/kg') # https://www.researchgate.net/publication/277311384_Ash_Content_and_Calorific_Energy_of_Corn_Stover_Components_in_Eastern_Canada
+# HHV_dict['DDGS'] = TEA_LCA_Qty(substance_dict['DDGS'], 22.7,'MJ/kg') # https://agritrop.cirad.fr/582534/1/ID582534.pdf
+# HHV_dict['Soybean Meal'] = TEA_LCA_Qty(substance_dict['Soybean Meal'], 16.12,'MJ/kg') # https://nutrition.ansci.illinois.edu/sites/default/files/AnimFeedSciTechnol188.64-73.pdf
+# #HHV_dict['Glycerol'] = TEA_LCA_Qty(substance_dict['Glycerol'], 25.3,'MJ/kg') # https://www.intechopen.com/books/biofuels-status-and-perspective/glycerol-as-a-raw-material-for-hydrogen-production
+# HHV_dict['Glycerin'] = TEA_LCA_Qty(substance_dict['Glycerin'], 25.3,'MJ/kg')
+# HHV_dict['Electricity, Generation'] = TEA_LCA_Qty(substance_dict['Electricity, Generation'], 1, 'MJ/MJ')
+# HHV_dict['Biochar'] = TEA_LCA_Qty(substance_dict['Biochar'], 20.55, 'MJ/kg') # https://www.sciencedirect.com/science/article/pii/S258929912030046X#:~:text=The%20calorific%20value%20of%20the,potential%20use%20as%20solid%20fuel.
 
 # Assorted cited values used in calculations
 N20_emit_proportion = Qty_Cited(

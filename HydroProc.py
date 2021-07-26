@@ -21,6 +21,7 @@ def main():
     yield_value = 3698
     biomass_IO_array = SC.grow_soybean(land_area_val, yield_value)
     conversion_IO_array = HE.Hexane_Extraction(biomass_IO_array)
+    print(conversion_IO_array)
     return Hydro_Processing(conversion_IO_array)
 
 if __name__ == "__main__":
