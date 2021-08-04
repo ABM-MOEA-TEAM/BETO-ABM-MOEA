@@ -141,15 +141,18 @@ def calcCredits(tl_array):
         print('Error - substance name list and value list of unequal length')
         return
     
+    LCA_val = 0
+    
     for i in range(len(output_subst_list)):
         name = output_subst_list[i]
         amount = output_value_list[i]
         
-        if (name == 'Soybean Meal' or
-            name == 'Corn Stover, Left' or
-            name == 'DDGS' or
-            name == 'Glycerin'):
-            
+        # if (name == 'Soybean Meal' or
+        #     name == 'Corn Stover, Left' or
+        #     name == 'DDGS' or
+        #     name == 'Glycerin'):
+           
+        if name in D.coprod_list:
             match_list = [[D.LCA_key_str, name],
                           [D.LCA_IO, D.tl_output]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,

@@ -57,8 +57,8 @@ LCA_key_str = 'Key_String'
 LCA_IO = 'In_or_out'
 LCA_units = 'Default_Unit'
 LCA_energy_impact = 'Energy_Impact (MJ/X)'
-LCA_cost = 'Cost'
-LCA_GHG_impact = 'GHG_Impact'
+LCA_cost = 'Cost ($/X)'
+LCA_GHG_impact = 'GHG_Impact (g CO2e/X)'
 # LCA_inventory_df = pd.read_csv(path_list[0])
 LCA_inventory_df = pd.read_excel(path_list[3],'LCI')
 
