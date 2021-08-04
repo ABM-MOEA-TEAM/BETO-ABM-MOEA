@@ -83,6 +83,34 @@ DoNotConsolidateList = ['Electricity',
 # DoNotConsolidateList.append('Gasoline')
 # DoNotConsolidateList.append('Water')
 
+output_fuels_list = ['Biodiesel, Produced',
+            'Diesel, Produced',
+            'Electricity, Generated', 
+            'Ethanol',
+            'Gasoline, Produced',
+            'Hydrogen, Produced',
+            'Jet A-1',
+            'Jet-A',
+            'JP-5',
+            'JP-8',
+            'LPG, Produced',
+            'Naptha',
+            'Propane, Produced']
+
+emissions_list = ['CH4 Emissions',
+                  'CO2 Emissions',
+                  'CO Emissions',
+                  'LUC Emissions',
+                  'N2O Emissions',
+                  'NOx Emissions']
+
+coprod_list = ['Corn Grain',
+               'Corn Stover',
+               'DDGS',
+               'Glycerin',
+               'Soybean Meal',
+               'Soybeans']
+
 # Non-funglist is an explicit list of substance to not be added/aggegregated.
 # This prevents the non-vertically integrated case from functioning
 # (5/25) Change to more "Do not consolidate List" - prescribe each substance
@@ -105,7 +133,8 @@ normal = 'Normal'
 # Substance Variables
 substance_id = 'substance_id'
 key_string = 'Key_String'
-substances_df = pd.read_excel(path_list[3],'SubstanceList')
+substances_df = pd.read_excel(path_list[3],'SubsList')
+# substances_df = pd.read_excel(path_list[3],'SubstanceList')
 hhv = 'HHV'
 
 substance_dict = {}
@@ -159,6 +188,27 @@ for i in range(len(HHV_list)):
 # HHV_dict['Glycerin'] = TEA_LCA_Qty(substance_dict['Glycerin'], 25.3,'MJ/kg')
 # HHV_dict['Electricity, Generation'] = TEA_LCA_Qty(substance_dict['Electricity, Generation'], 1, 'MJ/MJ')
 # HHV_dict['Biochar'] = TEA_LCA_Qty(substance_dict['Biochar'], 20.55, 'MJ/kg') # https://www.sciencedirect.com/science/article/pii/S258929912030046X#:~:text=The%20calorific%20value%20of%20the,potential%20use%20as%20solid%20fuel.
+
+Carbon_Dict = {}
+
+Carbon_Dict['Water'] = 0
+Carbon_Dict['Corn Grain'] = 0.5
+Carbon_Dict['Corn Stover, Collected'] = 0.5
+Carbon_Dict['Corn Stover'] = 0.5
+Carbon_Dict['DDGS'] = 0.5
+Carbon_Dict['Soybean Meal'] = 0.5
+Carbon_Dict['Biodiesel, Produced'] = 0.86
+Carbon_Dict['Diesel, Produced'] = 0.86
+Carbon_Dict['Ethanol'] = 0.52
+Carbon_Dict['Glycerin'] = 0
+Carbon_Dict['Gasoline, Produced'] = 0.84
+Carbon_Dict['Jet A-1'] = 0.86
+Carbon_Dict['Jet-A'] = 0.86
+Carbon_Dict['JP-5'] = 0.86
+Carbon_Dict['JP-8'] = 0.86
+Carbon_Dict['LPG, Produced'] = 0.82
+Carbon_Dict['Naptha'] = 0.84
+Carbon_Dict['Propane, Produced'] = 0.82
 
 # Assorted cited values used in calculations
 N20_emit_proportion = Qty_Cited(

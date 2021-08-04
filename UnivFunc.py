@@ -55,9 +55,36 @@ def collectIndepVars(tab_string):
             name_list = return_array[i-3]
             
             quad_list = list(zip(name_list, val_list, I_O_list, unit_list))
+            
+            # have encountered a scenario where the shortest list is the 
+            # length of the quad_list, which I worry will cut out some values
+            # (haven't demonstrated this happens here)
     
     
     return quad_list
+
+def DayCentFips():
+    excel_read = collectDayCentData()
+    
+    DayCent_Fips = []
+    
+    fips = 'fips'
+    
+    for i in range(len(excel_read)):
+        row = excel_read.loc[i]
+        DayCent_Fips.append(row[fips])
+        
+    return_fips = []
+    
+    
+    i = 0
+    while i < len(DayCent_Fips):
+        value = DayCent_Fips[i]
+        return_fips.append(value)
+        i += 4
+    
+    return return_fips
+
 
 def DayCentYields(crop_selection, percent_collected_ID):
     
@@ -105,6 +132,12 @@ def collectEconIndepVars(column_id):
     
     if column_id == 'Soy Biodiesel' or column_id == 0:
         column_number = 1
+    
+    if column_id == 'Soy Jet':
+        column_number = 2
+        
+    if column_id == 'Corn Grain EtOH':
+        column_number = 3
     
     if column_number == 0:
         print('Error - unrecognized column ID string')
@@ -159,7 +192,7 @@ eroi_col = 'EROI'
 
 def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
                            downstream_indicator, tl_array, input_substance_string,
-                           step_ID, DayCent_read_string):
+                           step_ID, DayCent_read_string, fips):
 # This needs to be decentralized and cleaned up. Ideally, I would find a work around
 # for the gross nested-if statement logic (7/1)    
     
@@ -182,11 +215,11 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
       
     return nested_if_logic(tab_string, yield_value, geospatial_indicator, 
                            downstream_indicator, tl_array, input_substance_string,
-                           which_step, DayCent_read_string)
+                           which_step, DayCent_read_string, fips)
 
 def nested_if_logic(tab_string, yield_value, geospatial_indicator, 
                            downstream_indicator, tl_array, input_substance_string,
-                           which_step, DayCent_read_string):
+                           which_step, DayCent_read_string, fips):
    
     ################## DOWNSTREAM NESTED IF LOGIC ######################
     
@@ -238,6 +271,8 @@ def nested_if_logic(tab_string, yield_value, geospatial_indicator,
         j = 0
 
         while j < len(quad_list):
+            
+            skip_ind = 0
             rows = quad_list[j]
             
             if rows[2] == 'In' and rows[3] == 'dollars/yr':
@@ -283,7 +318,7 @@ def nested_if_logic(tab_string, yield_value, geospatial_indicator,
                                                 D.tl_input, scale_value.qty*
                                                 Main_Substance_Amount/D.HHV_dict['LNG'].qty) 
                     i += 1
-                    
+                
                 else:
                     scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
                                                 rows[1],'kg/kg')
@@ -304,34 +339,51 @@ def nested_if_logic(tab_string, yield_value, geospatial_indicator,
                 
                 if rows[0] == 'LNG':
                     scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
-                                        rows[1],'')
+                                        rows[1],'MJ/kg')
                     return_array.loc[i] = getWriteRow(rows[0], which_step,
-                                            D.tl_input, scale_value.qty
-                                            *Main_Substance_Amount*D.HHV_dict['LNG'].qty)
-                    print('Potential Error in Units - Rows 316/324')
+                                            D.tl_input, scale_value.qty*Main_Substance_Amount/D.HHV_dict['LNG'].qty)
+                    skip_ind = 1
+
+                    
                 if rows[0] == 'Natural Gas':
                     scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
                                         rows[1],'MJ/kg')
                     return_array.loc[i] = getWriteRow(rows[0], which_step,
                                             D.tl_input, scale_value.qty
                                             *Main_Substance_Amount/D.HHV_dict['Natural Gas'].qty)
-                    # print('Engaged')
-                else:
+                    skip_ind = 1
+                    
+                    
+                elif skip_ind != 1:
                     scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
                                         rows[1],'MJ/kg')
                     return_array.loc[i] = getWriteRow(rows[0], which_step,
                                             D.tl_input, scale_value.qty
                                             *Main_Substance_Amount) 
+                    # print('triggered')
+
                 i += 1
                 
             if rows[2] == 'Out' and rows[3] == 'kg/kg Feedstock':
+                if rows[0] == 'Ethanol' and tab_string == 'StarchFerm':
+                    
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
+                                                rows[1]+0.014532693,'')   
+                    # Need to include the Gasoline Denaturant. Not sure how to 
+                    # address this at all..
+                    
+                    return_array.loc[i] = getWriteRow(rows[0], which_step,
+                                                    D.tl_output, scale_value.qty*
+                                                    Main_Substance_Amount) 
+                    i += 1
                 
-                scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
-                                            rows[1],'')
-                return_array.loc[i] = getWriteRow(rows[0], which_step,
-                                                D.tl_output, scale_value.qty*
-                                                Main_Substance_Amount) 
-                i += 1
+                else:
+                    scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],
+                                                rows[1],'')
+                    return_array.loc[i] = getWriteRow(rows[0], which_step,
+                                                    D.tl_output, scale_value.qty*
+                                                    Main_Substance_Amount) 
+                    i += 1
             j += 1
     
         return return_array
@@ -594,30 +646,61 @@ def nested_if_logic(tab_string, yield_value, geospatial_indicator,
     
     i = 0
     
-    scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
-                                        output_units_list[0])        
-    return_array.loc[0] = getWriteRow(output_name_list[0], which_step,
-                                        D.tl_output, scale0.qty*size.qty)
-    i = i + 1
+    # scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
+    #                                     output_units_list[0])        
+    # return_array.loc[0] = getWriteRow(output_name_list[0], which_step,
+    #                                     D.tl_output, scale0.qty*size.qty)
+    # i += 1
     
     if len(output_name_list) >= 2:
         
-        if output_name_list[1] == 'Corn Stover':
+        for j in range(len(output_name_list)):
             
-            scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[1]],output_value_list[1],
-                                        output_units_list[1])        
-            return_array.loc[1] = getWriteRow(output_name_list[1], which_step,
-                                                D.tl_output, scale1.qty*size.qty
-                                                *stover_collection_percentage/100)
-            corn_stover_yield = scale1.qty*size.qty*(stover_collection_percentage/100)
+            if output_name_list[j] == 'Corn Stover':            
+                
+                scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[j]],output_value_list[j],
+                                            output_units_list[j])        
+                return_array.loc[i] = getWriteRow(output_name_list[j], which_step,
+                                                    D.tl_output, scale1.qty*size.qty
+                                                    *stover_collection_percentage/100)
+                corn_stover_yield = scale1.qty*size.qty*(stover_collection_percentage/100)
+                i += 1
+                # print('1')
+            
+            if output_name_list[j] == 'Corn Grain' or output_name_list[j] == 'Soybeans':
+              
+                scale0 = D.TEA_LCA_Qty(D.substance_dict['Corn Grain'], output_value_list[j],
+                                            output_units_list[j])
+                return_array.loc[0] = getWriteRow(output_name_list[0], which_step,
+                                        D.tl_output, scale0.qty*size.qty)
+                i += 1
+                # print('2')
+                
+            if (output_name_list[j] != 'Corn Grain' and
+                output_name_list[j] != 'Corn Stover' and
+                output_name_list[j] != 'Soybeans'):
+
+                scale = D.TEA_LCA_Qty(D.substance_dict[output_name_list[j]],output_value_list[j],
+                                                output_units_list[j])        
+                return_array.loc[i] = getWriteRow(output_name_list[j], which_step,
+                                                D.tl_output, scale.qty*size.qty)
+                i += 1
+                # print('3')
+    
+    # if len(output_name_list) >= 2:
         
-        else:
+    #     for j in range(len(output_name_list)):
             
-            scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[1]],output_value_list[1],
-                                            output_units_list[1])        
-            return_array.loc[1] = getWriteRow(output_name_list[1], which_step,
-                                                D.tl_output, scale1.qty*size.qty)
-        i = i + 1
+    #         if output_name_list[j] == 'Corn Grain':
+                
+            
+    
+    else:
+        scale0 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]],output_value_list[0],
+                                        output_units_list[0])        
+        return_array.loc[0] = getWriteRow(output_name_list[0], which_step,
+                                        D.tl_output, scale0.qty*size.qty)
+        i += 1
     
     Main_Substance_Amount = scale0.qty*size.qty
     
@@ -625,6 +708,31 @@ def nested_if_logic(tab_string, yield_value, geospatial_indicator,
 
     while j < len(quad_list):
         rows = quad_list[j]
+
+        if rows[2] == 'External In' and rows[0] == 'Hexane Loss':
+            
+            col_title = 'Practice Set (Python)'  # Will then change this to be electricity
+                                                 # when we have that column populated, and so on
+            
+            # Best would be to reference the list title with the row name, but don't know if we
+            # will be clean enough on the excel end to be able to rely on that being correct...
+            
+            data_set = External_Data(col_title)
+            value = 0
+            
+            for i in range(len(data_set)):
+                data_row = data_set[i]
+                if data_row[0] == fips:
+                    value = data_row[1]
+            if value == 0:
+                print('Error - could not find matching FIP')
+            
+            #print(value)
+            scale_value = D.TEA_LCA_Qty(D.substance_dict[rows[0]],value,rows[3])
+            return_array.loc[i] = getWriteRow(rows[0], which_step,
+                                            D.tl_input, scale_value.qty)
+            i += 1
+        
         if rows[2] == 'In' and rows[3] == 'kg/ha/yr':
             
             if rows[0] == 'Corn Stover':
@@ -765,6 +873,24 @@ def nested_if_logic(tab_string, yield_value, geospatial_indicator,
         j += 1
             
     return return_array
+
+def External_Data(col_title):
+    
+    path_list = [Path(cwd + '/CSU_All_Pathway_TEALCA_ACTIVE.xlsx')]
+    
+    excel_read = pd.read_excel(path_list[0],'GeoInputs')
+    
+    value_list = []
+    fips_list = []
+    
+    for i in range(len(excel_read)):
+        row = excel_read.loc[i]
+        value_list.append(row[col_title])
+        fips_list.append(row['FIPS'])
+        
+    return_list = list(zip(fips_list, value_list))
+
+    return return_list
 
 # Instantiate an empty dataframe
 def createEmptySummaryFrame():

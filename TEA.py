@@ -25,15 +25,23 @@ def calc_NPV(tl_array, prod, coprods, path_string):
     
     economic_variable_list = UF.collectEconIndepVars(path_string)
     
-    ecovar = {'disc rate': economic_variable_list[1],
-              't': economic_variable_list[2],
-              'equity': economic_variable_list[3], 
-              'interest': economic_variable_list[4], 
-              'loan term': economic_variable_list[5],
-              'maint rate': economic_variable_list[6], 
-              'ins rate': economic_variable_list[7], 
+    ecovar = {'op days': economic_variable_list[0],
+              'disc rate': economic_variable_list[1],
+              'fed tax': economic_variable_list[2],
+              'state tax': economic_variable_list[3],
+              'equity': economic_variable_list[4], 
+              'interest': economic_variable_list[5], 
+              'loan term': economic_variable_list[6],
+              'maint rate': economic_variable_list[7], 
+              'ins rate': economic_variable_list[8], 
               'land lease': 0, 
-              'dep capex': economic_variable_list[8]}
+              'dep capex': economic_variable_list[9],
+              'tax credit': economic_variable_list[10]}
+    
+    # !! As of 7-28-21: We have included both federal and state tax rates in
+    # the all pathways excel file.  Currently I am only working with the Fed
+    # rate, will need to add functionality to include this behavior
+    
     #print(ecovar)
     macrs = [0.143, 0.245, 0.175, 0.125, 0.089, 0.089, 0.089, 0.045]
     ###yrs = input('What is the project lifespan? ')
@@ -123,7 +131,7 @@ def calc_NPV(tl_array, prod, coprods, path_string):
     # print(loanannpay)
     # print(loanint)
     # print(loanprin)
-    
+    # print(ecovar)
     
     
     # print(opex)
@@ -168,6 +176,7 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
                                              subst_name == 'Propane, Produced' or 
                                              subst_name == 'Ethanol' or 
                                              subst_name == 'Biodiesel, Produced'):
+                
                 pint_price_per_MJ = LCA_val 
                 # print('--------')
                 # print(subst_name)
@@ -240,7 +249,9 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
         if taxincome [i] < 0:
             incometax.append (0)
         else:
-            incometax.append (taxincome [i] * ecovar['t'])
+            incometax.append ((taxincome [i] * (ecovar['fed tax'] + 
+                                                ecovar['state tax'])) 
+                                                - ecovar['tax credit'])
         i += 1
     # calculating cash flow
     cashflow = [-invequityshare]
@@ -420,7 +431,9 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
         if taxincome [i] < 0:
             incometax.append (0)
         else:
-            incometax.append (taxincome [i] * ecovar['t'])
+            incometax.append (taxincome [i] * (ecovar['fed tax']
+                                               + ecovar['state tax'])
+                                               - ecovar['tax credit'])
         i += 1
     # calculating cash flow
     cashflow = [-invequityshare]
@@ -502,15 +515,28 @@ def calc_MFSP(tl_array, prod, coprods, path_string):
     
     economic_variable_list = UF.collectEconIndepVars(path_string)
     
-    ecovar = {'disc rate': economic_variable_list[1],
-              't': economic_variable_list[2],
-              'equity': economic_variable_list[3], 
-              'interest': economic_variable_list[4], 
-              'loan term': economic_variable_list[5],
-              'maint rate': economic_variable_list[6], 
-              'ins rate': economic_variable_list[7], 
+    # ecovar = {'disc rate': economic_variable_list[1],
+    #           'fed tax': economic_variable_list[2],
+    #           'equity': economic_variable_list[3], 
+    #           'interest': economic_variable_list[4], 
+    #           'loan term': economic_variable_list[5],
+    #           'maint rate': economic_variable_list[6], 
+    #           'ins rate': economic_variable_list[7], 
+    #           'land lease': 0, 
+    #           'dep capex': economic_variable_list[8]}
+    
+    ecovar = {'op days': economic_variable_list[0],
+              'disc rate': economic_variable_list[1],
+              'fed tax': economic_variable_list[2],
+              'state tax': economic_variable_list[3],
+              'equity': economic_variable_list[4], 
+              'interest': economic_variable_list[5], 
+              'loan term': economic_variable_list[6],
+              'maint rate': economic_variable_list[7], 
+              'ins rate': economic_variable_list[8], 
               'land lease': 0, 
-              'dep capex': economic_variable_list[8]}
+              'dep capex': economic_variable_list[9],
+              'tax credit': economic_variable_list[10]}
     
     macrs = [0.143, 0.245, 0.175, 0.125, 0.089, 0.089, 0.089, 0.045]
     ###yrs = input('What is the project lifespan? ')
@@ -630,11 +656,12 @@ def calcOPEX(tl_array):
                                       match_list, 
                                       D.LCA_cost)
             if in_or_out == D.tl_input:
-                total = LCA_val*mag
+                total = LCA_val * mag
                 # print('------',subst_name,'-------')
                 # print(LCA_val)
                 # print(mag)
                 # print(total)
+                # print(inputs_cost)
                 # print('---------------------')
                 inputs_cost += (LCA_val * mag)
     #print(inputs_cost)
@@ -658,13 +685,13 @@ def calcNonFuelValue(tl_array, baseline_indicator):
             if in_or_out == D.tl_output and baseline_indicator == 1:
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
-                # print('--------')
-                # print(subst_name)
-                # print(LCA_val)
-                # print(mag)
-                # print(total)
-                # print(outputs_value)
-                # print('--------')
+                print('--------')
+                print(subst_name)
+                print(LCA_val)
+                print(mag)
+                print(total)
+                print(outputs_value)
+                print('--------')
 
             
             if in_or_out == D.tl_output and baseline_indicator != 1 and (

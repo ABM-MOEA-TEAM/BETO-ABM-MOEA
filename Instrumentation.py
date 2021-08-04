@@ -16,8 +16,12 @@ import TEA
 
 # output = TEA.calc_NPV(biomass_IO)
 
-output = UF.collectIndepVars('SoyCult')
+# output = UF.collectIndepVars('SoyCult')
+# output = UF.DayCentFips()
 
+output = UF.External_Data('Practice Set (Python)')
+
+#output = UF.collectEconIndepVars('Corn Grain EtOH')
 # corn_stover_25 = UF.DayCentYields('stover_yield_Mg_ha', 1)
 # corn_stover_50 = UF.DayCentYields('stover_yield_Mg_ha', 2)
 # corn_stover_75 = UF.DayCentYields('stover_yield_Mg_ha', 3)

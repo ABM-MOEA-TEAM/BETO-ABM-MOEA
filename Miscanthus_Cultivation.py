@@ -11,7 +11,7 @@ import UnivFunc as UF
 
 def grow_miscanthus(land_area_val):
 
-    return UF.Collect_IndepVars_Loop('MiscCult', 0, 0, 0, 0, 0, 0, 0)
+    return UF.Collect_IndepVars_Loop('MiscCult', 0, 0, 0, 0, 0, 0, 0,0)
     # tab_string = 'MiscCult'
     
     # vars_list = UF.collectIndepVars(tab_string)

@@ -10,8 +10,14 @@ import geoplot
 
 import matplotlib.pyplot as plt
 
+# from mapclassify import Quantiles, User_Defined
+
 import pandas as pd
 import seaborn as sns
+
+# import numpy as np; np.random.seed(42)
+
+# import mapclassify
 
 import os
 from pathlib import Path
@@ -48,15 +54,16 @@ fig, ax = plt.subplots(1, 1, figsize=(16, 12))
 
 # Set up the color sheme:
 import mapclassify as mc
-scheme = mc.Quantiles(fullData['mfsp'], k=10)
+scheme = mc.EqualIntervals(fullData['mfsp'], k=8)
+res = mc.Pooled(mfsp_data, k=8)
 
 # Map
 geoplot.choropleth(fullData, 
     hue="mfsp", 
     linewidth=.15,
-    scheme=scheme, cmap='copper_r', #magma, viridis, mako, rocket, turbo, inferno, heat
-    legend=True,                    # Can also type in nonsense for this argument to get
-    edgecolor='black',              # a very long list of all possible color palettes
+    scheme=scheme, cmap='plasma_r',             # magma, viridis, mako, rocket, turbo, inferno, heat
+    legend=True,                                        # Can also type in nonsense for this argument to get
+    edgecolor='black',                                  # a very long list of all possible color palettes
     ax=ax);
 
-ax.set_title('Soy Jet-A MFSP by County - $/kg', fontsize=13);
+ax.set_title('MFSP by County - $/kg', fontsize=15);

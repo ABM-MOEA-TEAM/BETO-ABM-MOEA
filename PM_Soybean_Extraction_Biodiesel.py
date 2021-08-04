@@ -29,12 +29,12 @@ results_array = UF.createEmptyFrame()
 #ds_results_array = UF.createEmptyFrame()
 
 
-biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 0)
+biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
-conversion_IO = UF.Collect_IndepVars_Loop('HexExt', 0, 1, 1, biomass_IO,'Soybeans', 1, 0)
+conversion_IO = UF.Collect_IndepVars_Loop('HexExt', 0, 1, 1, biomass_IO,'Soybeans', 1, 0, 0)
 results_array = results_array.append(conversion_IO, ignore_index=True)
-# upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0)
-upgrading_IO = UF.Collect_IndepVars_Loop('HydroProc', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0)
+# upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
+upgrading_IO = UF.Collect_IndepVars_Loop('HydroProc', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
 IO_array = UF.consolidateIO(results_array)
 
@@ -61,8 +61,9 @@ coprods = ['LPG, Produced', 'Diesel, Produced',
 
 # NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel')
 
-MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel')
-#print(MFSP*37.75)
+# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel')
+MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet')
+# print(MFSP*37.75)
 
 #Output_NPV_Value = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel')
 
@@ -89,6 +90,6 @@ MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel')
 # NPV_Biomass_Conversion = TEA.calc_NPV(NPV_BC_Consolidated)
 # NPV_Conversion_Upgrading = TEA.calc_NPV(NPV_CU_Consolidated)
 
-DayCent_Yield_List = UF.DayCentYields('soy_yield_Mg_ha', 0)  
+# DayCent_Yield_List = UF.DayCentYields('soy_yield_Mg_ha', 0)  
 
 
