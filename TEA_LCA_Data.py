@@ -197,6 +197,7 @@ Carbon_Dict['Corn Stover, Collected'] = 0.5
 Carbon_Dict['Corn Stover'] = 0.5
 Carbon_Dict['DDGS'] = 0.5
 Carbon_Dict['Soybean Meal'] = 0.5
+Carbon_Dict['Soybeans'] = 0.5
 Carbon_Dict['Biodiesel, Produced'] = 0.86
 Carbon_Dict['Diesel, Produced'] = 0.86
 Carbon_Dict['Ethanol'] = 0.52

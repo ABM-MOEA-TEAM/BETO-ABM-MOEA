@@ -1,6 +1,7 @@
 import TEA_LCA_Data as D
 import pandas as pd
 import numpy as np
+import NewNestedIfLogic as N
 
 import csv
 
@@ -212,10 +213,13 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
         print('1 --------- Conversion/Extraction Step')
         print('2 --------- Upgrading Step')
         return
-      
-    return nested_if_logic(tab_string, yield_value, geospatial_indicator, 
+    
+    return N.newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                            downstream_indicator, tl_array, input_substance_string,
                            which_step, DayCent_read_string, fips)
+    # return nested_if_logic(tab_string, yield_value, geospatial_indicator, 
+    #                        downstream_indicator, tl_array, input_substance_string,
+    #                        which_step, DayCent_read_string, fips)
 
 def nested_if_logic(tab_string, yield_value, geospatial_indicator, 
                            downstream_indicator, tl_array, input_substance_string,

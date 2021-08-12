@@ -38,9 +38,6 @@ def calc_NPV(tl_array, prod, coprods, path_string):
               'dep capex': economic_variable_list[9],
               'tax credit': economic_variable_list[10]}
     
-    # !! As of 7-28-21: We have included both federal and state tax rates in
-    # the all pathways excel file.  Currently I am only working with the Fed
-    # rate, will need to add functionality to include this behavior
     
     #print(ecovar)
     macrs = [0.143, 0.245, 0.175, 0.125, 0.089, 0.089, 0.089, 0.045]
@@ -289,90 +286,143 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
     
 
 def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
-             loanpay, tl_array, prod, coprods, land_cost_qty):
-    # print(price_per_MJ)
-    pint_price_per_MJ = D.returnPintQtyObj(price_per_MJ, 'yr/MJ')
-    #pint_price_per_kg = D.returnPintQtyObj(price_per_MJ, 'yr/kg')
+             loanpay, tl_array, prod, coprods, land_cost_qty, cult_only):
     
-    # I haven't been able to work out how to get the HHV dictionary to give us just the 
-    # values, not the pint quantities.  Because of this, I have this gross 'yr/MJ' unit
-    # on the pint_price_per_MJ value as the logic below demands a unitless value. I 
-    # am happy to change it to include pint units downstream, but it is nice being able
-    # to see the MFSP results as floats in the variable explorer (and not as a 'Quanti-
-    # ty object of pint.quantity module') (6/7)
-    
-    #Primary Fuel Products
-    # jet_a_out = 0
-    # diesel_out = 0
-    # gasoline_out = 0
-    # ethanol_out = 0
-    # biodiesel_out = 0
-
-    # for i in range(len(tl_array)):
-    #     row_vals = tl_array.loc[i]
-    #     subst_name = row_vals[UF.substance_name]          
-    #     in_or_out = row_vals[UF.input_or_output]
+    if cult_only == 1:
+        crop_price_per_MJ = price_per_MJ
         
-    match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
-    fuel_out = UF.returnPintQty(tl_array, match_list)
-    primary_fuel_out_type = prod[0]
-    transport_fuel_kg = fuel_out
-    
-    other_fuel_out_type = []
-    other_HHVs = []
-    other_fuel_kg = []
-    additional_revenue = 0
-    #print(transport_fuel_kg)
-    
-    
-    
-    # Need to add logic to handle multiple different fuels with the HHV's
-    # Going to throw some things off?  (7/22)
-    
-    for i in range(len(coprods)):
-        if (coprods[i] == 'Diesel, Produced' or  
+        crop_price_per_MJ = D.returnPintQtyObj(price_per_MJ, 'yr/MJ')
+        
+        match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
+        crop_out = UF.returnPintQty(tl_array, match_list)
+        primary_crop_out_type = prod[0]
+        crop_kg = crop_out
+        
+        other_crop_out_type = []
+        other_HHVs = []
+        other_crop_kg = []
+        additional_revenue = 0
+        
+        
+        for i in range(len(coprods)):
+        
+            if (coprods[i] == 'Corn Stover' or  
                                              coprods[i] == 'Gasoline, Produced' or 
                                              coprods[i] == 'LPG, Produced' or 
                                              # coprods[i] == 'Propane, Produced' or 
                                              coprods[i] == 'Ethanol' or 
                                              coprods[i] == 'Biodiesel, Produced'):
             
-            other_fuel_out_type.append(coprods[i])
+                other_crop_out_type.append(coprods[i])
+                
+            for i in range(len(other_crop_out_type)):
+                other_HHVs.append(D.HHV_dict[other_crop_out_type[i]].qty)
+                match_list = [[UF.substance_name, coprods[i]],[UF.input_or_output, D.tl_output]]
+                other_crop_kg.append(UF.returnPintQty(tl_array, match_list))
             
-    for i in range(len(other_fuel_out_type)):
-        other_HHVs.append(D.HHV_dict[other_fuel_out_type[i]].qty)
-        match_list = [[UF.substance_name, coprods[i]],[UF.input_or_output, D.tl_output]]
-        other_fuel_kg.append(UF.returnPintQty(tl_array, match_list))
-    
-    HHV = D.HHV_dict[primary_fuel_out_type].qty
-    
-    primary_transport_fuel_energy = transport_fuel_kg * HHV
-
-
-    ann_coproduct_revenue = 0   # Placeholder value for the eventual coproducts (might not be needed here anymore? 3/22)
-      
-    nonfuel_value = calcNonFuelValue(tl_array, 0)
-    ann_fuel_revenue =  (pint_price_per_MJ * primary_transport_fuel_energy) 
-    add_num = 0
-    
-    # print(ann_fuel_revenue)
-    
-    for i in range(len(other_fuel_out_type)):
-        other_transport_fuel_energy = other_fuel_kg[i] * (other_HHVs[i]).magnitude
-        # print(other_transport_fuel_energy)
-        add_num = pint_price_per_MJ * other_transport_fuel_energy
-        additional_revenue += add_num.magnitude
+            HHV = D.HHV_dict[primary_crop_out_type].qty
+            
+            primary_crop_energy = crop_kg * HHV
         
         
-    # ann_fuel_revenue = pint_price_per_kg * transport_fuel_kg
+            ann_coproduct_revenue = 0   # Placeholder value for the eventual coproducts (might not be needed here anymore? 3/22)
+              
+            nonfuel_value = calcNonFuelValue_cult(tl_array, prod)
+            ann_fuel_revenue =  (crop_price_per_MJ * primary_crop_energy) 
+            add_num = 0
+            
+            # print(ann_fuel_revenue)
+            
+            for i in range(len(other_crop_out_type)):
+                other_crop_energy = other_crop_kg[i] * (other_HHVs[i]).magnitude
+                # print(other_transport_fuel_energy)
+                add_num = crop_price_per_MJ * other_crop_energy
+                additional_revenue += add_num.magnitude
+                
+                
+            # ann_fuel_revenue = pint_price_per_kg * transport_fuel_kg
+            
+            # ann_fuel_revenue += additional_revenue
+        
+            # print(add_num)
+            # print(ann_fuel_revenue)
+            
+            # print(nonfuel_value)
+            annrevenue = ann_fuel_revenue + nonfuel_value
+            
+        
+    else:
+        # print(price_per_MJ)
+        pint_price_per_MJ = D.returnPintQtyObj(price_per_MJ, 'yr/MJ')
+        #pint_price_per_kg = D.returnPintQtyObj(price_per_MJ, 'yr/kg')
+        
+        # I haven't been able to work out how to get the HHV dictionary to give us just the 
+        # values, not the pint quantities.  Because of this, I have this gross 'yr/MJ' unit
+        # on the pint_price_per_MJ value as the logic below demands a unitless value. I 
+        # am happy to change it to include pint units downstream, but it is nice being able
+        # to see the MFSP results as floats in the variable explorer (and not as a 'Quanti-
+        # ty object of pint.quantity module') (6/7)
+        match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
+        fuel_out = UF.returnPintQty(tl_array, match_list)
+        primary_fuel_out_type = prod[0]
+        transport_fuel_kg = fuel_out
+        
+        other_fuel_out_type = []
+        other_HHVs = []
+        other_fuel_kg = []
+        additional_revenue = 0
+        #print(transport_fuel_kg)
+        
+        
+        
+        # Need to add logic to handle multiple different fuels with the HHV's
+        # Going to throw some things off?  (7/22)
+        
+        for i in range(len(coprods)):
+            if (coprods[i] == 'Diesel, Produced' or  
+                                                 coprods[i] == 'Gasoline, Produced' or 
+                                                 coprods[i] == 'LPG, Produced' or 
+                                                 # coprods[i] == 'Propane, Produced' or 
+                                                 coprods[i] == 'Ethanol' or 
+                                                 coprods[i] == 'Biodiesel, Produced'):
+                
+                other_fuel_out_type.append(coprods[i])
+                
+        for i in range(len(other_fuel_out_type)):
+            other_HHVs.append(D.HHV_dict[other_fuel_out_type[i]].qty)
+            match_list = [[UF.substance_name, coprods[i]],[UF.input_or_output, D.tl_output]]
+            other_fuel_kg.append(UF.returnPintQty(tl_array, match_list))
+        
+        HHV = D.HHV_dict[primary_fuel_out_type].qty
+        
+        primary_transport_fuel_energy = transport_fuel_kg * HHV
     
-    ann_fuel_revenue += additional_revenue
-
-    # print(add_num)
-    # print(ann_fuel_revenue)
     
-    annrevenue = ann_fuel_revenue + ann_coproduct_revenue + nonfuel_value
+        ann_coproduct_revenue = 0   # Placeholder value for the eventual coproducts (might not be needed here anymore? 3/22)
+          
+        nonfuel_value = calcNonFuelValue(tl_array, 0)
+        ann_fuel_revenue =  (pint_price_per_MJ * primary_transport_fuel_energy) 
+        add_num = 0
+        
+        # print(ann_fuel_revenue)
+        
+        for i in range(len(other_fuel_out_type)):
+            other_transport_fuel_energy = other_fuel_kg[i] * (other_HHVs[i]).magnitude
+            # print(other_transport_fuel_energy)
+            add_num = pint_price_per_MJ * other_transport_fuel_energy
+            additional_revenue += add_num.magnitude
+            
+            
+        # ann_fuel_revenue = pint_price_per_kg * transport_fuel_kg
+        
+        ann_fuel_revenue += additional_revenue
     
+        # print(add_num)
+        # print(ann_fuel_revenue)
+        
+        annrevenue = ann_fuel_revenue + ann_coproduct_revenue + nonfuel_value
+        
+    # print('===== Annual Revenue ====')
     # print(annrevenue)
     # print('Annual Fuel Revenue Variable')
     # print(ann_fuel_revenue)
@@ -472,6 +522,159 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     #print(price_per_MJ)
     # print(npv)
     return abs(npv[-1])
+
+def calc_MBSP(biomass_IO, prod, coprods, path_string):
+    
+    tl_array = biomass_IO
+    
+    for i in range(len(biomass_IO)):
+        row_vals = biomass_IO.loc[i]
+        subst_name = row_vals[UF.substance_name]          
+        
+    match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
+    
+    crop_out = UF.returnPintQty(tl_array, match_list)
+    crop_out_type = prod[0]
+    
+    # print(crop_out_type)
+    
+    HHV = D.HHV_dict[crop_out_type].qty      
+ 
+    #print(fuel_out_type)
+ 
+    capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
+    land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Cost']])
+    capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
+    labor =  UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude
+    
+    #calculating total costs for inputs to the pathway (opex)
+    
+    opex = calcOPEX(tl_array)
+    #print(capex)
+    # print('Operational Cost ------')
+    # print(opex)
+    # print('-----------------------')
+    
+    #Economic analysis variables
+    
+    economic_variable_list = UF.collectEconIndepVars(path_string)
+    
+    ecovar = {'op days': economic_variable_list[0],
+              'disc rate': economic_variable_list[1],
+              'fed tax': economic_variable_list[2],
+              'state tax': economic_variable_list[3],
+              'equity': economic_variable_list[4], 
+              'interest': economic_variable_list[5], 
+              'loan term': economic_variable_list[6],
+              'maint rate': economic_variable_list[7], 
+              'ins rate': economic_variable_list[8], 
+              'land lease': 0, 
+              'dep capex': economic_variable_list[9],
+              'tax credit': economic_variable_list[10]}
+    
+    macrs = [0.143, 0.245, 0.175, 0.125, 0.089, 0.089, 0.089, 0.045]
+    ###yrs = input('What is the project lifespan? ')
+    landcapex =  land_cost_qty.magnitude 
+    
+    #Total depreciable investment
+    depinv =  capex_qty.magnitude * ecovar['dep capex']
+    # print(depinv)
+    #Investment-loan share
+    invloanshare = capex * (1-ecovar['equity'])
+    # print(invloanshare)
+    #Loan annual payment
+    loanannpay = capex*(1-ecovar['equity'])*ecovar['interest']*(1+ecovar['interest'])**ecovar['loan term']/((1+ecovar['interest'])**ecovar['loan term']-1)
+    # print('---------')
+    # print('Loan Annual Payment')
+    # print(loanannpay)
+    # print('---------')
+    #Investment-equity share
+    invequityshare = capex * (ecovar['equity'])
+    # print(invequityshare)
+    
+    #Salvage value end of life
+    salvage = landcapex
+    #Annual insurance
+    annins = depinv * ecovar ['ins rate']
+    # print(annins)
+    #Annual maintenance
+    annmaint = depinv * ecovar['maint rate']
+    # print(annmaint)
+    #Annual material and energy costs = opex, Annual labor costs = labor
+    #Fixed operating costs in $/yr
+    fopex =  annins + annmaint + opex + labor
+    # print(fopex)
+    
+    #creating MACRS list with zeros at the end to match duration of project
+    depyrs = len (macrs)
+    dif = int(yrs) - depyrs
+    if dif > 0:
+        addzero = [0] * dif
+        macrs.extend (addzero)
+    
+    depreciation = []
+    i = 0
+    
+    #calculating depreciation of depreciable investment in each year
+    while i < len(macrs) :
+        depreciation.append (depinv * macrs [i])
+        i += 1
+    
+    i = 0
+    # print(depreciation)
+    #calculating loan payment, interest, and principle for each time step
+    loanpay = [ ]
+    loanint = [ ]
+    loanprin = [ ]
+    
+    while i < int(ecovar['loan term']):
+        loanpay.append (loanannpay)
+        if i == 0:
+            loanint.append (invloanshare*ecovar ['interest'])
+            loanprin.append (invloanshare-loanpay[i]+loanint [i])
+        else:
+            loanint.append (loanprin [i-1]*ecovar ['interest'])
+            loanprin.append (loanprin[i-1]-loanpay[i] + loanint[i])
+        
+        i += 1
+        
+    # print(loanpay)
+    # print(loanint)
+    # print(loanprin)
+    
+    
+    #adding zeros to the end of loan payment, interest, and principle for duration of project
+    dif = int(yrs) - len(loanprin)
+    
+    if dif > 0:
+        addzero = [0] * dif
+        loanpay.extend (addzero)
+        loanint.extend (addzero)
+        loanprin.extend (addzero)
+        
+    result = s_opt.minimize_scalar(lambda price_per_MJ: NPV_goal(price_per_MJ, 
+                                                                 fopex, 
+                                                                 depreciation, 
+                                                                 loanint, 
+                                                                 ecovar, 
+                                                                 invequityshare,
+                                                                 loanpay,
+                                                                 tl_array,
+                                                                 prod,
+                                                                 coprods,
+                                                                 land_cost_qty,
+                                                                 1))
+    
+    # print('Result Value ?')
+    # print(result)
+    # print('---------')
+    # print('CAPEX')
+    # print(capex)  
+    # print('-------')
+    return result.x     # $/MJ (above optimization) * MJ/gge
+    
+    
+    return
 
 def calc_MFSP(tl_array, prod, coprods, path_string):
     
@@ -628,7 +831,8 @@ def calc_MFSP(tl_array, prod, coprods, path_string):
                                                                  tl_array,
                                                                  prod,
                                                                  coprods,
-                                                                 land_cost_qty))
+                                                                 land_cost_qty,
+                                                                 0))
     
     # print('Result Value ?')
     # print(result)
@@ -668,6 +872,36 @@ def calcOPEX(tl_array):
     return inputs_cost
 
 # Calculate value of non-fuel outputs
+
+def calcNonFuelValue_cult(tl_array, prod):
+    
+    outputs_value = 0
+    
+    for i in range(len(tl_array)):
+        row_vals = tl_array.loc[i]
+        subst_name = row_vals[UF.substance_name]
+        in_or_out = row_vals[UF.input_or_output]
+        mag = row_vals[UF.magnitude]
+        if in_or_out != D.zeroed:
+            match_list = [[D.LCA_key_str, subst_name],
+                          [D.LCA_IO, in_or_out]]
+            LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost)
+            if in_or_out == D.tl_output and subst_name not in prod:
+                total = LCA_val * mag
+                outputs_value += (LCA_val * mag)  # In dollars 
+                # print('--------')
+                # print(subst_name)
+                # print(LCA_val)
+                # print(mag)
+                # print(total)
+                # print(outputs_value)
+                # print('--------')
+
+        
+    return outputs_value
+
 def calcNonFuelValue(tl_array, baseline_indicator):
     outputs_value = 0
     
@@ -685,13 +919,13 @@ def calcNonFuelValue(tl_array, baseline_indicator):
             if in_or_out == D.tl_output and baseline_indicator == 1:
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
-                print('--------')
-                print(subst_name)
-                print(LCA_val)
-                print(mag)
-                print(total)
-                print(outputs_value)
-                print('--------')
+                # print('--------')
+                # print(subst_name)
+                # print(LCA_val)
+                # print(mag)
+                # print(total)
+                # print(outputs_value)
+                # print('--------')
 
             
             if in_or_out == D.tl_output and baseline_indicator != 1 and (

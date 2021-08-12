@@ -34,8 +34,10 @@ results_array = UF.createEmptyFrame()
 
 # yield_value = DayCent_Yield_List[i]*1000
 
-# biomass_IO = UF.Collect_IndepVars_Loop('CornCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
-biomass_IO = UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0, 0, 0)
+yield_value = 10000
+
+biomass_IO = UF.Collect_IndepVars_Loop('CornCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
+# biomass_IO = UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
 conversion_IO = UF.Collect_IndepVars_Loop('StarchFerm', 0, 0, 1, biomass_IO,'Corn Grain', 1, 0, 0)
 results_array = results_array.append(conversion_IO, ignore_index=True)
@@ -45,7 +47,9 @@ IO_array = UF.consolidateIO(results_array)
 # NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Corn Grain EtOH')
 
 MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH')
-    
+ 
+
+print(MFSP.magnitude * 26.95)   
 #     append_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [yield_value], 
 #                                  'MFSP ($/kg)' : [MFSP.magnitude * 26.95]})
 

@@ -94,6 +94,60 @@ def LCAMetrics(tl_array):
     
     return return_list
 
+def LCAMetrics_cult(tl_array):
+    
+    # Need to add logic to produce baseline revenue for $allocation
+    
+    return_list = []
+    
+    # output_frame = pd.DataFrame({'Energy Allocation, Pre-Combustion' : [],
+    #                              'Energy Allocation, Post-Combustion' : [],
+    #                              'Mass Allocation, Pre-Combustion' : [],
+    #                              'Mass Allocation, Post-Combustion' : [],
+    #                              'Economic Allocation, Pre-Combustion' : [],
+    #                              'Economic Allocation, Post-Combustion' : [],
+    #                              'System Boundary Expansion, Pre-Combustion' : [],
+    #                              'System Boundary Expansion, Post-Combustion' : [],})
+    
+    input_emissions = calcInputEmissions(tl_array)
+    end_use_emissions = calcEndUseEmissions(tl_array)
+    coprod_emissions = calcCoProdEndUse(tl_array)
+    total_MJ = calcMJProduced(tl_array)
+    # total_fuel_MJ = calcFuelMJProduced(tl_array)
+    total_kg = calcMassOut(tl_array)
+    total_dollars = calcRevenue(tl_array)
+    total_credits = calcCredits(tl_array)
+    
+    ea_precomb_ghg = input_emissions / total_MJ
+    ea_postcomb_ghg = (input_emissions + end_use_emissions + coprod_emissions) / total_MJ
+    ma_precomb_ghg = input_emissions / total_kg
+    ma_postcomb_ghg = (input_emissions + end_use_emissions + coprod_emissions) / total_kg
+    dollara_precomb_ghg = input_emissions / total_dollars
+    dollara_postcomb_ghg = (input_emissions + end_use_emissions + coprod_emissions) / total_dollars
+    # se_precomb_ghg = (input_emissions + total_credits) / total_fuel_MJ
+    # se_postcomb_ghg = (input_emissions + total_credits + end_use_emissions + coprod_emissions) / total_fuel_MJ
+    
+    return_list.append(ea_precomb_ghg.magnitude)
+    return_list.append(ea_postcomb_ghg.magnitude)
+    return_list.append(ma_precomb_ghg)
+    return_list.append(ma_postcomb_ghg)
+    return_list.append(dollara_precomb_ghg)
+    return_list.append(dollara_postcomb_ghg)
+    # return_list.append(se_precomb_ghg.magnitude)
+    # return_list.append(se_postcomb_ghg.magnitude)
+    
+    output_frame = pd.DataFrame({'Energy Allocation, Pre-Combustion' : [ea_precomb_ghg.magnitude],
+                                 'Energy Allocation, Post-Combustion' : [ea_postcomb_ghg.magnitude],
+                                 'Mass Allocation, Pre-Combustion' : [ma_precomb_ghg],
+                                 'Mass Allocation, Post-Combustion' : [ma_postcomb_ghg],
+                                 'Economic Allocation, Pre-Combustion' : [dollara_precomb_ghg],
+                                 'Economic Allocation, Post-Combustion' : [dollara_postcomb_ghg]})
+                                 # 'System Boundary Expansion, Pre-Combustion' : [se_precomb_ghg.magnitude],
+                                 # 'System Boundary Expansion, Post-Combustion' : [se_postcomb_ghg.magnitude],})
+    
+    
+    return return_list
+
 def calcMassOut(tl_array):
     
     return_value = 0
