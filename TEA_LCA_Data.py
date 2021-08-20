@@ -61,6 +61,7 @@ LCA_cost = 'Cost ($/X)'
 LCA_GHG_impact = 'GHG_Impact (g CO2e/X)'
 # LCA_inventory_df = pd.read_csv(path_list[0])
 LCA_inventory_df = pd.read_excel(path_list[3],'LCI')
+LCA_geospat_inventory_df = pd.read_excel(path_list[3],'GeoInputs')
 
 # Going to just try switching the read source over to the all_pathways sheet (6/29)
 

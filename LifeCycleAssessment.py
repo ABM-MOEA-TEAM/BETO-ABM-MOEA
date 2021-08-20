@@ -210,7 +210,7 @@ def calcCredits(tl_array):
             match_list = [[D.LCA_key_str, name],
                           [D.LCA_IO, D.tl_output]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                         match_list, D.LCA_GHG_impact)            
+                                         match_list, D.LCA_GHG_impact,0,0)            
             # print(LCA_val)
             return_value += amount * LCA_val
         
@@ -252,7 +252,7 @@ def calcInputEmissions(tl_array):
         match_list = [[D.LCA_key_str, name],
                       [D.LCA_IO, D.tl_input]]
         LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                     match_list, D.LCA_GHG_impact)            
+                                     match_list, D.LCA_GHG_impact,0,0)            
         return_value += amount * LCA_val
         
         # Instrumentation
@@ -271,7 +271,7 @@ def calcInputEmissions(tl_array):
             match_list = [[D.LCA_key_str, name],
                            [D.LCA_IO, D.tl_output]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                         match_list, D.LCA_GHG_impact)
+                                         match_list, D.LCA_GHG_impact,0,0)
             return_value += amount * LCA_val
             
             # Instrumentation
@@ -466,7 +466,7 @@ def calcRevenue(tl_array):
         match_list = [[D.LCA_key_str, name],
                       [D.LCA_IO, D.tl_output]]
         LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                     match_list, D.LCA_cost)            
+                                     match_list, D.LCA_cost,0,0)            
         return_value += amount * LCA_val
         
         # Instrumentation

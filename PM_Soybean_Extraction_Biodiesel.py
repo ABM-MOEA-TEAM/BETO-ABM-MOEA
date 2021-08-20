@@ -10,7 +10,7 @@ import UnivFunc as UF
 import pandas as pd
 
 import TEA
-import LCA
+import LifeCycleAssessment as L
 
 # import Soy_Cultivation as SC
 # import Hexane_Extraction as HE
@@ -25,10 +25,14 @@ ds_results_array = UF.createEmptyFrame()
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 biomass_yield = 1
 
+# ol = ['']
+
+ol = ['Arable Land Value ($/ha)', 'Grid Electricity Price ($/MJ)']
+
 results_array = UF.createEmptyFrame()
 #ds_results_array = UF.createEmptyFrame()
 
-yield_value = 3017.13296
+# yield_value = 3017.13296
 
 # biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
 biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 0, 0)
@@ -61,12 +65,17 @@ coprods = ['Soybean Meal','Glycerin']
 # coprods = ['LPG, Produced', 'Diesel, Produced', 
 #             'Gasoline, Produced']
 
-# NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel')
+# NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel', 9001, ol)
 
-MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel')
-# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet')
+MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', 1, ol)
+# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 9001, ol)
+
+LCAs = L.LCAMetrics(IO_array)
+
 print(MFSP.magnitude*37.75)
 # print(MFSP.magnitude * 46)
+print(LCAs)
+
 
 #Output_NPV_Value = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel')
 

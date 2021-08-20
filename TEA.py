@@ -10,7 +10,7 @@ yrs = 30 # userinputs.yrs
 
 # function used for goal finding
 
-def calc_NPV(tl_array, prod, coprods, path_string):
+def calc_NPV(tl_array, prod, coprods, path_string, fip, override_list):
     
     for i in range(len(tl_array)):
         row_vals = tl_array.loc[i]
@@ -21,7 +21,7 @@ def calc_NPV(tl_array, prod, coprods, path_string):
     capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
     labor =  UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude
     
-    opex = calcOPEX(tl_array)
+    opex = calcOPEX(tl_array, fip, override_list)
     
     economic_variable_list = UF.collectEconIndepVars(path_string)
     
@@ -118,7 +118,7 @@ def calc_NPV(tl_array, prod, coprods, path_string):
         loanprin.extend (addzero)
 
     result = NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, 
-                      loanpay, tl_array, prod, coprods, land_cost_qty)        
+                      loanpay, tl_array, prod, coprods, land_cost_qty, override_list, fip)        
     
     # print('---------')
     # print('CAPEX')
@@ -144,7 +144,7 @@ def calc_NPV(tl_array, prod, coprods, path_string):
 
 
 def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
-             tl_array, prod, coprods, land_cost_qty):
+             tl_array, prod, coprods, land_cost_qty, override_list, fip):
     
     # If no output fuel exists, I want to either call this loop or have it be run
     # automatically.
@@ -163,9 +163,9 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
         if in_or_out != D.zeroed:
             match_list = [[D.LCA_key_str, subst_name],
                           [D.LCA_IO, in_or_out]]
-            LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
-                                      match_list, 
-                                      D.LCA_cost)
+            LCA_val = UF.returnLCANumber(D.LCA_inventory_df,    # This looks like the output list of 
+                                      match_list,               # transport fuels. I do not know if we want
+                                      D.LCA_cost,0)             # to geospatially vary these cost values... ignore?
             if in_or_out == D.tl_output and (subst_name == 'Jet-A' or
                                              subst_name == 'Diesel, Produced' or
                                              subst_name == 'Gasoline, Produced' or 
@@ -187,7 +187,7 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
     match_list = [[UF.substance_name, prod[0]],[UF.input_or_output, D.tl_output]] 
     fuel_out = UF.returnPintQty(tl_array, match_list)
 
-    nonfuel_value = calcNonFuelValue(tl_array, 1)
+    nonfuel_value = calcNonFuelValue(tl_array, 1, override_list, fip)
     #ann_fuel_revenue =  (pint_price_per_MJ * fuel_out)
     
     annrevenue = nonfuel_value
@@ -286,7 +286,7 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
     
 
 def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
-             loanpay, tl_array, prod, coprods, land_cost_qty, cult_only):
+             loanpay, tl_array, prod, coprods, land_cost_qty, cult_only, override_list, fip):
     
     if cult_only == 1:
         crop_price_per_MJ = price_per_MJ
@@ -327,7 +327,7 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
         
             ann_coproduct_revenue = 0   # Placeholder value for the eventual coproducts (might not be needed here anymore? 3/22)
               
-            nonfuel_value = calcNonFuelValue_cult(tl_array, prod)
+            nonfuel_value = calcNonFuelValue_cult(tl_array, prod, override_list, fip)
             ann_fuel_revenue =  (crop_price_per_MJ * primary_crop_energy) 
             add_num = 0
             
@@ -400,7 +400,7 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     
         ann_coproduct_revenue = 0   # Placeholder value for the eventual coproducts (might not be needed here anymore? 3/22)
           
-        nonfuel_value = calcNonFuelValue(tl_array, 0)
+        nonfuel_value = calcNonFuelValue(tl_array, 0, override_list, fip)
         ann_fuel_revenue =  (pint_price_per_MJ * primary_transport_fuel_energy) 
         add_num = 0
         
@@ -523,11 +523,12 @@ def NPV_goal(price_per_MJ, fopex, depreciation, loanint, ecovar, invequityshare,
     # print(npv)
     return abs(npv[-1])
 
-def calc_MBSP(biomass_IO, prod, coprods, path_string):
+def calc_MBSP(biomass_IO, prod, coprods, path_string, fip, override_list):
     
     tl_array = biomass_IO
     
     for i in range(len(biomass_IO)):
+        # print(i)
         row_vals = biomass_IO.loc[i]
         subst_name = row_vals[UF.substance_name]          
         
@@ -544,12 +545,30 @@ def calc_MBSP(biomass_IO, prod, coprods, path_string):
  
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Cost']])
-    capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
-    labor =  UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude
+
+    match_list = [[D.LCA_key_str, 'Land Cost']]#, [D.LCA_IO, in_or_out]]
+    land_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost, override_list, fip)
+    
+    match_list = [[D.LCA_key_str, 'Capital Cost']]#, [D.LCA_IO, in_or_out]]
+    capex_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost, override_list, fip)
+    
+    match_list = [[D.LCA_key_str, 'Labor']]#, [D.LCA_IO, in_or_out]]
+    labor_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost, override_list, fip)
+    
+    capex =   ((capex_qty.magnitude * capex_scalar) + 
+               (land_cost_qty.magnitude * land_scalar)) #inputs ['capex']
+    
+    labor =  (UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude) * labor_scalar
     
     #calculating total costs for inputs to the pathway (opex)
     
-    opex = calcOPEX(tl_array)
+    opex = calcOPEX(tl_array, fip, override_list)
     #print(capex)
     # print('Operational Cost ------')
     # print(opex)
@@ -663,7 +682,9 @@ def calc_MBSP(biomass_IO, prod, coprods, path_string):
                                                                  prod,
                                                                  coprods,
                                                                  land_cost_qty,
-                                                                 1))
+                                                                 1,
+                                                                 override_list,
+                                                                 fip))
     
     # print('Result Value ?')
     # print(result)
@@ -676,7 +697,7 @@ def calc_MBSP(biomass_IO, prod, coprods, path_string):
     
     return
 
-def calc_MFSP(tl_array, prod, coprods, path_string):
+def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
     
     for i in range(len(tl_array)):
         row_vals = tl_array.loc[i]
@@ -703,13 +724,32 @@ def calc_MFSP(tl_array, prod, coprods, path_string):
     #print(fuel_out_type)
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Cost']])
-    capex =   capex_qty.magnitude + land_cost_qty.magnitude  #inputs ['capex']
-    labor =  UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude
+
+    # Need to go through grab LCA value for potential scalars
+    match_list = [[D.LCA_key_str, 'Land Cost']]#, [D.LCA_IO, in_or_out]]
+    land_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost, override_list, fip)
+    
+    match_list = [[D.LCA_key_str, 'Capital Cost']]#, [D.LCA_IO, in_or_out]]
+    capex_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost, override_list, fip)
+    
+    match_list = [[D.LCA_key_str, 'Labor']]#, [D.LCA_IO, in_or_out]]
+    labor_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
+                                      match_list, 
+                                      D.LCA_cost, override_list, fip)
+    
+    capex =   ((capex_qty.magnitude * capex_scalar) + 
+               (land_cost_qty.magnitude * land_scalar)) #inputs ['capex']
+    
+    labor =  (UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude) * labor_scalar
     
     
     #calculating total costs for inputs to the pathway (opex)
     
-    opex = calcOPEX(tl_array)
+    opex = calcOPEX(tl_array, fip, override_list)
     #print(capex)
     # print('Operational Cost ------')
     # print(opex)
@@ -832,7 +872,9 @@ def calc_MFSP(tl_array, prod, coprods, path_string):
                                                                  prod,
                                                                  coprods,
                                                                  land_cost_qty,
-                                                                 0))
+                                                                 0,
+                                                                 override_list,
+                                                                 fip))
     
     # print('Result Value ?')
     # print(result)
@@ -843,7 +885,7 @@ def calc_MFSP(tl_array, prod, coprods, path_string):
     return result.x     # $/MJ (above optimization) * MJ/gge
 
 # Calculate cost of inputs (opex)
-def calcOPEX(tl_array):
+def calcOPEX(tl_array, fip, override_list):
     inputs_cost = 0
     
     for i in range(len(tl_array)):
@@ -854,11 +896,12 @@ def calcOPEX(tl_array):
         if in_or_out != D.zeroed and (subst_name != 'Land Cost' and
                                       subst_name != 'Capital Cost' and
                                       subst_name != 'Labor'):
+            
             match_list = [[D.LCA_key_str, subst_name],
                           [D.LCA_IO, in_or_out]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
-                                      D.LCA_cost)
+                                      D.LCA_cost, override_list, fip)
             if in_or_out == D.tl_input:
                 total = LCA_val * mag
                 # print('------',subst_name,'-------')
@@ -873,7 +916,7 @@ def calcOPEX(tl_array):
 
 # Calculate value of non-fuel outputs
 
-def calcNonFuelValue_cult(tl_array, prod):
+def calcNonFuelValue_cult(tl_array, prod, override_list, fip):
     
     outputs_value = 0
     
@@ -887,7 +930,7 @@ def calcNonFuelValue_cult(tl_array, prod):
                           [D.LCA_IO, in_or_out]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
-                                      D.LCA_cost)
+                                      D.LCA_cost, 0, 0)
             if in_or_out == D.tl_output and subst_name not in prod:
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
@@ -902,7 +945,7 @@ def calcNonFuelValue_cult(tl_array, prod):
         
     return outputs_value
 
-def calcNonFuelValue(tl_array, baseline_indicator):
+def calcNonFuelValue(tl_array, baseline_indicator,override_list, fip):
     outputs_value = 0
     
     for i in range(len(tl_array)):
@@ -915,7 +958,7 @@ def calcNonFuelValue(tl_array, baseline_indicator):
                           [D.LCA_IO, in_or_out]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
-                                      D.LCA_cost)
+                                      D.LCA_cost,0,0)
             if in_or_out == D.tl_output and baseline_indicator == 1:
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 

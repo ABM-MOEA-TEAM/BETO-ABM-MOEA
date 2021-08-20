@@ -10,7 +10,7 @@ import UnivFunc as UF
 import pandas as pd
 
 import TEA
-# import LCA
+import LifeCycleAssessment
 
 import os
 from pathlib import Path
@@ -23,6 +23,8 @@ path_list = [Path(cwd + '/soy_biodiesel_prodlist.csv'),
 
 prod = ['Ethanol']
 coprods = ['DDGS','Corn Stover']
+# ol = ['SolarPV Utility Electricity Cost ($/MJ)', 'Practice Set (Python)']
+ol = ['']
 
 output_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [], 'MFSP ($/kg)' : []})
 
@@ -34,22 +36,37 @@ results_array = UF.createEmptyFrame()
 
 # yield_value = DayCent_Yield_List[i]*1000
 
-yield_value = 10000
+# yield_value = 10974
 
-biomass_IO = UF.Collect_IndepVars_Loop('CornCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
-# biomass_IO = UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0, 0, 0)
+# biomass_IO = UF.Collect_IndepVars_Loop('CornCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
+biomass_IO = UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
 conversion_IO = UF.Collect_IndepVars_Loop('StarchFerm', 0, 0, 1, biomass_IO,'Corn Grain', 1, 0, 0)
 results_array = results_array.append(conversion_IO, ignore_index=True)
 
 IO_array = UF.consolidateIO(results_array)
 
-# NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Corn Grain EtOH')
+# NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Corn Grain EtOH', 9001, ol)
 
-MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH')
- 
+MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH', 1003, ol) 
+LCAs = LifeCycleAssessment.LCAMetrics(IO_array)
 
 print(MFSP.magnitude * 26.95)   
+print(LCAs)
+
+# print('and')
+
+# prod = ['Corn Grain']
+# coprods = ['Corn Stover']
+
+# # coprods = ['']
+
+# MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Corn Grain EtOH', 9001, ol)
+# print(MBSP.magnitude * 20)  # Assumed HHV for Corn Grain
+
+# MBSP is produced by loop to be of unit $/MJ
+# So we scale by MJ/kg (MJ/kg * $/MJ = $/kg)
+
 #     append_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [yield_value], 
 #                                  'MFSP ($/kg)' : [MFSP.magnitude * 26.95]})
 

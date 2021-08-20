@@ -43,7 +43,13 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     # others? (Like nitrous or ethanol and fuel denaturant)
     # Is there any way to parse through the units string, find out if 'ha' is
     # present and, if so, just perform the scale by size operation?
+    # How do we handle situations in which the geospatial read-in values are
+    # of the "main (exception logic) substances" - like the inputs to the 
+    # downstream processing bits?
     
+    # Want to change "DayCent_read_string" to be column for External Data read
+    
+    # Still suppressing "geospatial and downstream" instances
     
     # Breakdown the old loop such that the main "unit read" logic is not
     # repeated three times. There really is only one or two things that 
@@ -69,6 +75,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     stover_collection_percentage = 0
     i = 0       # This counter indexes the return array
     skip_ind = 0
+    overwrite_scale = 0
     
     # Grab Independent Variables logic
     
@@ -127,10 +134,6 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
             print('input substance string recognized. Ensure that')
             print('input substance string matches subst dict str.')
             return
-
-    # Other logic goes in 
-
-    # < here >    
     
     # Geospatial Data Logic
     
@@ -143,7 +146,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
         k = 0
         while k < len(quad_list):
             
-            rows = quad_list[k]
+            rows    = quad_list[k]
             name    = rows[0]
             amount  = rows[1]
             inout   = rows[2]
@@ -193,6 +196,8 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                                     D.tl_output, scale.qty*size.qty)
             i += 1
         
+        main_substance_amount = scale.qty * size.qty
+        
         if len(output_name_list) >= 2:
             
             
@@ -224,80 +229,45 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                                                         D.tl_output, scale1.qty*size.qty)
                     i = i + 1
         
-        main_substance_amount = scale.qty * size.qty
         
+
+
+    if fips != 0:
         
-        # print(output_name_list)
+        # Think that this only works for non-main substances...
+        # Wait wait we want different costs and different LCI's, not 
+        # different substance amounts? Well have capability...
+
         
+        data_list = UF.External_Data('Practice Set (Python)')
         
-    # if geospatial_indicator == 1 and downstream_indicator != 1:
+        # print(data_list)
         
-    #     k = 0
-    #     while k < len(quad_list):
+        fip_list = []
+        amt_list = []
+        
+        k = 0 # Indexing Element
+        
+        for i in range(len(data_list)):
             
-    #         rows = quad_list[k]
-    #         name    = rows[0]
-    #         amount  = rows[1]
-    #         inout   = rows[2]
-    #         unit    = rows[3]
+            # Omit the empty first row
             
-    #         # print(unit)
+            fip = data_list[i][0]
+            amt = data_list[i][1]
             
-    #         if name == 'Stover Collected':
-    #             stover_collection_percentage = amount
-    #         if inout == 'Out':
-    #             output_name_list.append(name)
-    #             output_value_list.append(amount)
-    #             output_units_list.append(unit)
-    #         if unit == 'ha':
-    #             size = D.TEA_LCA_Qty(D.substance_dict['Land Area'],
-    #                                  amount, 'hectare')
-    #         k += 1
-                
-    #     if len(output_name_list) == 0:
-    #         print('Error - No Out Substances Found From Excel Sheet')
-    #         return
-    #     # if size == 0:
-    #     #     print('Error - No land Area Argument Detected, expects ha')
-    #     #     return 
-    #     if tab_string == 'CornCult' and stover_collection_percentage == 0:
-    #         print('Error - expected non-zero argument for stover collection %')
+            fip_list.append(fip)
+            amt_list.append(amt)
+
+        # print(fip_list)
+        # print(amt_list)
         
-    #     # This is the input substitution which takes the yield value in from .?
-        
-    #     scale = D.TEA_LCA_Qty(D.substance_dict[output_name_list[0]], 
-    #                           yield_value, output_units_list[0])
-    #     # return_array.loc[0] = UF.getWriteRow(name, which_step,
-    #     #                                     D.tl_output, scale.qty)
-    #     # i += 1
-        
-    #     if len(output_name_list) >= 2:
+        if fips in fip_list:
             
+            k = fip_list.index(fips)
+            amt = amt_list[k]
+            # print(k)
+            # print(amt)
             
-    #         for j in range(len(output_name_list)):
-    #             if output_name_list[j] == 'Corn Stover':
-                    
-    #                 scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[j]],
-    #                                        output_value_list[j],
-    #                                        output_units_list[j])        
-    #                 return_array.loc[i] = UF.getWriteRow(output_name_list[j], 
-    #                                                      which_step,
-    #                                                      D.tl_output, 
-    #                                                      scale1.qty*size.qty
-    #                                                      *stover_collection_percentage/100)
-                    
-    #                 corn_stover_yield = scale1.qty*size.qty*(stover_collection_percentage/100)
-                
-    #             else:
-    #                 # print(output_units_list)
-    #                 scale1 = D.TEA_LCA_Qty(D.substance_dict[output_name_list[j]],output_value_list[j],
-    #                                                 output_units_list[j])        
-    #                 return_array.loc[i] = UF.getWriteRow(output_name_list[j], which_step,
-    #                                                     D.tl_output, scale1.qty*size.qty)
-    #             i = i + 1
-        
-    #     main_substance_amount = scale.qty * size.qty
-        
         
     # Cultivation Portion
     
@@ -602,6 +572,11 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                                                      scale.qty * main_substance_amount)
                 i += 1
                 # print(i)
+        # else:
+        #     print('Warning - unrecognized Unit in index')
+        #     print('i -' , i)
+        #     print('j -' , j)
+            
         j += 1
             
     return return_array

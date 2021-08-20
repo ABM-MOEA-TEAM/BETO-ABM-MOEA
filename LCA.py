@@ -47,7 +47,7 @@ def calcEROI(tl_array):
 # Calculate GHG Impact by energy allocation (reminder--need to add calculations 
 # for allocation by mass, economic allocation, as well as system expansion displacement credits)
 
-def calcGHGImpact(tl_array, prod, coprods): # Needs additional argument (calcGHGImpact(tl_array,products_list,co-products_list))
+def calcGHGImpact(tl_array, prod, coprods): 
     
     # Note that the fact that this is transportation fuel could be a substance attribute
     

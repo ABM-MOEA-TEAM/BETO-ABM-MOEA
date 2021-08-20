@@ -2,6 +2,7 @@ import TEA_LCA_Data as D
 import pandas as pd
 import numpy as np
 import NewNestedIfLogic as N
+import math
 
 import csv
 
@@ -140,6 +141,9 @@ def collectEconIndepVars(column_id):
     if column_id == 'Corn Grain EtOH':
         column_number = 3
     
+    if column_id == 'Algae HEFA':
+        column_number = 8
+    
     if column_number == 0:
         print('Error - unrecognized column ID string')
         
@@ -196,11 +200,10 @@ def Collect_IndepVars_Loop(tab_string, yield_value, geospatial_indicator,
                            step_ID, DayCent_read_string, fips):
 # This needs to be decentralized and cleaned up. Ideally, I would find a work around
 # for the gross nested-if statement logic (7/1)    
-    
-    yield_input_list = []
 
 # Identify the step - cultivation, conversion or upgrading from the given argument
 # This gets passed on to the nested if logic loop (the big boolean rats nest)
+
     if step_ID == 0:
         which_step = D.biomass_production
     if step_ID == 1:
@@ -890,7 +893,17 @@ def External_Data(col_title):
     for i in range(len(excel_read)):
         row = excel_read.loc[i]
         value_list.append(row[col_title])
-        fips_list.append(row['FIPS'])
+        
+        # if math.isnan(row[col_title]) == False:
+        #     value_list.append(round(row[col_title]))
+        # else:
+        #     value_list.append(row[col_title])
+        
+        if math.isnan(row['FIPS']) == False:
+            fips_list.append(round(row['FIPS']))
+        else:
+            fips_list.append(row['FIPS'])
+        
         
     return_list = list(zip(fips_list, value_list))
 
@@ -924,25 +937,164 @@ def returnPintQty(tl_array, match_list):
             
     return return_obj
 
-def returnLCANumber(df, match_list, desired_col_name):
+def returnGeoLCANumber(column_title, fip):
+    
+    excel_read = D.LCA_geospat_inventory_df
+    # print('ok I did it')
+    
+    fips = 'FIPS'
+    amt_list = []
+    fip_list = []
+    
+    for i in range(len(excel_read)):
+        
+        row = excel_read.loc[i]
+        amt_list.append(row[column_title])
+        fip_list.append(row[fips])
+        
+    # Need to grab given FIP and read same index on amt_list
+    
+    l = fip_list.index(fip)
+    return_value = amt_list[l]
+    
+    # print('Grab fip', fip)
+    # print('Instance Occurs at index ', l)
+    # print('Amount present at index ', return_value)
+    
+    # return 0.018722222
+    
+    return return_value
+
+def returnLCANumber(df, match_list, desired_col_name, override_list, fip):
     return_obj = 0
     num_pairs = len(match_list)
     query_str = ''
+    catch_subst_list = []
+    column_title_list = []
+    catch_subst = ''
+    column_title = ''
+    
+    if isinstance(override_list, list) == True:
+        
+        for i in range(len(override_list)):
+            
+            name = override_list[i]
+            
+# Not sure how to handle the CapEx Cost Modifier yet - could I alter the LCI term? w/ scalar?
+
+# Need to modify the State Corporate Tax in the Collect Econ Variables. Does it really matter? SA
+
+############################## Cost Overwrites #####################################
+            
+            if name == 'Arable Land Value ($/ha)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Land Cost'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+            
+            if name == 'Marginal Land Value ($/ha)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Land Cost'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+                
+            if name == 'Non-Arable Land Value' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Land Cost'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+                
+            if name == 'CapEx Cost Mod (-)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Capital Cost'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+            
+            if name == 'Labor Cost Mod (-)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Labor Cost'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+                
+            if name == 'Grid Electricity Price ($/MJ)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Electricity, Grid'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+            
+            if name == 'SolarPV Utility Electricity Cost ($/MJ)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Electricity, Grid'    # Need new substance of electricity type                            
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+            
+            if name == 'Fossil Fuel Price Mod (-)' and desired_col_name == D.LCA_cost:
+                
+                catch_subst  = 'Electricity, Grid'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+            
+            # Dummy set for messing around with. Prescribe substance to overwrite
+            
+            # if name == 'Practice Set (Python)' and desired_col_name == D.LCA_cost:
+            
+            #     catch_subst = 'Water'
+            #     column_title = name
+            #     catch_subst_list.append(catch_subst)
+            #     column_title_list.append(column_title)
+            
+                
+############################### GHG Overwrites #####################################
+
+            if name == 'Grid Electricity GHG (g/MJ)' and desired_col_name == D.LCA_GHG_impact:
+                
+                catch_subst  = 'Electricity, Grid'                             
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+
+            if name == 'SolarPV Utility Electricity GHG (g/MJ)' and desired_col_name == D.LCA_GHG_impact:
+                
+                catch_subst  = 'Electricity, Grid'   # Need new substance of new type of electricity                          
+                column_title = name
+                catch_subst_list.append(catch_subst)
+                column_title_list.append(column_title)
+                        
+    if len(catch_subst_list) >= 1:
+        
+        
+        for j in range(len(catch_subst_list)):
+            
+            if match_list[0][1] == catch_subst_list[j]:
+                
+                # print(catch_subst_list[j])
+                return returnGeoLCANumber(column_title_list[j], fip)
+
     for i in range(num_pairs):
+        
         if i == (num_pairs-1):
             query_str += match_list[i][0] + ' == "' + match_list[i][1] + '"'
         else:
             query_str += match_list[i][0] + ' == "' + match_list[i][1] + '" and '
-    
+        
     rows = df.query(query_str)
     if len(rows) == 1:
         return_obj = rows.iloc[0][desired_col_name]
     else:
         # print('LCA query returned no value')
-        pass
-            
+        pass        
+   
     return return_obj
 
+    
 def returnProdlist(pathname):
     prodlist = []
     return_list = []        
