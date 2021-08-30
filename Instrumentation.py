@@ -61,10 +61,10 @@ def execute():
 
     IO_array = UF.consolidateIO(results_array)
     
-    LCAMetrics = L.LCAMetrics(IO_array)
+    # LCAMetrics = L.LCAMetrics(IO_array)
 
     # MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', 9001, ol)
-    MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 9001, ol)
+    # MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 9001, ol)
     # MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH', 9001, ol)
     
     toc = time.perf_counter()

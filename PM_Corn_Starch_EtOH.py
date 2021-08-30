@@ -23,7 +23,10 @@ path_list = [Path(cwd + '/soy_biodiesel_prodlist.csv'),
 
 prod = ['Ethanol']
 coprods = ['DDGS','Corn Stover']
-# ol = ['SolarPV Utility Electricity Cost ($/MJ)', 'Practice Set (Python)']
+
+# ol = ['SolarPV Utility Electricity Cost ($/MJ)', 'Arable Land Value ($/ha)']
+# ol = ['SolarPV Utility Electricity Cost ($/MJ)']
+# ol = ['Arable Land Value ($/ha)']
 ol = ['']
 
 output_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [], 'MFSP ($/kg)' : []})
@@ -49,20 +52,20 @@ IO_array = UF.consolidateIO(results_array)
 # NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Corn Grain EtOH', 9001, ol)
 
 MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH', 1003, ol) 
-LCAs = LifeCycleAssessment.LCAMetrics(IO_array)
+LCAs = LifeCycleAssessment.LCAMetrics(IO_array, ol, 1)
 
 print(MFSP.magnitude * 26.95)   
 print(LCAs)
 
 # print('and')
 
-# prod = ['Corn Grain']
-# coprods = ['Corn Stover']
+prod = ['Corn Grain']
+coprods = ['Corn Stover']
 
-# # coprods = ['']
+# coprods = ['']
 
-# MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Corn Grain EtOH', 9001, ol)
-# print(MBSP.magnitude * 20)  # Assumed HHV for Corn Grain
+MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Corn Grain EtOH', 1, ol)
+print(MBSP.magnitude * 20)  # Assumed HHV for Corn Grain
 
 # MBSP is produced by loop to be of unit $/MJ
 # So we scale by MJ/kg (MJ/kg * $/MJ = $/kg)

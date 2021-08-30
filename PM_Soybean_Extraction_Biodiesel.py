@@ -25,9 +25,12 @@ ds_results_array = UF.createEmptyFrame()
 land_area_val = D.TEA_LCA_Qty(D.substance_dict['Land Area'], 1, 'hectare')
 biomass_yield = 1
 
-# ol = ['']
+ol = ['']
 
-ol = ['Arable Land Value ($/ha)', 'Grid Electricity Price ($/MJ)']
+# ol = ['Arable Land Value ($/ha)', 'Grid Electricity Price ($/MJ)']
+# ol = ['Arable Land Value ($/ha)']
+# ol = ['Grid Electricity Price ($/MJ)']
+
 
 results_array = UF.createEmptyFrame()
 #ds_results_array = UF.createEmptyFrame()
@@ -68,11 +71,11 @@ coprods = ['Soybean Meal','Glycerin']
 # NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel', 9001, ol)
 
 MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', 1, ol)
-# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 9001, ol)
+# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 1, ol)
 
-LCAs = L.LCAMetrics(IO_array)
+LCAs = L.LCAMetrics(IO_array, ol, 1)
 
-print(MFSP.magnitude*37.75)
+print(MFSP.magnitude * 37.75)
 # print(MFSP.magnitude * 46)
 print(LCAs)
 

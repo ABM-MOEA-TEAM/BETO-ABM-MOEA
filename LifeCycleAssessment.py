@@ -8,6 +8,7 @@ Created on Fri Jul 30 11:15:20 2021
 import TEA_LCA_Data as D
 import UnivFunc as UF
 import pandas as pd
+import math
 
 def readtl_array(tl_array):
     
@@ -40,7 +41,7 @@ def readtl_array(tl_array):
 # If possible it would be cool to write a general UF loop that takes
 # a few arguments and does one or the other...
 
-def LCAMetrics(tl_array):
+def LCAMetrics(tl_array, ol, fip):
     
     # Need to add logic to produce baseline revenue for $allocation
     
@@ -55,7 +56,7 @@ def LCAMetrics(tl_array):
     #                              'System Boundary Expansion, Pre-Combustion' : [],
     #                              'System Boundary Expansion, Post-Combustion' : [],})
     
-    input_emissions = calcInputEmissions(tl_array)
+    input_emissions = calcInputEmissions(tl_array, ol, fip)
     end_use_emissions = calcEndUseEmissions(tl_array)
     coprod_emissions = calcCoProdEndUse(tl_array)
     total_MJ = calcMJProduced(tl_array)
@@ -94,7 +95,7 @@ def LCAMetrics(tl_array):
     
     return return_list
 
-def LCAMetrics_cult(tl_array):
+def LCAMetrics_cult(tl_array, ol, fip):
     
     # Need to add logic to produce baseline revenue for $allocation
     
@@ -109,7 +110,7 @@ def LCAMetrics_cult(tl_array):
     #                              'System Boundary Expansion, Pre-Combustion' : [],
     #                              'System Boundary Expansion, Post-Combustion' : [],})
     
-    input_emissions = calcInputEmissions(tl_array)
+    input_emissions = calcInputEmissions(tl_array, ol, fip)
     end_use_emissions = calcEndUseEmissions(tl_array)
     coprod_emissions = calcCoProdEndUse(tl_array)
     total_MJ = calcMJProduced(tl_array)
@@ -210,8 +211,8 @@ def calcCredits(tl_array):
             match_list = [[D.LCA_key_str, name],
                           [D.LCA_IO, D.tl_output]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                         match_list, D.LCA_GHG_impact,0,0)            
-            # print(LCA_val)
+                                         match_list, D.LCA_GHG_impact,0,0)   # Skipped this one?         
+            # print(LCA_val)                                                 # Can we think of a case where this is needed?
             return_value += amount * LCA_val
         
         # Instrumentation
@@ -224,7 +225,7 @@ def calcCredits(tl_array):
     
     return return_value
 
-def calcInputEmissions(tl_array):
+def calcInputEmissions(tl_array, ol, fip):
     
     return_value = 0
 
@@ -252,7 +253,7 @@ def calcInputEmissions(tl_array):
         match_list = [[D.LCA_key_str, name],
                       [D.LCA_IO, D.tl_input]]
         LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                     match_list, D.LCA_GHG_impact,0,0)            
+                                     match_list, D.LCA_GHG_impact, ol, fip)            
         return_value += amount * LCA_val
         
         # Instrumentation
@@ -271,7 +272,7 @@ def calcInputEmissions(tl_array):
             match_list = [[D.LCA_key_str, name],
                            [D.LCA_IO, D.tl_output]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                         match_list, D.LCA_GHG_impact,0,0)
+                                         match_list, D.LCA_GHG_impact,0,0) # Don't expect to have county-to-county specific emissions data
             return_value += amount * LCA_val
             
             # Instrumentation
@@ -477,3 +478,112 @@ def calcRevenue(tl_array):
     
         
     return return_value
+
+def calcCriteria(tl_array, ol, fip):
+    
+    return_list = []
+    
+    Acid_total  = 0
+    Eco_total   = 0
+    Eutr_total  = 0
+    HHC_total   = 0
+    HHNC_total  = 0
+    O3D_total   = 0
+    O3F_total   = 0
+    RD_total    = 0
+    RE_total    = 0
+    
+    input_subst_list = []
+    input_value_list = []
+    
+    quad_list = readtl_array(tl_array)
+    
+    input_subst_list = quad_list[0]
+    input_value_list = quad_list[1]
+    
+    if len(input_subst_list) != len(input_value_list):
+        print('Error - substance name list and value list of unequal length')
+        return
+        
+    for i in range(len(input_subst_list)):
+        name = input_subst_list[i]
+        amount = input_value_list[i]
+        
+        match_list = [[D.LCA_key_str, name],
+                      [D.LCA_IO, D.tl_input]]
+        
+        Acid_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Acidification, ol, fip)   
+        if math.isnan(Acid_val) == True:
+                print('Warning - No Value Present for Acidification,', name)
+                pass         
+        else:
+            Acid_total += amount * Acid_val
+            
+        Eco_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Ecotoxicity, ol, fip)
+        if math.isnan(Eco_val) == True:
+                print('Warning - No Value Present for Ecotoxicity,', name)
+                pass 
+        else:
+            Eco_total += amount * Eco_val
+            
+        Eutr_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Eutrophication, ol, fip)
+        if math.isnan(Eutr_val) == True:
+                print('Warning - No Value Present for Eutrophication,', name)
+                pass 
+        else:
+            Eutr_total += amount * Eutr_val
+            
+        HHC_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_HHC, ol, fip)
+        if math.isnan(HHC_val) == True:
+                print('Warning - No Value Present for HHC,', name)
+                pass
+        else:
+            HHC_total += amount * HHC_val
+            
+        HHNC_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_HHNC, ol, fip)
+        if math.isnan(HHNC_val) == True:
+                print('Warning - No Value Present for HHNC,', name)
+                pass 
+        else:
+            HHNC_total += amount * HHNC_val
+            
+        O3D_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Ozone_Depletion, ol, fip)
+        if math.isnan(O3D_val) == True:
+                print('Warning - No Value Present for Ozone Depletion,', name)
+                pass
+        else:
+            O3D_total += amount * O3D_val
+            
+        O3F_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Ozone_Formation, ol, fip)
+        if math.isnan(O3F_val) == True:
+                print('Warning - No Value Present for Ozone Formation,', name)
+                pass 
+        else:
+            O3F_total += amount * O3F_val
+            
+        RD_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Resource_Depletion, ol, fip)
+        if math.isnan(RD_val) == True:
+                print('Warning - No Value Present for Resource Depletion,', name)
+                pass 
+        else:
+            RD_total += amount * RD_val
+            
+        RE_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                     match_list, D.LCA_Respiratory_Effects, ol, fip)
+        if math.isnan(RE_val) == True:
+                print('Warning - No Value Present for Respiratory Effects,', name)
+                pass 
+        else:
+            RE_total += amount * RE_val
+        
+        
+        
+    return [Acid_total, Eco_total, Eutr_total, HHC_total, HHNC_total, O3D_total, O3F_total, RD_total, RE_total]
