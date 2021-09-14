@@ -19,12 +19,15 @@ from pathlib import Path
 prod = ['Algal Biomass, Whole']
 coprods = ['']
 
+ol = ['']
+fip = 1
+
 results_array = UF.createEmptyFrame()
 
 biomass_IO = UF.Collect_IndepVars_Loop('AlgaeCult', 0, 0, 0, 0, 0, 0, 0, 0)
-results_array.append(biomass_IO)
+results_array = results_array.append(biomass_IO, ignore_index=True)
 
 IO_array = UF.consolidateIO(results_array)
 
-MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Algae HEFA', 1001)
-cult_LCA = L.LCAMetrics_cult(biomass_IO)
+# MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Algae HEFA', fip, ol)
+# cult_LCA = L.LCAMetrics_cult(IO_array, ol, fip)

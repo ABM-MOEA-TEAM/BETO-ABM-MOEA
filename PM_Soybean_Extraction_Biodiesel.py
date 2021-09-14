@@ -42,8 +42,8 @@ biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
 conversion_IO = UF.Collect_IndepVars_Loop('HexExt', 0, 1, 1, biomass_IO,'Soybeans', 1, 0, 0)
 results_array = results_array.append(conversion_IO, ignore_index=True)
-upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
-# upgrading_IO = UF.Collect_IndepVars_Loop('HydroProc', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
+# upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
+upgrading_IO = UF.Collect_IndepVars_Loop('HydroProc', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
 IO_array = UF.consolidateIO(results_array)
 
@@ -61,22 +61,22 @@ pathname = path_list[0]
 # with but I don't know how often this will change and I don't know if there is 
 # going to be a lot of formatting lift for the IO to do this. (7/19)
 
-prod = ['Biodiesel, Produced']
-coprods = ['Soybean Meal','Glycerin']
+# prod = ['Biodiesel, Produced']
+# coprods = ['Soybean Meal','Glycerin']
 
-# prod = ['Jet-A']
-# coprods = ['LPG, Produced', 'Diesel, Produced', 
-#             'Gasoline, Produced']
+prod = ['Jet-A']
+coprods = ['LPG, Produced', 'Diesel, Produced', 
+            'Gasoline, Produced']
 
 # NPV = TEA.calc_NPV(IO_array, prod, coprods, 'Soy Biodiesel', 9001, ol)
 
-MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', 1, ol)
-# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 1, ol)
+# MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', 1, ol)
+MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 1, ol)
 
 LCAs = L.LCAMetrics(IO_array, ol, 1)
 
-print(MFSP.magnitude * 37.75)
-# print(MFSP.magnitude * 46)
+# print(MFSP.magnitude * 37.75)
+print(MFSP.magnitude * 46)
 print(LCAs)
 
 

@@ -294,7 +294,7 @@ def calcMJProduced(tl_array):
     output_value_list = []
     
     quad_list = readtl_array(tl_array)
-    
+    # print(quad_list)
     output_subst_list = quad_list[2]
     output_value_list = quad_list[3]
     
@@ -479,7 +479,24 @@ def calcRevenue(tl_array):
         
     return return_value
 
-def calcCriteria(tl_array, ol, fip):
+def calcWater(tl_array, fip, ol):
+    
+    return_val = 0
+    
+    input_subst_list = []
+    input_value_list = []
+    output_subst_list = []
+    output_value_list = []
+    
+    quad_list = readtl_array(tl_array)
+    
+    input_subst_list = quad_list[0]
+    input_value_list = quad_list[1]
+    output_subst_list = quad_list[2]
+    output_value_list = quad_list[3]
+
+
+def calcCriteria(tl_array, fip, ol):
     
     return_list = []
     

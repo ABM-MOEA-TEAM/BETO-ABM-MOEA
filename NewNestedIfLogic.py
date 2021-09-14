@@ -81,7 +81,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     
     quad_list = UF.collectIndepVars(tab_string)
     return_array = UF.createEmptyFrame()
-
+    # print(quad_list)
     # Downstream Logic - Add Main Substance Amount
     
     if downstream_indicator == 1:
@@ -196,8 +196,16 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                                     D.tl_output, scale.qty*size.qty)
             i += 1
         
-        main_substance_amount = scale.qty * size.qty
+        if tab_string == 'AlgaeCult':
+            
+            scale = D.TEA_LCA_Qty(D.substance_dict['Algae Biomass, Whole'],
+                                    yield_value, 'kg/ha/yr')
+            return_array.loc[0] = UF.getWriteRow('Algae Biomass, Whole', which_step,
+                                    D.tl_output, scale.qty*size.qty)
+            i += 1
         
+        main_substance_amount = scale.qty * size.qty
+
         if len(output_name_list) >= 2:
             
             
@@ -273,7 +281,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     
     if downstream_indicator == 0 and geospatial_indicator == 0:
         # Then you are in the cultivation portion
-        
+        print('in cultivation')
         k = 0 
         while k < len(quad_list):
             rows = quad_list[k]
@@ -325,7 +333,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                     # print('Corn Stover', i)
                     # main_substance_amount = scale.qty * size.qty
                     
-                if name == 'Corn Grain' or name == 'Soybeans':
+                if name == 'Corn Grain' or name == 'Soybeans' or name == 'Algal Biomass, Whole' or name == 'Woody Biomass':
                     
                     scale = D.TEA_LCA_Qty(D.substance_dict[name],
                                           amount, unit)
@@ -335,12 +343,15 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                     # print('Corn Grain', i)
                     i += 1
                     # print('Corn Grain', i)
+                    # print('alg', i, name)
                     main_substance_amount = scale.qty * size.qty
-                    
+                    print(main_substance_amount)
                     
                 if (name != 'Corn Grain' and
                     name != 'Corn Stover' and
-                    name != 'Soybeans'):
+                    name != 'Soybeans' and
+                    name != 'Algae Biomass, Whole' and
+                    name != 'Woody Biomass'):
                     
                     scale = D.TEA_LCA_Qty(D.substance_dict[name], amount, unit)
                     return_array.loc[i] = UF.getWriteRow(name, which_step, D.tl_output, 
@@ -401,6 +412,8 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
         if inout == 'In' and unit == 'dollars/ha':
             
             scale = D.TEA_LCA_Qty(D.substance_dict[name], amount, unit)
+            # print(amount)
+            # print(name)
             return_array.loc[i] = UF.getWriteRow(name, which_step, 
                                   D.tl_input, scale.qty*size.qty)
             i += 1    

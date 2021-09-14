@@ -12,7 +12,8 @@ yrs = 30 # userinputs.yrs
 
 def calc_NPV(tl_array, prod, coprods, path_string, fip, override_list):
     
-    for i in range(len(tl_array)):
+    # for i in range(len(tl_array)):
+    for i in tl_array.index:
         row_vals = tl_array.loc[i]
         subst_name = row_vals[UF.substance_name]          
     
@@ -155,7 +156,8 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
     
     # print('In the correct loop')
     
-    for i in range(len(tl_array)):
+    # for i in range(len(tl_array)):
+    for i in tl_array.index:
         row_vals = tl_array.loc[i]
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
@@ -527,7 +529,9 @@ def calc_MBSP(biomass_IO, prod, coprods, path_string, fip, override_list):
     
     tl_array = biomass_IO
     
-    for i in range(len(biomass_IO)):
+    # for i in range(len(biomass_IO)):
+
+    for i in biomass_IO.index: 
         # print(i)
         row_vals = biomass_IO.loc[i]
         subst_name = row_vals[UF.substance_name]          
@@ -699,7 +703,8 @@ def calc_MBSP(biomass_IO, prod, coprods, path_string, fip, override_list):
 
 def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
     
-    for i in range(len(tl_array)):
+    # for i in range(len(tl_array)):
+    for i in tl_array.index:
         row_vals = tl_array.loc[i]
         subst_name = row_vals[UF.substance_name]          
         
@@ -888,7 +893,8 @@ def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
 def calcOPEX(tl_array, fip, override_list):
     inputs_cost = 0
     
-    for i in range(len(tl_array)):
+    # for i in range(len(tl_array)):
+    for i in tl_array.index:
         row_vals = tl_array.loc[i]
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
@@ -920,7 +926,8 @@ def calcNonFuelValue_cult(tl_array, prod, override_list, fip):
     
     outputs_value = 0
     
-    for i in range(len(tl_array)):
+    # for i in range(len(tl_array)):
+    for i in tl_array.index:
         row_vals = tl_array.loc[i]
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
@@ -948,7 +955,8 @@ def calcNonFuelValue_cult(tl_array, prod, override_list, fip):
 def calcNonFuelValue(tl_array, baseline_indicator,override_list, fip):
     outputs_value = 0
     
-    for i in range(len(tl_array)):
+    # for i in range(len(tl_array)):
+    for i in tl_array.index:
         row_vals = tl_array.loc[i]
         subst_name = row_vals[UF.substance_name]
         in_or_out = row_vals[UF.input_or_output]
