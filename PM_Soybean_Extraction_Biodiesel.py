@@ -40,10 +40,10 @@ results_array = UF.createEmptyFrame()
 # biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
 biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
-conversion_IO = UF.Collect_IndepVars_Loop('HexExt', 0, 1, 1, biomass_IO,'Soybeans', 1, 0, 0)
+conversion_IO = UF.Collect_IndepVars_Loop('HexExtSoy', 0, 1, 1, biomass_IO,'Soybeans', 1, 0, 0)
 results_array = results_array.append(conversion_IO, ignore_index=True)
 # upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
-upgrading_IO = UF.Collect_IndepVars_Loop('HydroProc', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
+upgrading_IO = UF.Collect_IndepVars_Loop('HydroProcOil', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, 0)
 results_array = results_array.append(upgrading_IO, ignore_index=True)
 IO_array = UF.consolidateIO(results_array)
 
@@ -72,6 +72,8 @@ coprods = ['LPG, Produced', 'Diesel, Produced',
 
 # MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', 1, ol)
 MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', 1, ol)
+
+# MFSP = TEA.quick_MFSP(IO_array, prod, coprods, 'Soy Jet', 1, ol)
 
 LCAs = L.LCAMetrics(IO_array, ol, 1)
 

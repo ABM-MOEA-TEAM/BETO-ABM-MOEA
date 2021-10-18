@@ -83,6 +83,9 @@ def LCAMetrics(tl_array, ol, fip):
     return_list.append(se_precomb_ghg.magnitude)
     return_list.append(se_postcomb_ghg.magnitude)
     
+    # print('Input Emissions Total')
+    # print(input_emissions)
+    
     output_frame = pd.DataFrame({'Energy Allocation, Pre-Combustion' : [ea_precomb_ghg.magnitude],
                                  'Energy Allocation, Post-Combustion' : [ea_postcomb_ghg.magnitude],
                                  'Mass Allocation, Pre-Combustion' : [ma_precomb_ghg],
@@ -136,6 +139,7 @@ def LCAMetrics_cult(tl_array, ol, fip):
     return_list.append(dollara_postcomb_ghg)
     # return_list.append(se_precomb_ghg.magnitude)
     # return_list.append(se_postcomb_ghg.magnitude)
+    
     
     output_frame = pd.DataFrame({'Energy Allocation, Pre-Combustion' : [ea_precomb_ghg.magnitude],
                                  'Energy Allocation, Post-Combustion' : [ea_postcomb_ghg.magnitude],
@@ -213,6 +217,11 @@ def calcCredits(tl_array):
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
                                          match_list, D.LCA_GHG_impact,0,0)   # Skipped this one?         
             # print(LCA_val)                                                 # Can we think of a case where this is needed?
+            if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(name)
+                print('Replacing with 0')
+                LCA_val = 0
             return_value += amount * LCA_val
         
         # Instrumentation
@@ -253,7 +262,13 @@ def calcInputEmissions(tl_array, ol, fip):
         match_list = [[D.LCA_key_str, name],
                       [D.LCA_IO, D.tl_input]]
         LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                     match_list, D.LCA_GHG_impact, ol, fip)            
+                                     match_list, D.LCA_GHG_impact, ol, fip)  
+        if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(name)
+                print('Replacing with 0')
+                LCA_val = 0
+                      
         return_value += amount * LCA_val
         
         # Instrumentation
@@ -273,10 +288,32 @@ def calcInputEmissions(tl_array, ol, fip):
                            [D.LCA_IO, D.tl_output]]
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
                                          match_list, D.LCA_GHG_impact,0,0) # Don't expect to have county-to-county specific emissions data
+            if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(name)
+                print('Replacing with 0')
+                LCA_val = 0
+            
             return_value += amount * LCA_val
             
-            # Instrumentation
             # print('In the thingy')
+            # print('----', name, '----')
+            # print(LCA_val)
+            # print(amount)
+            # print(LCA_val * amount)
+            # print(return_value)
+            # print('---------------')
+        
+        # Want to have something that is much more general
+        # maybe...?
+        if name in D.Waste_List:
+            match_list = [[D.LCA_key_str, name],
+                          [D.LCA_IO, D.tl_output]]
+            LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
+                                         match_list, D.LCA_GHG_impact, 0, 0)
+            
+            return_value += amount * LCA_val
+            # Instrumentation
             # print('----', name, '----')
             # print(LCA_val)
             # print(amount)
@@ -309,6 +346,9 @@ def calcMJProduced(tl_array):
         name = output_subst_list[i]
         HHV = D.HHV_dict[name].qty
         amount = output_value_list[i]
+        
+        if math.isnan(amount) == True:
+            amount = 0
         
         return_value += amount * HHV 
     
@@ -467,7 +507,13 @@ def calcRevenue(tl_array):
         match_list = [[D.LCA_key_str, name],
                       [D.LCA_IO, D.tl_output]]
         LCA_val = UF.returnLCANumber(D.LCA_inventory_df,
-                                     match_list, D.LCA_cost,0,0)            
+                                     match_list, D.LCA_cost,0,0)    
+        if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(name)
+                print('Replacing with 0')
+                LCA_val = 0
+                    
         return_value += amount * LCA_val
         
         # Instrumentation

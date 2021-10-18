@@ -222,6 +222,9 @@ Carbon_Dict['LPG, Produced'] = 0.82
 Carbon_Dict['Naptha'] = 0.84
 Carbon_Dict['Propane, Produced'] = 0.82
 
+Waste_List = ['Wastewater',
+              'Slag']
+
 # Assorted cited values used in calculations
 N20_emit_proportion = Qty_Cited(
     'N2O emissions due to N fertilizer application', 0.01325, 'dimensionless',

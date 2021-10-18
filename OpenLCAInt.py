@@ -19,7 +19,16 @@ path_list = [Path(cwd + '/ImpactResults.xlsx'),
              Path(cwd + '/LifeCycleHold.xlsx')]
 
 method = 'TRACI [v2.1, February 2014]'
-process_string = 'dichloropropene to generic market for pesticide, unspecified | pesticide, unspecified | Cutoff, S'
+# method = 'TRACI'
+# process_string = 'butene production, mixed | butene, mixed | APOS, S'
+# UUID = '758a20f5-4c5b-37ec-814f-1a0c1e0aec00'
+
+# process_string = 'bark chips production, hardwood, at sawmill | bark | APOS, S'
+process_string = 'electricity, high voltage, production mix | electricity, high voltage | APOS, S'
+# process_string = 'market for maintenance, electric bicycle | maintenance, electric bicycle | Cutoff, U'
+# UUID = 'a72b5b5d-0d3b-3f29-8c1d-1c3620aa469f'
+UUID = '5510474f-0212-32d9-8699-7a00f9dbc6ac'
+# UUID = 'a2b1d953-bafb-34a0-b01e-63af53104e11'
 
 process_string_list = ['linseed production | linseed | Cutoff, S',
                        'dichloropropene to generic market for pesticide, unspecified | pesticide, unspecified | Cutoff, S',
@@ -88,15 +97,28 @@ def getImpacts(method, process_string):
     setup.calculation_type = olca.CalculationType.CONTRIBUTION_ANALYSIS
     
     # Select the impact method
-    
     setup.impact_method = client.find(olca.ImpactMethod, method)
     
-    # client.create_product_system(process_string)
     
-
+    # Determine if a product system exists in the OpenLCA env.
     
-    # setup.product_system = client.create_product_system(olca.ProductSystem, process_string)
+    print('Initializing Contribution Analysis')
+    print('Searching for Product System...')
+    
+    null_comparison_obj = None
     setup.product_system = client.find(olca.ProductSystem, process_string)
+    print('...')
+    
+    if type(setup.product_system) == type(null_comparison_obj):
+        print('No Product System Exists - Constructing...')
+        
+        client.create_product_system(UUID)
+        print('Constructed')
+        setup.product_system = client.find(olca.ProductSystem, process_string)
+        print('')
+    
+    print('Executing Impact Analysis...')
+        
     # setup.parameter_redefs = client.find(olca.Location, 'GLO')
     
     # define the 'amount' variable in setup
@@ -106,6 +128,8 @@ def getImpacts(method, process_string):
     setup.amount = 1.0
     
     results = client.calculate(setup)
+    
+    print('...')
     
     client.excel_export(results, 'ImpactResults.xlsx')
     
@@ -121,14 +145,14 @@ def formatOutput():
     output_vals = []
     output_unit = []
     
-    for i in range(1,10):
+    for i in range(1,11):
         output_vals.append(excel_read.loc[i][4])
         output_unit.append(excel_read.loc[i][3])
         output_name.append(excel_read.loc[i][2])
     
     return_obj = []
     
-    for j in range(9):
+    for j in range(10):
         return_obj.append([output_name[j],output_vals[j],output_unit[j]])
       
     print(return_obj)

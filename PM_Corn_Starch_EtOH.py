@@ -8,6 +8,8 @@ Created on Wed Jul 28 10:18:14 2021
 import TEA_LCA_Data as D
 import UnivFunc as UF
 import pandas as pd
+import MonteCarloEx as MCE
+
 
 import TEA
 import LifeCycleAssessment
@@ -32,15 +34,21 @@ ol = ['']
 output_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [], 'MFSP ($/kg)' : []})
 
 j = 0
-
-# for i in range(len(DayCent_Yield_List)):
     
 results_array = UF.createEmptyFrame()
 
 # yield_value = DayCent_Yield_List[i]*1000
+# yield_value = 15000 #10974
+  
+# yield_values_list = MCE.MonteCarloEx('Normal', 10974, 3000, 1000, 0, 0)
+# output_obj = []
 
-# yield_value = 10974
-
+# for i in range(1000):
+    
+    # results_array = UF.createEmptyFrame()
+    
+    # yield_value = yield_values_list[i]
+    
 # biomass_IO = UF.Collect_IndepVars_Loop('CornCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
 biomass_IO = UF.Collect_IndepVars_Loop('CornCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index=True)
@@ -53,45 +61,50 @@ IO_array = UF.consolidateIO(results_array)
 
 MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH', 1003, ol) 
 LCAs = LifeCycleAssessment.LCAMetrics(IO_array, ol, 1)
-
+    
 print(MFSP.magnitude * 26.95)   
 print(LCAs)
-
-# print('and')
-
-prod = ['Corn Grain']
-coprods = ['Corn Stover']
-
-# coprods = ['']
-
-MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Corn Grain EtOH', 1, ol)
-print(MBSP.magnitude * 20)  # Assumed HHV for Corn Grain
-
-# MBSP is produced by loop to be of unit $/MJ
-# So we scale by MJ/kg (MJ/kg * $/MJ = $/kg)
-
-#     append_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [yield_value], 
-#                                  'MFSP ($/kg)' : [MFSP.magnitude * 26.95]})
-
-#     output_frame = output_frame.append(append_frame, ignore_index = True)
     
-#     if i % 10 == 0:
-#         j += 1
-#         if j % 5 == 0 and j % 10 != 0:
-#             print('...')
-#         if j == 10:
-#             print('16% Completed')
-#         if j == 20:
-#             print('33% Completed')
-#         if j == 30:
-#             print('50% Completed')
-#         if j == 40:
-#             print('66% Completed')
-#         if j == 50:
-#             print('83% Completed')
-#         if j == 60:
-#             print('99% Completed')
-            
-# output_frame.to_excel(path_list[1])
+    # print('and')
+    
+    # prod = ['Corn Grain']
+    # coprods = ['Corn Stover']
+
+    # append_obj = [[MFSP.magnitude*26.95],[yield_value]]
+    # output_obj.append(append_obj)
+    # output_obj.append(LCAs[1])    
+    # coprods = ['']
+    
+    # MBSP = TEA.calc_MBSP(biomass_IO, prod, coprods, 'Corn Grain EtOH', 1, ol)
+    # print(MBSP.magnitude * 20)  # Assumed HHV for Corn Grain
+    
+    # MBSP is produced by loop to be of unit $/MJ
+    # So we scale by MJ/kg (MJ/kg * $/MJ = $/kg)
+    
+    #     append_frame = pd.DataFrame({'DayCent Yields (kg/ha)' : [yield_value], 
+    #                                  'MFSP ($/kg)' : [MFSP.magnitude * 26.95]})
+    
+    #     output_frame = output_frame.append(append_frame, ignore_index = True)
+        
+    # if i % 10 == 0:
+    #         j += 1
+    # if j == 1:
+    #     print('10% complete')
+    #         if j % 5 == 0 and j % 10 != 0:
+    #             print('...')
+    #         if j == 10:
+    #             print('16% Completed')
+    #         if j == 20:
+    #             print('33% Completed')
+    #         if j == 30:
+    #             print('50% Completed')
+    #         if j == 40:
+    #             print('66% Completed')
+    #         if j == 50:
+    #             print('83% Completed')
+    #         if j == 60:
+    #             print('99% Completed')
+                
+    # output_frame.to_excel(path_list[1])
 
 

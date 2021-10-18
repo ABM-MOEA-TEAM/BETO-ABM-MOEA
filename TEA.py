@@ -1,6 +1,8 @@
 import scipy.optimize as s_opt
 import TEA_LCA_Data as D
 import UnivFunc as UF
+import math
+import LifeCycleAssessment as LCA 
 
 # This module conducts the economic analysis for a given biofuel production pathway 
 # using the pathway module. This module calls the pathway module and has the user choose the pathway
@@ -168,6 +170,13 @@ def NPV_calc(fopex, depreciation, loanint, ecovar, invequityshare, loanpay,
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df,    # This looks like the output list of 
                                       match_list,               # transport fuels. I do not know if we want
                                       D.LCA_cost,0)             # to geospatially vary these cost values... ignore?
+            
+            if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(subst_name)
+                print('Replacing with 0')
+                LCA_val = 0
+                
             if in_or_out == D.tl_output and (subst_name == 'Jet-A' or
                                              subst_name == 'Diesel, Produced' or
                                              subst_name == 'Gasoline, Produced' or 
@@ -701,6 +710,42 @@ def calc_MBSP(biomass_IO, prod, coprods, path_string, fip, override_list):
     
     return
 
+def quick_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
+    
+    # Goal is to replicate the approximation that takes place in the TEA tab of the 
+    # all pathways model 
+    
+    return_var = 0
+    
+    capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
+    land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Cost']])
+    amortized_capex = (capex_qty + land_cost_qty) / 30
+    
+    labor =  (UF.returnPintQty(tl_array, [[UF.substance_name, 'Labor']]).magnitude) 
+    opex = calcOPEX(tl_array, fip, override_list)
+    
+    dep_amt_rate = 0.9 # Note we will have to add functionality if we want to dynamically update this
+    maint_rate = 0.03
+    ins_rate = 0.01
+    
+    dep_inv     = capex_qty * dep_amt_rate 
+    insurance   = dep_inv * ins_rate
+    maintenance = dep_inv * maint_rate
+    
+    coprod_rev = calcNonFuelValue(tl_array, 0, override_list, fip) * 0.35 # average discount over 30 yrs
+    fuel_prod_mj = LCA.calcFuelMJProduced(tl_array)
+    fuel_prod_gge = fuel_prod_mj/132.61 # MJ per gas gallon equivalent
+    
+    total_costs = amortized_capex.magnitude + labor + opex + insurance.magnitude + maintenance.magnitude
+    
+    rev_minus_costs = coprod_rev - total_costs
+    
+    mfsp_non_discounted = rev_minus_costs/-(fuel_prod_gge)
+    
+    return_var = mfsp_non_discounted / 0.35 # and again, as revenue must be discounted as well
+    
+    return return_var
+    
 def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
     
     # for i in range(len(tl_array)):
@@ -880,6 +925,7 @@ def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
                                                                  0,
                                                                  override_list,
                                                                  fip))
+                                                                 
     
     # print('Result Value ?')
     # print(result)
@@ -908,6 +954,11 @@ def calcOPEX(tl_array, fip, override_list):
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_cost, override_list, fip)
+            if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(subst_name)
+                print('Replacing with 0')
+                LCA_val = 0
             if in_or_out == D.tl_input:
                 total = LCA_val * mag
                 # print('------',subst_name,'-------')
@@ -938,6 +989,11 @@ def calcNonFuelValue_cult(tl_array, prod, override_list, fip):
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_cost, 0, 0)
+            if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(subst_name)
+                print('Replacing with 0')
+                LCA_val = 0
             if in_or_out == D.tl_output and subst_name not in prod:
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
@@ -967,6 +1023,11 @@ def calcNonFuelValue(tl_array, baseline_indicator,override_list, fip):
             LCA_val = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
                                       D.LCA_cost,0,0)
+            if math.isnan(LCA_val) == True:
+                print('Warning - NaN value associated with ')
+                print(subst_name)
+                print('Replacing with 0')
+                LCA_val = 0
             if in_or_out == D.tl_output and baseline_indicator == 1:
                 total = LCA_val * mag
                 outputs_value += (LCA_val * mag)  # In dollars 
