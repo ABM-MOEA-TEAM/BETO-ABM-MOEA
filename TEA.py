@@ -774,12 +774,24 @@ def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
     #print(fuel_out_type)
     capex_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Capital Cost']])
     land_cost_qty = UF.returnPintQty(tl_array, [[UF.substance_name, 'Land Cost']])
-
+    # print(land_cost_qty)
+    
+    if type(override_list) == list:
+            
+        if 'Arable Land Value ($/ha)' in override_list:
+            # print('Stepping in and grabbing given land cost')
+            amount = UF.returnGeoLCANumber('Arable Land Value ($/ha)',fip, 'Electricity, Grid')
+            # print('done')
+            # print(amount)
+            land_cost_qty = D.returnPintQtyObj(amount, 'dollars')
+            
+    # print(land_cost_qty)
     # Need to go through grab LCA value for potential scalars
     match_list = [[D.LCA_key_str, 'Land Cost']]#, [D.LCA_IO, in_or_out]]
     land_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
-                                      D.LCA_cost, override_list, fip)
+                                      D.LCA_cost, 0, 0)  
+    # print(land_scalar)
     
     match_list = [[D.LCA_key_str, 'Capital Cost']]#, [D.LCA_IO, in_or_out]]
     capex_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
@@ -789,7 +801,7 @@ def calc_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
     match_list = [[D.LCA_key_str, 'Labor']]#, [D.LCA_IO, in_or_out]]
     labor_scalar = UF.returnLCANumber(D.LCA_inventory_df, 
                                       match_list, 
-                                      D.LCA_cost, override_list, fip)
+                                      D.LCA_cost, 0, 0) # Clobbering the OL here, always refences actual value?
     
     capex =   ((capex_qty.magnitude * capex_scalar) + 
                (land_cost_qty.magnitude * land_scalar)) #inputs ['capex']

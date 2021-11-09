@@ -22,8 +22,8 @@ results_array = UF.createEmptyFrame()
 yield_value = 7000  # 8960 is base value
 
 # Override Biomass Yield Input - 
-biomass_IO = UF.Collect_IndepVars_Loop('GrassCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
-# biomass_IO = UF.Collect_IndepVars_Loop('GrassCult', 0, 0, 0, 0, 0, 0, 0, 0)
+# biomass_IO = UF.Collect_IndepVars_Loop('GrassCult', yield_value, 1, 0, 0, 0, 0, 0, 0)
+biomass_IO = UF.Collect_IndepVars_Loop('GrassCult', 0, 0, 0, 0, 0, 0, 0, 0)
 results_array = results_array.append(biomass_IO, ignore_index = True)
 conversion_IO = UF.Collect_IndepVars_Loop('GasFT', 0, 0, 1, biomass_IO, 'Woody Biomass', 1, 0, 0)
 results_array = results_array.append(conversion_IO, ignore_index = True)

@@ -297,7 +297,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     
     if downstream_indicator == 0 and geospatial_indicator == 0:
         # Then you are in the cultivation portion
-        # print('in cultivation')
+        print('in cultivation')
         k = 0 
         while k < len(quad_list):
             rows = quad_list[k]
@@ -316,6 +316,11 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
             if unit == 'ha':
                 size = D.TEA_LCA_Qty(D.substance_dict['Land Area'],
                                      amount, 'hectare')
+            if name == 'Nitrogen in Fertilizer':
+                # print('grabbed Nitrogen Amount')
+                # scale = D.TEA_LCA_Qty(D.substance_dict[name])
+                nitrogen_amnt = amount
+                # print(nitrogen_amnt)
             k += 1
             
         if len(output_name_list) == 0:
@@ -362,7 +367,12 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                     # print('alg', i, name)
                     main_substance_amount = scale.qty * size.qty
                     # print(main_substance_amount)
-                    
+                
+                if name == 'Nitrogen in Fertilizer':
+                    print('I grabbed the Nitrogen amount early')  # Think this only occurs in Corn Stover Cult.
+                    nitrogen_amnt = amount
+                    print(nitrogen_amnt)
+                
                 if (name != 'Corn Grain' and
                     name != 'Corn Stover' and
                     name != 'Soybeans' and
@@ -387,6 +397,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
                                             D.tl_output, scale.qty*size.qty)
             main_substance_amount = scale.qty * size.qty
             # print(main_substance_amount)
+                
             i += 1
     
 
@@ -412,6 +423,13 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
             # print('No Unit Read for index ', j)
             # I think this solves our little indexing issue
             pass
+        
+        if inout == 'In' and unit == 'kg N2O/kg N':
+            print('grabbing Nitrogen Value')
+            
+            scale = D.TEA_LCA_Qty(D.substance_dict[name], amount, 'kg/kg')
+            return_array.loc[i] = UF.getWriteRow(name, which_step, 
+                                  D.tl_input, scale.qty * nitrogen_amnt)
             
         if inout == 'In' and unit == 'dollars/yr':
             
