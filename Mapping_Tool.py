@@ -32,10 +32,10 @@ fullData = geoData.merge(mfsp_data, left_on=['id'], right_on=['id'])
 fig, ax = plt.subplots(1, 1, figsize=(16, 12))
 
 
-# scheme = mc.Quantiles(fullData['readme'], k=8)
+scheme = mc.Quantiles(fullData['readme'], k=8)
 
-scheme = mc.UserDefined(fullData['readme'], [0,3,4,5,6,7])
-# scheme = mc.UserDefined(fullData['readme'], [0,10,12,14,16,18,20])
+# scheme = mc.UserDefined(fullData['readme'], [38.091,38.25,38.5,38.75])
+# scheme = mc.UserDefined(fullData['readme'], [8,10,12,14,16,18,20])
 
 
 geoplot.choropleth(fullData,
@@ -52,8 +52,8 @@ geoplot.choropleth(fullData,
                    #                '0.40 - 0.50 $/kg',
                    #                '0.50 - 1.00 $/kg',
                    #                'NA - No Yield Data'],
-                    # legend_labels = ['No Yield Data',
-                    #                     '0.00 - 10.00 $ / GGE',
+                    # legend_labels = [   '0.00 - 8.00 $ / GGE',
+                    #                     '8.00 - 10.00 $ / GGE',
                     #                     '10.00 - 12.00 $ / GGE',
                     #                     '12.00 - 14.00 $ / GGE',
                     #                     '14.00 - 16.00 $ / GGE',
@@ -69,5 +69,5 @@ geoplot.choropleth(fullData,
 
                    ax = ax)
 
-ax.set_title('Soy Jet Std Dev ($/GGE)', fontsize=15);
+ax.set_title('Corn Ethanol ($/GGE)', fontsize=15);
 # ax.set_title('Corn EtOH GHG - Energy Allocation - Post-Combustion', fontsize=15);

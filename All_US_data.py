@@ -23,6 +23,24 @@ def doit(obj):
     fip = obj[1]
     toc = time.perf_counter()
     
+    mod_list = []
+    
+    pdf = np.random.lognormal(0,0.333333,10000)
+    for i in range(len(pdf)):
+        mod_list.append(1 - pdf[i])
+    
+    for i in range(len(mod_list)):
+        mod_list[i] += 2
+    
+    for i in range(len(mod_list)):
+        if mod_list[i] <= 0.1:
+            mod_list[i] = 0.1
+    
+    for i in range(len(mod_list)):
+        mod_list[i] = mod_list[i] / 2.2
+    
+    
+    
     # cwd = os.getcwd()
     
     # path_list = [Path(cwd + '/readme_yields.xlsx')] # Presumably will all be in this file
@@ -48,9 +66,16 @@ def doit(obj):
     
     ol = ['Arable Land Value ($/ha)', 'Grid Electricity Price ($/MJ)', 'Grid Electricity GHG (g/MJ)']
     
-    prod = ['Jet-A']
-    coprods = ['LPG, Produced', 'Diesel, Produced', 
-                'Gasoline, Produced']
+    
+    prod = ['Ethanol']
+    coprods = ['DDGS','Corn Stover']
+    
+    # prod = ['Biodiesel, Produced']
+    # coprods = ['Soybean Meal','Glycerin']
+    
+    # prod = ['Jet-A']
+    # coprods = ['LPG, Produced', 'Diesel, Produced', 
+    #             'Gasoline, Produced']
     
     # BD_return_list = []
     # LC_BD_return = []
@@ -63,27 +88,32 @@ def doit(obj):
     BD_results_array = UF.createEmptyFrame()    
     
     yield_value = soy_yield * 1000
+    # yield_value = 3017.1329604
     # print('------',yield_value,'------')
     # print(fip)
     # for k in range(10):
             
     if yield_value != 0:
         
-        # modifier = np.random.choice(pdf)
+        modifier = np.random.choice(mod_list)
         
-        # yield_value = yield_value * modifier
+        yield_value = yield_value * modifier
         # print(yield_value)
         BD_results_array = UF.createEmptyFrame()
         
-        biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', yield_value, 1, 0, 0, 0, 0, 0, fip)
+        # biomass_IO = UF.Collect_IndepVars_Loop('SoyCult', yield_value, 1, 0, 0, 0, 0, 0, fip)
+        biomass_IO = UF.Collect_IndepVars_Loop('CornCult', yield_value, 1, 0, 0, 0, 0, 0, fip)
         BD_results_array = BD_results_array.append(biomass_IO, ignore_index=True)
-        conversion_IO = UF.Collect_IndepVars_Loop('HexExtSoy', 0, 1, 1, biomass_IO,'Soybeans', 1, 0, fip)
+        # conversion_IO = UF.Collect_IndepVars_Loop('HexExtSoy', 0, 1, 1, biomass_IO,'Soybeans', 1, 0, fip)
+        conversion_IO = UF.Collect_IndepVars_Loop('StarchFerm', 0, 1, 1, biomass_IO,'Corn Grain', 1, 0, fip)
         BD_results_array = BD_results_array.append(conversion_IO, ignore_index=True)
-        upgrading_IO = UF.Collect_IndepVars_Loop('HydroProcOil', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, fip)
-        BD_results_array = BD_results_array.append(upgrading_IO, ignore_index=True)
+        # upgrading_IO = UF.Collect_IndepVars_Loop('Transest', 0, 1, 1, conversion_IO, 'Soybean Oil', 2, 0, fip)
+        # upgrading_IO = UF.Collect_IndepVars_Loop('HydroProcOil', 0, 1, 1, conversion_IO,'Soybean Oil', 2, 0, fip)
+        # BD_results_array = BD_results_array.append(upgrading_IO, ignore_index=True)
         IO_array = UF.consolidateIO(BD_results_array)
         
-        MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Jet', fip, ol)
+        MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Corn Grain EtOH', fip, ol)
+        # MFSP = TEA.calc_MFSP(IO_array, prod, coprods, 'Soy Biodiesel', fip, ol)
         LCA = LifeCycleAssessment.LCAMetrics(IO_array, ol, fip)
         LCA = LCA[1]
         
