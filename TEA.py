@@ -737,7 +737,7 @@ def quick_MFSP(tl_array, prod, coprods, path_string, fip, override_list):
     fuel_prod_gge = fuel_prod_mj/132.61 # MJ per gas gallon equivalent
     
     total_costs = amortized_capex.magnitude + labor + opex + insurance.magnitude + maintenance.magnitude
-    
+    # Notice that you are not discounting the costs. Need to do that...
     rev_minus_costs = coprod_rev - total_costs
     
     mfsp_non_discounted = rev_minus_costs/-(fuel_prod_gge)

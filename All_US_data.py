@@ -65,6 +65,7 @@ def doit(obj):
     # ol = ['']
     
     ol = ['Arable Land Value ($/ha)', 'Grid Electricity Price ($/MJ)', 'Grid Electricity GHG (g/MJ)']
+    # ol = ['Grid Electricity Price ($/MJ)', 'Grid Electricity GHG (g/MJ)']
     
     
     prod = ['Ethanol']

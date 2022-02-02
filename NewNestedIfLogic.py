@@ -77,6 +77,13 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     skip_ind = 0
     overwrite_scale = 0
     
+    
+    # Pdf instantiation for Monte Carlo Executions 
+    
+    pdf_norm_015 = np.random.normal(1,0.15,1000)
+    pdf_norm_021 = np.random.normal(1,0.21 ,1000)
+    
+    
     # Grab Independent Variables logic
     
     quad_list = UF.collectIndepVars(tab_string)
@@ -297,7 +304,7 @@ def newNestedIfLogic(tab_string, yield_value, geospatial_indicator,
     
     if downstream_indicator == 0 and geospatial_indicator == 0:
         # Then you are in the cultivation portion
-        print('in cultivation')
+        # print('in cultivation')
         k = 0 
         while k < len(quad_list):
             rows = quad_list[k]

@@ -29,6 +29,7 @@ if __name__ == '__main__':
     excel_read = pd.read_excel(path_list[0])
     
     corn_yields = []
+    soy_yields = []
     fips_list = []
     input_obj = []
         
@@ -39,8 +40,10 @@ if __name__ == '__main__':
         fips_list.append(rows['FIPS'])
     
     for i in range(len(corn_yields)):
-        for j in range(100):
+        for j in range(20):            # This is the monte carlo amount. 
             input_obj.append([corn_yields[i],fips_list[i]])
+    # for i in range(10000):
+    #     input_obj.append([10.974,51125])
     # input_obj = [0,1,2,3,4,5]
     # print(input_obj)
     
